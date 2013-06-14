@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{% block title %}TODO: TITLE{% endblock %}</title>
+    {% block htmlhead %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    {% endblock %}
+  </head>
+<body>
+<header>
+  <h1>{{ display_title }}</h1>
+  <nav>
+    {% block nav %} TODO: NAV {% endblock %}
+  </nav>
+</header>
+
+{% block body %}
+{% endblock %}
+
+<ul id="flashed_notices">
+{% for msg in get_flashed_messages() %}
+  <li>{{ msg }}</li>
+{% endfor %}
+</ul>
+<footer>
+</footer>
+{% block end_of_page_javascript %}
+  <!-- jquery, ga, whatever goes here. -->
+<script type="text/javascript" src="{{ url_for('static',filename='main.js') }}"></script>
+{% endblock %}
+</body>
+</html>
