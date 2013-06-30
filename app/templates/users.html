@@ -1,0 +1,26 @@
+{% extends "index.html" %}
+{% block title %} Userlist {% endblock %}
+
+{% block body %}
+<table>
+<thead>
+<tr>
+<td>Login Name</td>
+<td>Display Name</td>
+<td>Email</td>
+<td>Other Flags</td>
+</tr>
+</thead>
+<tbody>
+{% for user in users %}
+    <tr>
+    <td>{{ user.loginname }}</td>
+    <td>{{ user.displayname }}</td>
+    <td>{{ user.emailaddress }}</td>
+    <td>{% if user.is_admin %}ADMIN {% endif %}
+        {% if user.is_locked_out %} Locked Out! {% endif %}</td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

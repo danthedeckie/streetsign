@@ -10,19 +10,37 @@
 <header>
   <h1>{{ display_title }}</h1>
   <nav>
-    {% block nav %} TODO: NAV {% endblock %}
+    {% block nav %}
+    <ul>
+        {% macro navitem(view, text) -%}
+            <li><a href="{{ url_for(view) }}">{{text}}</a></li>
+        {%- endmacro %}
+
+        {{ navitem('userlist',  'User list') }}
+        {{ navitem('grouplist', 'Group list') }}
+        {{ navitem('feedlist',  'Feed list') }}
+        {{ navitem('postlist',  'Post list') }}
+    </ul>
+    {% endblock %}
   </nav>
 </header>
-
-{% block body %}
-{% endblock %}
-
+<article>
+{% block body %}{% endblock %}
+</article>
 <ul id="flashed_notices">
 {% for msg in get_flashed_messages() %}
   <li>{{ msg }}</li>
 {% endfor %}
 </ul>
 <footer>
+<div class="footerbox">
+<h2>Log in</h2>
+<form action="{{ url_for('login') }}">
+    <input name="username" placeholder="Your user name..." /><br />
+    <input name="password" type="password" placeholder="password" /><br />
+    <input type="submit" value="Log in" />
+</form>
+</div>
 </footer>
 {% block end_of_page_javascript %}
   <!-- jquery, ga, whatever goes here. -->

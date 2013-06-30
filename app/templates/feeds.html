@@ -1,0 +1,21 @@
+{% extends "index.html" %}
+{% block title %} Feed Lists {% endblock %}
+
+{% block body %}
+<table>
+<thead>
+  <tr>
+    <td>Feed Name</td>
+    <td>Other Flags</td>
+  </tr>
+</thead>
+<tbody>
+{% for feed in feeds %}
+    <tr>
+        <td>{{ feed.name }}</td>
+        <td></td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

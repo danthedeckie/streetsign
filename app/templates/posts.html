@@ -1,0 +1,37 @@
+{% extends "index.html" %}
+{% block title %} Post List {% endblock %}
+
+{% block body %}
+<table>
+<thead>
+<tr>
+<td>Author</td>
+<td>Publisher</td>
+<td>Other Flags</td>
+<td>Type</td>
+<td>Content</td>
+</tr>
+</thead>
+<tbody>
+{% for post in posts %}
+    <tr>
+    <td>{% if post.author %}
+            {{ post.author }} on {{ post.write_date }}
+        {% else %}
+            No Author!
+        {% endif %}
+    </td>
+    <td>{% if post.publisher %}
+            {{ post.publisher }} on {{ post.publish_date }}
+        {% else %}
+            Not Published!
+        {% endif %}
+    </td>
+    <td>{% if post.active %}Active{% endif %}</td>
+    <td>{{ post.type }}</td>
+    <td>{{ post.content }}</td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

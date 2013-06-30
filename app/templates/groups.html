@@ -1,0 +1,22 @@
+{% extends "index.html" %}
+{% block title %} User Group list {% endblock %}
+
+{% block body %}
+<table>
+<thead>
+<tr>
+<td>Group Name</td>
+<td>Other Flags</td>
+<td>Members</td>
+</tr>
+</thead>
+<tbody>
+{% for group in groups %}
+    <tr>
+        <td>{{ group.name }}</td>
+        <td>{% if not group.display %} HIDDEN {% endif %} </td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}
