@@ -36,11 +36,6 @@
 {% endfor %}
 </tbody>
 </table>
+<a href="{{ url_for('post_new') }}">New Post</a>
 
-<h2>New Post</h2>
-<form action="{{url_for('postlist') }}" method="POST">
-  <select name="posttype" class="post_type_selector">
-
-</select>
-</form>
 {% endblock %}

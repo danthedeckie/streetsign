@@ -19,16 +19,19 @@ def make():
     ############################
     # default post types:
 
-    app.models.PostType(name='text',
+    app.models.PostType(name='Text',
+                        module_name='text',
                         description='Simple Plain Text. No Formatting.',
                         handler='plaintext').save()
 
 
-    app.models.PostType(name='html',
+    app.models.PostType(name='HTML',
+                        module_name='html',
                         description='Formattable text, with styles, etc.',
                         handler='html').save()
 
-    app.models.PostType(name='image',
+    app.models.PostType(name='Image',
+                        module_name='image',
                         description='Single simple image.',
                         handler='image').save()
 

@@ -1,4 +1,5 @@
 from peewee import *
+from importlib import import_module
 import sqlite3 # for catching an integrity error
 from passlib.hash import bcrypt # for passwords
 from uuid import uuid4 # for unique session ids
@@ -10,7 +11,8 @@ SECRET_KEY = app.config.get('SECRET_KEY')
 DB = SqliteDatabase(app.config.get('DATABASE_FILE'))
 
 __all__ = [ 'DB', 'User', 'user_login', 'user_logout', 'get_logged_in_user',
-            'Group', 'Post', 'PostType', 'Feed', 'FeedPermission', 'create_db' ]
+            'Group', 'Post', 'PostType', 'Feed', 'FeedPermission', 'create_db',
+            'post_type_module']
 
 class DBModel(Model):
     class Meta:
@@ -98,8 +100,16 @@ class UserGroup(DBModel):
 
 class PostType(DBModel):
     name = CharField(default='Post Data Type...')
+    module_name = CharField()
     description = TextField(default='Type of data for posts.')
     handler = CharField(default='text')
+
+def post_type_module(typeid):
+    return( import_module( 'app.post_types.' + \
+            PostType.select() \
+                    .where(PostType.id==typeid) \
+                    .get() \
+                    .module_name))
 
 
 class Post(DBModel):

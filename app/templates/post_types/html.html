@@ -1,0 +1,7 @@
+{% extends "post_editor.html" %}
+{% block title %}HTML Post{% endblock %}
+{% block form_body %}
+  <label>Contents: (rich text/HTML)<br/>
+  <input type="hidden" name="post_type" value="{{ post_type }}">
+  <textarea name="content" rows="10" cols="80" style="width: 100%;"></textarea></label>
+{% endblock %}

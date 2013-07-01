@@ -54,8 +54,8 @@
 </footer>
 {% block end_of_page_javascript %}
   <!-- jquery, ga, whatever goes here. -->
-<script type="text/javascript" src="{{ url_for('static',filename='jquery.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static',filename='main.js') }}"></script>
+  {{ linkmacros.static_js('jquery.js') }}
+  {{ linkmacros.static_js('main.js') }}
 {% endblock %}
 </body>
 </html>

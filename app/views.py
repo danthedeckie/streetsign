@@ -1,8 +1,9 @@
 from flask import render_template, url_for, request, session, redirect, \
                   flash, jsonify
 import app.user_session as user_session
+from importlib import import_module
 from app import app
-from app.models import User, Group, Feed, Post, PostType
+from app.models import User, Group, Feed, Post, PostType, post_type_module
 
 ######################################################################
 # Basic App stuff:
@@ -103,6 +104,21 @@ def feedpage(feedid):
 @app.route('/posts')
 def postlist():
     return render_template('posts.html', posts=Post.select())
+
+@app.route('/posts/new', methods=['GET','POST'])
+def post_new():
+    if request.method == 'GET':
+        return render_template('postnew.html',
+                post_types=PostType.select().dicts())
+    else: # POST. new post!
+        editor = post_type_module(request.form.get('post_type'))
+        return jsonify(editor.receive(request.form))
+       
+
+@app.route('/posts/edittype/<int:typeid>')
+def postedit_type(typeid):
+    editor = post_type_module(typeid)
+    return editor.form(request.form, typeid)
 
 ########################################################################
 # Bits and pieces of generated javascript & json 'clobber'

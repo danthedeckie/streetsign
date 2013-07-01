@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>
+</head>
+<body>
+{% block body %}
+  <form action="{{ form_action }}" method="POST">
+    {% block form_body %}
+    {% endblock %}
+    <input type="submit" value="Post!" />
+  </form>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
+</body>
+</html>

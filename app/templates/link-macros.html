@@ -6,4 +6,6 @@
 <a href="{{ url_for('feedpage', feedid=a.id) }}">{{a.name}}</a>
 {%- endmacro %}
 
-
+{% macro static_js(name) -%}
+<script type="text/javascript" src="{{ url_for('static', filename=name) }}"></script>
+{%- endmacro %}
