@@ -1,13 +1,5 @@
-# Flask Bootstrap
-An incredibly simple flask 'initial application' which has basic stuff set up
-so it's ready to go.
-
-## Including:
-
-- setup.sh (run this, and sets up everything). Can be run as often as you wish.
-- autogenerates a basic SECRET KEY in the config.
-- virtualenv 1.9.1 (in it's own .virtualenv folder, out of the way)
-- pylint pre-commit hook (from Sebastian Dahlgren)
+# Concertino
+A digital signage system, inspired by Concerto, however written in Flask/Peewee/Python.
 
 ## Usage:
 
@@ -24,8 +16,6 @@ To run the app with the flask autoreloading magic use
 for production deployment, look at the flask documentation.
 
 ## More info:
-
-A lot of the ideas here were inspired by the [Flask Mega Tutorial by Miguel Grinberg.](http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world).
 
 The virtual env is kept in .virtualenv, and usually shouldn't need to be touched.  I don't like the entering and exiting a virtualenv business, so went with the 'virtualenv stuff happens transparently when you use run.py, you shouldn't have to care about it'.  If you want to run python for the virtualenv, use .virtualenv/bin/python
 

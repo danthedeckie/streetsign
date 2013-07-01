@@ -4,4 +4,4 @@
 *.pyo
 *.swp
 config.py
-
+database.db
