@@ -5,33 +5,42 @@
 <table>
 <thead>
 <tr>
-<td>Author</td>
-<td>Publisher</td>
-<td>Other Flags</td>
 <td>Type</td>
 <td>Content</td>
+<td>Author</td>
+<td>on Feeds</td>
+<td>Other Flags</td>
 </tr>
 </thead>
 <tbody>
 {% for post in posts %}
     <tr>
+    <td>{{ post.type.name }}</td>
+    <td>{{ post.content|truncate(40,True) }}</td>
     <td>{% if post.author %}
-            {{ post.author }} on {{ post.write_date }}
+            {{linkmacros.user(post.author)}} (on {{ post.write_date }})
         {% else %}
             No Author!
         {% endif %}
     </td>
-    <td>{% if post.publisher %}
-            {{ post.publisher }} on {{ post.publish_date }}
+    <td>{% if post.feedsxref.get() %}
+            {%- for feedx in post.feedsxref -%}
+                   {{ linkmacros.feed(feedx.feed) }}
+            {%- endfor -%}
         {% else %}
             Not Published!
         {% endif %}
     </td>
     <td>{% if post.active %}Active{% endif %}</td>
-    <td>{{ post.type }}</td>
-    <td>{{ post.content }}</td>
     </tr>
 {% endfor %}
 </tbody>
 </table>
+
+<h2>New Post</h2>
+<form action="{{url_for('postlist') }}" method="POST">
+  <select name="posttype" class="post_type_selector">
+
+</select>
+</form>
 {% endblock %}

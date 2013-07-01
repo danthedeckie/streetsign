@@ -1,0 +1,29 @@
+{% extends "index.html" %}
+{% block title %} Feed: {{ feed.name }} {% endblock %}
+
+{% block body %}
+<h1>Feed: {{ feed.name }} </h1>
+<h2>Posts:</h2>
+<table>
+<thead>
+  <tr>
+    <td>Post</td>
+    <td>Author</td>
+    <td>Date</td>
+    <td>Other Flags</td>
+  </tr>
+</thead>
+<tbody>
+{% for postx in feed.postsxref %}
+    <tr>
+        <td>{{ postx.post.content|truncate(40,True) }}</td>
+        <td>{{ linkmacros.user(postx.post.author) }}</td>
+        <td><form method="POST" action="" >
+            <input type="hidden" name="action" value="delete" />
+            <input type="submit" value="X"></form></td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+<h2>User Permissions for this feed.</h2>
+{% endblock %}

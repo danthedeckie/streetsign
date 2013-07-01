@@ -1,6 +1,8 @@
-from flask import render_template, url_for, request, session, redirect, flash
+from flask import render_template, url_for, request, session, redirect, \
+                  flash, jsonify
+import app.user_session as user_session
 from app import app
-from app.models import User, Group, Feed, Post, user_login
+from app.models import User, Group, Feed, Post, PostType
 
 ######################################################################
 # Basic App stuff:
@@ -19,9 +21,7 @@ def login():
 
     return_to = request.form.get('from','index')
     try:
-        user = user_login(request.form['username'], request.form['password'])
-        session['username'] = request.form['username']
-        session['logged_in'] = True
+        user_session.login(request.form['username'], request.form['password'])
     except:
         flash('Invalid username or password! Sorry!')
 
@@ -30,8 +30,14 @@ def login():
 @app.route('/logout', methods=['POST'])
 def logout():
     return_to = request.form.get('from','index')
-    session.pop('username', None)
-    session.pop('logged_in', None)
+
+    # delete the session from the database:
+    try:
+        user_session.logout()
+    except:
+        flash('error logging out. That is odd')
+
+    # return to where we were.
     return redirect(url_for(return_to))
 
 ##################################################################
@@ -41,6 +47,10 @@ def logout():
 def userlist():
     return render_template('users.html', users=User.select())
 
+@app.route('/users/<int:userid>')
+def userpage(userid):
+    return render_template('userpage.html', user=User.select(id=userid))
+
 @app.route('/groups')
 def grouplist():
     return render_template('groups.html', groups=Group.select())
@@ -49,10 +59,54 @@ def grouplist():
 ####################################################################
 # Feeds & Posts:
 
-@app.route('/feeds')
+@app.route('/feeds', methods=['GET','POST'])
 def feedlist():
+    if request.method == 'POST':
+        if not user_session.is_admin():
+            flash('Only Admins can do this!')
+            return redirect(url_for('feedlist'))
+
+        action = request.form.get('action','create')
+
+        if action == 'create':
+            if not request.form.get('title','').strip():
+                flash("I'm not making you an un-named feed!")
+                return redirect(url_for('feedlist'))
+            Feed(name=request.form.get('title','blank').strip()).save()
+
     return render_template('feeds.html', feeds=Feed.select())
+
+@app.route('/feeds/<int:feedid>', methods=['GET','POST','DELETE'])
+def feedpage(feedid):
+    try:
+        feed = Feed.get(id=feedid).get()
+    except:
+        flash('invalid feed id! (' + feedid + ')')
+        return redirect(url_for('feedlist'))
+
+    if request.method == 'GET':
+        return render_template('feed.html', feed=feed)
+    elif request.method == 'POST':
+        action = request.form.get('action','none')
+
+        if action == 'rename':
+            feed.name = request.form.get('title', feed.name).strip()
+            feed.save()
+        elif action == 'delete':
+            feed.delete_instance()
+
+        return render_template('feeds.html', feeds=Feed.select())
+    elif request.method == 'DELETE':
+        # TODO;
+        pass
 
 @app.route('/posts')
 def postlist():
     return render_template('posts.html', posts=Post.select())
+
+########################################################################
+# Bits and pieces of generated javascript & json 'clobber'
+
+@app.route('/js/post_types.json')
+def post_types_json():
+    return jsonify(types=[x for x in PostType.select().dicts()])

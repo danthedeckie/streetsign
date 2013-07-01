@@ -13,7 +13,7 @@ app.config.from_object('config')
 
 from app import models
 from app import views
-from app.models import db, User, Group, Post, Feed, FeedPermission
+from app.models import DB, User, Group, Post, Feed, FeedPermission
 
 #auth = Auth(app, db)
 #admin = Admin(app, auth)

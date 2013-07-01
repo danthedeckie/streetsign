@@ -12,10 +12,17 @@
 <tbody>
 {% for feed in feeds %}
     <tr>
-        <td>{{ feed.name }}</td>
-        <td></td>
+        <td><a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a></td>
+        <td><form method="POST" action="{{ url_for('feedpage', feedid=feed.id) }}">
+            <input type="hidden" name="action" value="delete" />
+            <input type="submit" value="X"></form></td>
     </tr>
 {% endfor %}
 </tbody>
 </table>
+<form action="{{ url_for('feedlist') }}" method="POST">
+<h2> New Feed </h2>
+<label>Title:<input name="title" placeholder="new feed name..."/></label>
+<input type="submit" value="Create!" />
+</form>
 {% endblock %}

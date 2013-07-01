@@ -1,3 +1,4 @@
+{%- import "link-macros.html" as linkmacros -%}
 <!doctype html>
 <html>
   <head>
@@ -53,6 +54,7 @@
 </footer>
 {% block end_of_page_javascript %}
   <!-- jquery, ga, whatever goes here. -->
+<script type="text/javascript" src="{{ url_for('static',filename='jquery.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static',filename='main.js') }}"></script>
 {% endblock %}
 </body>

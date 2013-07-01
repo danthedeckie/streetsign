@@ -1,6 +1,7 @@
 from peewee import *
-import sqlite3
+import sqlite3 # for catching an integrity error
 from passlib.hash import bcrypt # for passwords
+from uuid import uuid4 # for unique session ids
 from datetime import datetime
 from app import app
 
@@ -8,9 +9,8 @@ SECRET_KEY = app.config.get('SECRET_KEY')
 
 DB = SqliteDatabase(app.config.get('DATABASE_FILE'))
 
-__all__ = [ 'DB', 'User', 'user_login', 'Group',
-            'Post', 'Feed', 'FeedPermission',
-            'create_db' ]
+__all__ = [ 'DB', 'User', 'user_login', 'user_logout', 'get_logged_in_user',
+            'Group', 'Post', 'PostType', 'Feed', 'FeedPermission', 'create_db' ]
 
 class DBModel(Model):
     class Meta:
@@ -31,11 +31,22 @@ class User(DBModel):
     is_admin = BooleanField(default=False)
     is_locked_out = BooleanField(default=False)
 
-    last_login_attempt = DateTimeField(datetime.now)
+    last_login_attempt = DateTimeField(default=datetime.now)
     failed_logins = IntegerField(default=0)
 
     def set_password(self, password):
         self.passwordhash = bcrypt.encrypt(password + SECRET_KEY)
+
+##########
+# login stuff:
+
+class UserSession(DBModel):
+    id = CharField(primary_key=True)
+    username = CharField()
+
+    user = ForeignKeyField(User)
+    login_time = DateTimeField(default=datetime.now)
+
 
 class InvalidPassword(Exception):
     def __init__(self, value):
@@ -51,9 +62,22 @@ def user_login(name, password):
     # on error, raises: User.DoesNotExist
 
     if bcrypt.verify(password + SECRET_KEY, user.passwordhash):
-        return user
+        session = UserSession(id=str(uuid4()), username=user.loginname, user=user)
+        session.save(force_insert=True)
+
+        return user, session.id
     else:
         raise InvalidPassword('Invalid Password!')
+
+def get_logged_in_user(name, uuid):
+    ''' either returns a logged in user, or raises an error '''
+    session = UserSession.get(id=uuid, username=name)
+    return session.user
+    
+def user_logout(name, uuid):
+    ''' removes a session '''
+    UserSession.get(id=uuid, username=name).delete_instance()
+    return True
 
 class Group(DBModel):
     name = CharField()
@@ -64,19 +88,26 @@ class UserGroup(DBModel):
     user = ForeignKeyField(User)
     group = ForeignKeyField(Group)
 
+
+
+
 #############################################################################
 #
 # Posts & Feeds:
 #
 
+class PostType(DBModel):
+    name = CharField(default='Post Data Type...')
+    description = TextField(default='Type of data for posts.')
+    handler = CharField(default='text')
 
 
 class Post(DBModel):
+    type = ForeignKeyField(PostType)
+    content = TextField()
     author = ForeignKeyField(User)
-    publisher = ForeignKeyField(User, null=True)
 
-    write_date = DateTimeField(datetime.now)
-    publish_date = DateTimeField(null=True)
+    write_date = DateTimeField(default=datetime.now)
 
     # Should it actually be displayed?
     active = BooleanField(default=True)
@@ -163,12 +194,18 @@ class FeedPermission(DBModel):
     write = BooleanField(default=False)
     publish = BooleanField(default=False)
 
+class FeedPost(DBModel):
+    feed = ForeignKeyField(Feed, related_name='postsxref')
+    post = ForeignKeyField(Post, related_name='feedsxref')
 
+    published = BooleanField(default=False)
+    publish_date = DateTimeField(null=True)
+    publisher = ForeignKeyField(User, null=True)
 
 ##############################################################################
 
 def create_all():
     ''' initialises the database, creates all needed tables. '''
     [t.create_table(True) for t in
-        (User, Group, Post, Feed, FeedPermission)]
+        (User, UserSession, Group, Post, Feed, FeedPost, PostType, FeedPermission)]
 
