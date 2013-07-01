@@ -1,2 +1,2 @@
 CSRF_ENABLED = True
-SECRET_KEY = 'TODO!!!'
+DATABASE_FILE = 'database.db'

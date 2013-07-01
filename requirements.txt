@@ -1,2 +1,8 @@
 flask
 pylint
+peewee
+flask-peewee
+
+# for passwords:
+py-bcrypt
+passlib

@@ -1,6 +1,9 @@
+/**********************************************************************/
+/* Generic bits and pieces */
+
 body {
     font-family: Sans-Serif;
-    background-color: #eee;
+    background-color: #9a9;
 }
 h1, h2 {
     text-align: center;
@@ -18,4 +21,76 @@ a:hover {
 }
 a:active {
     color: red;
+}
+
+table {
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    margin: auto;
+}
+tr {
+    background: #eee;
+    color: black;
+}
+tbody > tr:nth-child(odd) {
+    background: #ddd;
+}
+
+td {
+    padding: 2px;
+}
+
+thead > tr {
+    background: #333;
+    color: #eee;
+    font-width: 400;
+}
+/*************************************************************************/
+/* Specific Areas (main stuff, common to all pages.) */
+header {
+    width: 90%;
+    margin: auto;
+    background: #234;
+    padding: 10px;
+    color: #eff;
+    text-align: center;
+    border-radius: 10px 10px 0 0;
+    border: 1px solid #123;
+}
+header a {
+    color: white;
+}
+header > nav > ul {
+    display: block;
+}
+header > nav > ul > li {
+    display: inline;
+    background: rgba(255,255,255,0.1);
+    padding: 0.3em;
+    margin: 0px;
+}
+header > nav > ul > li:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+header > nav > ul > li:first-of-type {
+    border-radius: 10px 0 0 10px;
+}
+header > nav > ul > li:last-of-type {
+    border-radius: 0 10px 10px 0;
+}
+
+article {
+    background: #eee;
+    margin: auto;
+    width: 90%;
+    padding: 10px;
+    border: 1px solid #ddd;
+
+}
+
+div.footerbox {
+    width: 25%;
+    border: 1px solid #123;
+    padding: 1em;
 }

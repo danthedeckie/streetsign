@@ -34,12 +34,21 @@
 </ul>
 <footer>
 <div class="footerbox">
-<h2>Log in</h2>
-<form action="{{ url_for('login') }}">
-    <input name="username" placeholder="Your user name..." /><br />
-    <input name="password" type="password" placeholder="password" /><br />
-    <input type="submit" value="Log in" />
-</form>
+{% if session.logged_in %}
+    Logged in as {{ session.username }}.
+    <form action="{{ url_for('logout') }}" method="POST">
+        <input type="hidden" name="from" value="{{ request.endpoint }}" />
+        <input type="submit" value="Log out">
+    </form>
+{% else %}
+    <h2>Log in</h2>
+    <form action="{{ url_for('login') }}" method="POST">
+        <input name="username" placeholder="Your user name..." /><br />
+        <input name="password" type="password" placeholder="password" /><br />
+        <input type="hidden" name="from" value="{{ request.endpoint }}" />
+        <input type="submit" value="Log in" />
+    </form>
+{% endif %}
 </div>
 </footer>
 {% block end_of_page_javascript %}

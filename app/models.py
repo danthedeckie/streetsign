@@ -4,19 +4,17 @@ from passlib.hash import bcrypt # for passwords
 from datetime import datetime
 from app import app
 
-SECRET_KEY=app.config.get('SECRET_KEY')
+SECRET_KEY = app.config.get('SECRET_KEY')
 
-db = SqliteDatabase(app.config.get('DATABASE_FILE'))
+DB = SqliteDatabase(app.config.get('DATABASE_FILE'))
 
-__all__ = [ 'db', 'User', 'user_login', 'Group',
+__all__ = [ 'DB', 'User', 'user_login', 'Group',
             'Post', 'Feed', 'FeedPermission',
             'create_db' ]
 
-
-
 class DBModel(Model):
     class Meta:
-        database = db
+        database = DB 
 
 ##############################################################################
 #
@@ -39,19 +37,23 @@ class User(DBModel):
     def set_password(self, password):
         self.passwordhash = bcrypt.encrypt(password + SECRET_KEY)
 
+class InvalidPassword(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
 
 def user_login(name, password):
     ''' preferred way to get a user object, which checks the password,
-        and either returns a User object, or False '''
-    try:
-        user = User.select().where(User.name == name).get()
-    except User.DoesNotExist as e:
-        return False
+        and either returns a User object, or raises an exception '''
 
-    if user.passwordhash == bcrypt.encrypt(password + SECRET_KEY):
+    user = User.select().where(User.loginname == name).get()
+    # on error, raises: User.DoesNotExist
+
+    if bcrypt.verify(password + SECRET_KEY, user.passwordhash):
         return user
     else:
-        return False
+        raise InvalidPassword('Invalid Password!')
 
 class Group(DBModel):
     name = CharField()
@@ -116,9 +118,10 @@ class Feed(DBModel):
             return True
 
         # check for group-level read permission:
-        if (self.permissions.join(Group).join(UserGroup).
-                                       where(UserGroup.user == user,
-                                            Permissions.write == True).exists()):
+        if (self.permissions.join(Group)
+                            .join(UserGroup)
+                            .where(UserGroup.user == user,
+                                   Permissions.write == True).exists()):
             return True
 
         # oh well! no permission!
