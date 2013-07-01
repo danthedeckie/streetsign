@@ -7,7 +7,17 @@
   <form action="{{ form_action }}" method="POST">
     {% block form_body %}
     {% endblock %}
-    <input type="submit" value="Post!" />
+
+    {% if not feedlist %}
+        You do NOT have permission to write to any feeds! Sorry!
+    {% else %}
+        <label>Feeds to post to:<select multiple name="post_feeds">
+        {% for feed in feedlist %}
+            <option value="{{ feed.id }}">{{ feed.name }}</option>
+        {% endfor %}
+        </select></label>
+        <input style="float:right" type="submit" value="Post!" />
+    {% endif %}
   </form>
 {% endblock %}
 

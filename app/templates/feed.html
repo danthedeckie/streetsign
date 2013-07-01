@@ -25,5 +25,24 @@
 {% endfor %}
 </tbody>
 </table>
-<h2>User Permissions for this feed.</h2>
+<div class="autowidth">
+<h2>Permissions for this feed.</h2>
+<div class="free_blocks">
+    <h3>Writers:</h3>
+    <select multiple name="authors">
+    {% for user in allusers %}
+        <option {{ 'selected' if feed.user_can_write(user) }} value="{{user.id}}" class="{{'admin' if user.is_admin }}">{{ '*' if user.is_admin }}{{user.displayname}}</option>
+    {% endfor %}
+    </select>
+</div>
+<div class="free_blocks">
+    <h3>Publishers:</h3>
+    <select multiple name="publishers">
+    {% for user in allusers %}
+        <option {{ 'selected' if not feed.user_can_publish(user) }} value="{{user.id}}" class="{{'admin' if user.is_admin }}">{{ '*' if user.is_admin }}{{user.displayname}}</option>
+    {% endfor %}
+    </select>
+</div>
+<div class="cf"></div>
+</div>
 {% endblock %}

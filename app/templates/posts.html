@@ -23,7 +23,7 @@
             No Author!
         {% endif %}
     </td>
-    <td>{% if post.feedsxref.get() %}
+    <td>{% if post.feedsxref.exists() %}
             {%- for feedx in post.feedsxref -%}
                    {{ linkmacros.feed(feedx.feed) }}
             {%- endfor -%}

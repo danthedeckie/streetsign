@@ -79,7 +79,13 @@ header > nav > ul > li:first-of-type {
 header > nav > ul > li:last-of-type {
     border-radius: 0 10px 10px 0;
 }
-
+option.admin {
+    font-weight: bold;
+    color: #224;
+}
+option:checked {
+    background: #222;
+}
 article {
     background: #eee;
     margin: auto;
@@ -93,4 +99,24 @@ div.footerbox {
     width: 25%;
     border: 1px solid #123;
     padding: 1em;
+}
+
+div.free_blocks {
+    display: block;
+    padding: 1em;
+    float: left;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin: 0.3em;
+}
+.cf {
+    clear:both;
+    }
+.autowidth {
+    border: 2px solid #ddd;
+    border-radius: 15px;
+    display: block;
+    margin: auto;
+    width: auto;
+    margin-top: 10px;
 }

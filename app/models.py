@@ -133,15 +133,15 @@ class Feed(DBModel):
             return False
 
         # check for user-level read permission:
-        if self.permissions.where((Permissions.user == User)
-                                 &((Permissions.read == True))).exists():
+        if self.permissions.where((FeedPermission.user == User)
+                                 &((FeedPermission.read == True))).exists():
             return True
 
         # check for group-level read permission:
         if (self.permissions.join(Group)
                             .join(UserGroup)
                             .where((UserGroup.user == user)
-                                  &(Permissions.read == True)).exists()):
+                                  &(FeedPermission.read == True)).exists()):
             return True
 
         # oh well! no permission!
@@ -155,18 +155,42 @@ class Feed(DBModel):
             return False
 
         # check for user-level read permission:
-        if self.permissions.where(user==User, write==True).exists():
+        if self.permissions.where(FeedPermission.user==user,
+                                  FeedPermission.write==True).exists():
             return True
 
         # check for group-level read permission:
         if (self.permissions.join(Group)
                             .join(UserGroup)
                             .where(UserGroup.user == user,
-                                   Permissions.write == True).exists()):
+                                   FeedPermission.write == True).exists()):
             return True
 
         # oh well! no permission!
         return False
+
+    def user_can_publish(self, user):
+        if user.is_admin:
+            return True
+
+        if user.is_locked_out:
+            return False
+
+        # check for user-level read permission:
+        if self.permissions.where(FeedPermission.user==user,
+                                  FeedPermission.publish==True).exists():
+            return True
+
+        # check for group-level read permission:
+        if (self.permissions.join(Group)
+                            .join(UserGroup)
+                            .where(UserGroup.user == user,
+                                   FeedPermission.publish == True).exists()):
+            return True
+
+        # oh well! no permission!
+        return False
+
 
     def grant(self, permission, user=None, group=None):
         # one of them *must* be selected...
@@ -193,6 +217,12 @@ class Feed(DBModel):
             perm.feed = self
             perm.save()
 
+def writeable_feeds(user):
+    if user.is_admin:
+        return Feed.select()
+    # TODO - re-write this as a SQL query, rather than this silly slow method.
+    return [f for f in Feed.select() if f.user_can_write(user)]
+
 class FeedPermission(DBModel):
     feed = ForeignKeyField(Feed, related_name='permissions')
 
@@ -217,5 +247,6 @@ class FeedPost(DBModel):
 def create_all():
     ''' initialises the database, creates all needed tables. '''
     [t.create_table(True) for t in
-        (User, UserSession, Group, Post, Feed, FeedPost, PostType, FeedPermission)]
+        (User, UserSession, Group, UserGroup, Post, Feed, FeedPost,
+         PostType, FeedPermission)]
 

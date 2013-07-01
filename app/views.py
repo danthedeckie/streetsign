@@ -1,9 +1,10 @@
 from flask import render_template, url_for, request, session, redirect, \
-                  flash, jsonify
+                  flash, json
 import app.user_session as user_session
 from importlib import import_module
 from app import app
-from app.models import User, Group, Feed, Post, PostType, post_type_module
+from app.models import User, Group, Feed, FeedPost, Post, PostType, \
+                       post_type_module, writeable_feeds
 
 ######################################################################
 # Basic App stuff:
@@ -86,7 +87,9 @@ def feedpage(feedid):
         return redirect(url_for('feedlist'))
 
     if request.method == 'GET':
-        return render_template('feed.html', feed=feed)
+        return render_template('feed.html',
+                               feed=feed,
+                               allusers=User.select())
     elif request.method == 'POST':
         action = request.form.get('action','none')
 
@@ -111,18 +114,27 @@ def post_new():
         return render_template('postnew.html',
                 post_types=PostType.select().dicts())
     else: # POST. new post!
+        if not user_session.logged_in():
+            flash("You're not logged in!")
+            return redirect(url_for(post_new))
         editor = post_type_module(request.form.get('post_type'))
-        return jsonify(editor.receive(request.form))
-       
+
+        u = user_session.get_user()
+        fs = Feed().select().where(Feed.id << request.form.getlist('post_feeds'))
+        p = Post(type=request.form.get('post_type'),
+                 content=json.dumps(editor.receive(request.form)),
+                 author=u)
+        p.save()
+        for f in fs:
+            if f.user_can_write(u):
+                feedpost = FeedPost(feed=f, post=p).save()
+        return redirect(url_for('postlist'))
 
 @app.route('/posts/edittype/<int:typeid>')
 def postedit_type(typeid):
     editor = post_type_module(typeid)
-    return editor.form(request.form, typeid)
+    user = user_session.get_user()
+    return editor.form(request.form,
+                       post_type=typeid,
+                       feedlist=writeable_feeds(user))
 
-########################################################################
-# Bits and pieces of generated javascript & json 'clobber'
-
-@app.route('/js/post_types.json')
-def post_types_json():
-    return jsonify(types=[x for x in PostType.select().dicts()])
