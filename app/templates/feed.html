@@ -1,4 +1,8 @@
 {% extends "index.html" %}
+{% block htmlhead %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='lib/chosen/chosen.min.css') }}" />
+{% endblock %}
 {% block title %} Feed: {{ feed.name }} {% endblock %}
 
 {% block body %}
@@ -25,24 +29,37 @@
 {% endfor %}
 </tbody>
 </table>
+<form method="POST">
+<input type="hidden" name="action" value="edit" />
 <div class="autowidth">
 <h2>Permissions for this feed.</h2>
 <div class="free_blocks">
-    <h3>Writers:</h3>
-    <select multiple name="authors">
-    {% for user in allusers %}
-        <option {{ 'selected' if feed.user_can_write(user) }} value="{{user.id}}" class="{{'admin' if user.is_admin }}">{{ '*' if user.is_admin }}{{user.displayname}}</option>
-    {% endfor %}
-    </select>
+    <h3>Author Users:</h3>
+    {{ widgets.userselect("authors", allusers, feed.authors()) }}
 </div>
 <div class="free_blocks">
-    <h3>Publishers:</h3>
-    <select multiple name="publishers">
-    {% for user in allusers %}
-        <option {{ 'selected' if not feed.user_can_publish(user) }} value="{{user.id}}" class="{{'admin' if user.is_admin }}">{{ '*' if user.is_admin }}{{user.displayname}}</option>
-    {% endfor %}
-    </select>
+    <h3>Publisher Users:</h3>
+    {{ widgets.userselect("publishers", allusers, feed.publishers()) }}
 </div>
+
+<div class="free_blocks">
+    <h3>Author Groups:</h3>
+    {{ widgets.groupselect("author_groups", allgroups, feed.author_groups()) }}
+</div>
+<div class="free_blocks">
+    <h3>Publisher Groups:</h3>
+    {{ widgets.groupselect("publisher_groups", allgroups, feed.publisher_groups()) }}
+</div>
+<input type="submit" value="Save">
+</form>
+
 <div class="cf"></div>
 </div>
+{% endblock %}
+{% block end_of_page_javascript %}
+{{ super() }}
+{{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
+<script type="text/javascript">
+    $('select').chosen({'width':'100%'});
+</script>
 {% endblock %}

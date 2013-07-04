@@ -1,4 +1,5 @@
 from peewee import *
+import peewee
 from importlib import import_module
 import sqlite3 # for catching an integrity error
 from passlib.hash import bcrypt # for passwords
@@ -125,6 +126,19 @@ class Post(DBModel):
 class Feed(DBModel):
     name = CharField(default='New Feed')
 
+    # Yes, I like comprehensions.
+    def authors(self):
+        return [p.user for p in self.permissions if p.write == True and p.user]
+
+    def publishers(self):
+        return [p.user for p in self.permissions if p.publish == True and p.user]
+
+    def author_groups(self):
+        return [p.group for p in self.permissions if p.write == True and p.group]
+
+    def publisher_groups(self):
+        return [p.group for p in self.permissions if p.publish == True and p.group]
+
     def user_can_read(self, user):
         if user.is_admin:
             return True
@@ -191,7 +205,6 @@ class Feed(DBModel):
         # oh well! no permission!
         return False
 
-
     def grant(self, permission, user=None, group=None):
         # one of them *must* be selected...
         assert (user,group) != (None,None)
@@ -199,8 +212,8 @@ class Feed(DBModel):
         # first get previous permission, if there is one.
         try:
             perm = FeedPermission.select((FeedPermission.feed==self)
-                                        &(FeedPermission.user==user)
-                                        &(FeedPermission.group==group)).get()
+                                        &((FeedPermission.user==user)
+                                        |(FeedPermission.group==group))).get()
         except FeedPermission.DoesNotExist as e:
             perm = FeedPermission(feed=self, user=user, group=group)
 
@@ -216,6 +229,25 @@ class Feed(DBModel):
             self.save()
             perm.feed = self
             perm.save()
+
+    # and some convenience functions:
+    def set_authors(self, authorlist):
+        FeedPermission.delete().where((FeedPermission.feed==self)
+                                     &(FeedPermission.write==True)
+                                     &(FeedPermission.user)).execute()
+        for a in authorlist:
+            u = False
+            if type(a) == User:
+                u = a
+            elif a != None:
+                try:
+                    u = User().get(id=int(a))
+                except peewee.UserDoesNotExist as e:
+                    continue
+            
+            if u:
+                print 'granting write permission to ' + u.displayname
+                self.grant('Write', user=u)
 
 def writeable_feeds(user):
     if user.is_admin:

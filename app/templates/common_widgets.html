@@ -1,0 +1,19 @@
+{% macro userselect(tagname, all_list, selected_list) %}
+<select multiple name="{{tagname}}" data-placeholder="Select Users..." autocomplete="off" >
+{%- for user in all_list -%}
+    <option {{ 'selected' if user in selected_list }} value="{{user.id}}"
+     class="{{'admin' if user.is_admin }}">
+        {{- '*' if user.is_admin }}{{user.displayname}}</option>
+{%- endfor -%}
+</select>
+{% endmacro %}
+
+{% macro groupselect(tagname, all_list, selected_list) %}
+<select multiple name="{{tagname}}" autocomplete="off" data-placeholder="Select User Groups...">
+{%- for group in all_list -%}
+    <option {{ 'selected' if group in selected_list -}} value="{{group.id}}" >
+        {{- group.name -}}</option>
+{%- endfor -%}
+</select>
+{% endmacro %}
+

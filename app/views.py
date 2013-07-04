@@ -88,13 +88,23 @@ def feedpage(feedid):
 
     if request.method == 'GET':
         return render_template('feed.html',
-                               feed=feed,
-                               allusers=User.select())
+                     feed=feed,
+                     allusers=User.select(),
+                     allgroups=Group.select()
+                )
+
+
     elif request.method == 'POST':
         action = request.form.get('action','none')
 
-        if action == 'rename':
+        if action == 'edit':
             feed.name = request.form.get('title', feed.name).strip()
+
+            feed.set_authors(request.form.getlist('authors'))
+            feed.set_publishers(request.form.getlist('publishers'))
+            feed.set_author_groups(request.form.getlist('author_groups'))
+            feed.set_publisher_groups(request.form.getlist('publisher_groups'))
+
             feed.save()
         elif action == 'delete':
             feed.delete_instance()
@@ -103,6 +113,12 @@ def feedpage(feedid):
     elif request.method == 'DELETE':
         # TODO;
         pass
+
+
+
+##########################################
+# Posts:
+
 
 @app.route('/posts')
 def postlist():
