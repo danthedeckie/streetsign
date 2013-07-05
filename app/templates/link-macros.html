@@ -9,3 +9,7 @@
 {% macro static_js(name) -%}
 <script type="text/javascript" src="{{ url_for('static', filename=name) }}"></script>
 {%- endmacro %}
+
+{% macro post(post) %}
+<a href="{{ url_for('postpage', postid=post.id) }}">{{ post.repr() }}</a>
+{% endmacro %}

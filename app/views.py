@@ -131,48 +131,107 @@ def postlist():
 
 @app.route('/posts/new', methods=['GET','POST'])
 def post_new():
+    if not user_session.logged_in():
+        flash("You're not logged in!")
+        return redirect(url_for('index'))
+
     if request.method == 'GET':
+        feeds = []
+        if 'initial_feeds' in request.args:
+            feeds = [int(x) for x in request.args.getlist('initial_feeds')]
         return render_template('postnew.html',
+                initial_feeds=feeds,
                 post_types=PostType.select().dicts())
     else: # POST. new post!
-        if not user_session.logged_in():
-            flash("You're not logged in!")
-            return redirect(url_for(post_new))
         editor = post_type_module(request.form.get('post_type'))
 
         u = user_session.get_user()
-        fs = Feed().select().where(Feed.id << request.form.getlist('post_feeds'))
+        fs = by_id(Feed, request.form.getlist('post_feeds'))
         p = Post(type=request.form.get('post_type'),
                  content=json.dumps(editor.receive(request.form)),
                  author=u)
         p.save()
         for f in fs:
             if f.user_can_write(u):
-                feedpost = FeedPost(feed=f, post=p).save()
+                FeedPost(feed=f, post=p).save()
         return redirect(url_for('postlist'))
 
 @app.route('/posts/<int:postid>', methods=['GET','POST'])
-def postpage():
+def postpage(postid):
+    if not user_session.logged_in():
+        flash("You're not logged in!")
+        return redirect(url_for(postlist))
+
     try:
         post = Post.get(Post.id==postid)
-    except Post.DoesNotExist as e:
+        editor = post_type_module(post.type.id)
+        user = user_session.get_user()
+
+    except Post.DoesNotExist:
         flash('Sorry! Post id:{0} not found!'.format(postid))
         return(redirect(url_for('postlist')))
 
     if request.method == 'POST':
-        pass
-        # TODO editing a post.
-    
-    # TODO: a post editing page. including useful stuff such as 
-    #       display times? etc.
-    pass
+
+        feeds = by_id(Feed, request.form.getlist('post_feeds'))
+
+        for fx in post.feedsxref:
+            if fx.feed not in feeds:
+                if fx.feed.user_can_write(user):
+                    fx.delete().execute()
+
+        for f in feeds:
+            # if we don't have write permission, then this isn't our post!
+            if not f.user_can_write(user):
+                flash("Sorry, this post is in feed '{0}', which"
+                      " you don't have permission to post to."
+                      " Edit cancelled.".format(f.name))
+                return redirect(url_for('index'))
+
+            # if this post is already published, be careful about editing it!
+            try:
+                xref = FeedPost.get(feed=f, post=post)
+                if xref.published and not f.user_can_publish(user):
+                    # TODO! TODO TODO roll back transaction, and refuse the
+                    # edit, don't just unpublish  the link!
+                    flash('Oops! You cannot post to {0}. Someone already'
+                          'approved the post, but since you edited, it will'
+                          'now get unpublished from that feed.'.format(f.name))
+                    xref.published = False
+                    xref.publish_date = None
+                    xref.publisher = None
+
+            # new feed for this post! yay!
+            except FeedPost.DoesNotExist:
+                FeedPost(feed=f, post=post).save()
+                flash('Posted to {0}'.format(f.name))
+
+        # finally get around to editing the content of the post...
+        try:
+            content=json.dumps(editor.receive(request.form))
+            post.content = content
+            post.save()
+            flash('Updated.')
+        except:
+            flash('invalid content for this data type!')
+
+    # TODO: figure out how to do post display times, etc...
+
+    return render_template('post_editor.html',
+                            post = post,
+                            post_type = post.type.id,
+                            feedlist = writeable_feeds(user),
+                            current_feeds = [x.feed.id for x in post.feedsxref if x],
+                            form_content = editor.form(json.loads(post.content)))
 
 @app.route('/posts/edittype/<int:typeid>')
 def postedit_type(typeid):
     ''' returns an editor page, of type typeid '''
     editor = post_type_module(typeid)
     user = user_session.get_user()
-    return editor.form(request.form,
-                       post_type=typeid,
-                       feedlist=writeable_feeds(user))
-
+    initial_feeds=json.loads(request.args.get('initial_feeds'))
+    return render_template('post_editor_loaded.html',
+                           post_type = typeid,
+                           initial_feeds=initial_feeds,
+                           feedlist = writeable_feeds(user),
+                           form_content = editor.form(request.form))

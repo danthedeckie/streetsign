@@ -11,3 +11,9 @@ $.getJSON('/js/post_types.json', function(data) {
     });
     $(items.join('')).appendTo('.post_type_selector');
 }); */
+$('#flashed_notices > li').click(function(){
+    $(this).fadeOut();
+});
+$('#flashed_notices > li').delay(15000).fadeOut('slow');
+
+$('select.chosen').chosen({'width':'100%'});

@@ -1,5 +1,7 @@
 {% extends "index.html" %}
+
 {% block title %} New Post {% endblock %}
+
 {% block body %}
 <h2>New Post</h2>
 <label value="Post Type"><select name="post_type" id="post_type">
@@ -9,14 +11,17 @@
 </select></label>
 <div id="contentblock"></div>
 {% endblock %}
+
 {% block end_of_page_javascript %}
-{{ super() }}
-{{ linkmacros.static_js('post_editor.js') }}
-<script type="text/javascript">
-// As the static js is static, we need in inject URLs here.
-POST_TYPE_URL=function(id) {
-    var o="{{url_for('postedit_type', typeid='-1')}}";
-    return o.replace(/-1/, id);
-};
+    {{ super() }}
+    {{ linkmacros.static_js('post_editor.js') }}
+    <script type="text/javascript">
+    // As the static js is static, we need in inject URLs here.
+    INITIAL_FEEDS="?initial_feeds={{ initial_feeds|tojson|urlencode }}";
+    POST_TYPE_URL=function(id) {
+        var o="{{url_for('postedit_type', typeid='-1')}}";
+        return o.replace(/-1/, id)+INITIAL_FEEDS;
+    };
 </script>
+
 {% endblock %}

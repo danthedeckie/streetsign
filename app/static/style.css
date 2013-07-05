@@ -79,6 +79,26 @@ header > nav > ul > li:first-of-type {
 header > nav > ul > li:last-of-type {
     border-radius: 0 10px 10px 0;
 }
+#flashed_notices {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1em;
+}
+#flashed_notices > li {
+    background: rgba(2,2,2,0.6);
+    color: white;
+    font-weight: bold;
+    border-radius: 15px;
+    padding: 0.2em 1em 0.2em 1em;
+    list-style-type: none;
+}
+#flashed_notices > li:hover {
+    color: #aaa;
+}
+#flashed_notices > li .err {
+    background: rgba(8,2,2,0.7);
+}
 option.admin {
     font-weight: bold;
     color: #224;
@@ -119,4 +139,18 @@ div.free_blocks {
     margin: auto;
     width: auto;
     margin-top: 10px;
+}
+.error {
+    font-width: bold;
+    color: white;
+    background-color: red;
+    text-shadow: red 10;
+}
+
+.warning {
+    font-width: bold;
+    color: orange;
+    background-color: black;
+    text-shadow: black 10;
+    padding: 0.2em;
 }

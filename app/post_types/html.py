@@ -1,7 +1,7 @@
 from flask import render_template, url_for, json
 
-def form(data, **kwargs):
-    return render_template('post_types/html.html', **kwargs)
+def form(data):
+    return render_template('post_types/html.html', **data)
 
 def receive(data):
     return {'type':'html', 'content': data.get('content','')}

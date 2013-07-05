@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+</head>
+<body>
+{% block body %}
+  <form action="{{ form_action }}" method="POST">
+    <input type="hidden" name="post_type" value="{{ post_type }}">
+    {{ form_content|safe }}
+    {% if not feedlist %}
+        You do NOT have permission to write to any feeds! Sorry!
+    {% else %}
+        <label>Feeds to post to:<select multiple name="post_feeds" class="chosen">
+        {% for feed in feedlist %}
+            <option {{ 'selected' if feed.id in initial_feeds }}  value="{{ feed.id }}">{{ feed.name }}</option>
+        {% endfor %}
+        </select></label>
+        <input style="float:right" type="submit" value="Post!" />
+    {% endif %}
+  </form>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    $('select').chosen({'width':'100%'});
+</script>
+{% endblock %}
+</body>
+</html>

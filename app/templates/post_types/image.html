@@ -1,8 +1,4 @@
-{% extends "post_editor.html" %}
-{% block title %}Post an Image{% endblock %}
-{% block form_body %}
 <label>Image (Upload):<br/>
-  <input type="hidden" name="post_type" value="{{ post_type }}">
 <input type="file" name="image_file" id="image_file" accept="image/*" />
 </label>
 <div id="img_preview"></div>
@@ -15,4 +11,3 @@ window.URL = window.URL || window.webkitURL;
         $('#img_preview').attr('src',window.URL.createObjectURL($(this).val()));
     });
 </script> -->
-{% endblock %}

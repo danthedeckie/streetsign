@@ -1,13 +1,9 @@
 {% extends "index.html" %}
-{% block htmlhead %}
-{{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', filename='lib/chosen/chosen.min.css') }}" />
-{% endblock %}
 {% block title %} Feed: {{ feed.name }} {% endblock %}
 
 {% block body %}
 <h1>Feed: {{ feed.name }} </h1>
-<h2>Posts:</h2>
+<h2>Posts: <a href="{{ url_for('post_new') }}?initial_feeds={{ feed.id }}">NEW</a></h2>
 <table>
 <thead>
   <tr>
@@ -20,7 +16,7 @@
 <tbody>
 {% for postx in feed.postsxref %}
     <tr>
-        <td>{{ postx.post.content|truncate(40,True) }}</td>
+        <td>{{ linkmacros.post(postx.post) }}</td>
         <td>{{ linkmacros.user(postx.post.author) }}</td>
         <td><form method="POST" action="" >
             <input type="hidden" name="action" value="delete" />
@@ -55,11 +51,4 @@
 
 <div class="cf"></div>
 </div>
-{% endblock %}
-{% block end_of_page_javascript %}
-{{ super() }}
-{{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
-<script type="text/javascript">
-    $('select').chosen({'width':'100%'});
-</script>
 {% endblock %}
