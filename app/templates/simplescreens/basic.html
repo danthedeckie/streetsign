@@ -8,15 +8,33 @@
 </head>
 <body>
 <div id="zones" style="position:absolute;top:0;bottom:0;right:0;left:0;"></div>
-hi.
-<div id="graphics" class="zone" style="left: 10%; right: 50%; top: 10%; bottom: 10%;">
-</div>
+<!--<div id="graphics" class="zone" style="left: 10%; right: 50%; top: 10%; bottom: 10%;">
+</div>-->
 {% block end_of_page_javascript %}
   {{ linkmacros.static_js('jquery.js') }}
   {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
   {{ linkmacros.static_js('simplescreens/main.js') }}
   <script type="text/javascript">
-  zone('#zones', {"id": "main", "top": "20%", "left":"45%","right":"90%","bottom":"100%"});
+  // TODO: load this from a screens json thingy.
+  var zones = [{"name": "main",
+                   "top": "2%",
+                  "left": "2%",
+                 "right": "50%",
+                "bottom": "8%",
+                 "feeds": [1,2,3] },
+                {"name": "sidebar",
+                   "top": "3%",
+                  "left": "51%",
+                 "right": "5%",
+                "bottom": "8%",
+                 "feeds": [1] },
+
+                ];
+
+  for (var z in zones){
+    zone('#zones', zones[z]);
+    }
+  update_zones_posts();
   </script>
 {% endblock %}
 </body>

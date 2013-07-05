@@ -1,20 +1,26 @@
 window.zones = [];
 
 function zone_html(id, top, left, bottom, right) {
-    var x = ('<div id="'+id+'" class="zone" style="'
-            +'   left:' + left
-            +' ;right:' + right
+    return ('<div id="_zone_'+id+'" class="zone" style="'
+            +'left:' + left
+            +';right:' + right
             +';bottom:' + bottom
-            +'   ;top:' + top + '"></div>');
-    alert (x);
+            +';top:' + top + '">'+id+'</div>');
     return x;
 }
-
 
 function zone(container, obj) {
     window.zones.push(obj);
 
-    obj.el = $(container).prepend(zone_html(
-                obj.id, obj.top, obj.left, obj.bottom, obj.right)).fadeIn();
+    obj.el = $(zone_html(obj.name, obj.top, obj.left, obj.bottom, obj.right))
+              .prependTo(container)[0];
 
+    obj.el.innerHTML = obj.el.innerHTML + '<br/>(initialising)';
+}
+
+function update_zones_posts() {
+    for (var z in window.zones) {
+        window.zones[z].el.innerHTML = 'updated';
+    }
+    setTimeout(update_zones_posts, 12000);
 }
