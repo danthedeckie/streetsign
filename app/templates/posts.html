@@ -8,7 +8,7 @@
 <td>Type</td>
 <td>Content</td>
 <td>Author</td>
-<td>on Feeds</td>
+<td>Feeds</td>
 <td>Other Flags</td>
 </tr>
 </thead>
@@ -16,16 +16,16 @@
 {% for post in posts %}
     <tr>
     <td>{{ post.type.name }}</td>
-    <td>{{ post.content|truncate(40,True) }}</td>
+    <td>{{ linkmacros.post(post) }}</td>
     <td>{% if post.author %}
-            {{linkmacros.user(post.author)}} (on {{ post.write_date }})
+            {{linkmacros.user(post.author)}} (on {{ post.write_date.date() }})
         {% else %}
             No Author!
         {% endif %}
     </td>
     <td>{% if post.feedsxref.exists() %}
             {%- for feedx in post.feedsxref -%}
-                   {{ linkmacros.feed(feedx.feed) }}
+                   {{ linkmacros.feed(feedx.feed) }}&nbsp;
             {%- endfor -%}
         {% else %}
             Not Published!
