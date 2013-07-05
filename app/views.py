@@ -160,10 +160,12 @@ def postpage():
         return(redirect(url_for('postlist')))
 
     if request.method == 'POST':
+        pass
         # TODO editing a post.
     
     # TODO: a post editing page. including useful stuff such as 
     #       display times? etc.
+    pass
 
 @app.route('/posts/edittype/<int:typeid>')
 def postedit_type(typeid):

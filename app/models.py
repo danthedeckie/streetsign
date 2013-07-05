@@ -318,13 +318,32 @@ class FeedPermission(DBModel):
     write = BooleanField(default=False)
     publish = BooleanField(default=False)
 
+
 class FeedPost(DBModel):
     feed = ForeignKeyField(Feed, related_name='postsxref')
     post = ForeignKeyField(Post, related_name='feedsxref')
 
+    # When should the feed actually be shown:
+    active_start = DateTimeField(null=True)
+    active_end = DateTimeField(null=True)
+
+    # Time restrictions are defined in TimeRestriction.
+
+    # For how long should it be displayed?
+    display_time = IntegerField(default=8)
+
+
+    #publisher info:
     published = BooleanField(default=False)
     publish_date = DateTimeField(null=True)
     publisher = ForeignKeyField(User, null=True)
+
+
+class TimeRestriction(DBModel):
+    start_time = TimeField(null=True)
+    end_time = TimeField(null=True)
+
+    feedpost = ForeignKeyField(FeedPost, related_name='time_restrictions')
 
 ##############################################################################
 
@@ -332,7 +351,7 @@ def create_all():
     ''' initialises the database, creates all needed tables. '''
     [t.create_table(True) for t in
         (User, UserSession, Group, UserGroup, Post, Feed, FeedPost,
-         PostType, FeedPermission)]
+         PostType, FeedPermission, TimeRestriction)]
 
 def by_id(model, ids):
     ''' returns a list of objects, selected by id (list) '''
