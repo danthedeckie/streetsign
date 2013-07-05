@@ -2,9 +2,10 @@
 
 import app
 
-app.models.create_all()
+from app.models import *
 
 def make():
+    app.models.create_all()
     ############################
     # 3 basic users:
     def user_exists(name):

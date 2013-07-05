@@ -11,7 +11,7 @@
 {% macro groupselect(tagname, all_list, selected_list) %}
 <select multiple name="{{tagname}}" autocomplete="off" data-placeholder="Select User Groups...">
 {%- for group in all_list -%}
-    <option {{ 'selected' if group in selected_list -}} value="{{group.id}}" >
+    <option {{ 'selected' if group in selected_list }} value="{{group.id}}" >
         {{- group.name -}}</option>
 {%- endfor -%}
 </select>

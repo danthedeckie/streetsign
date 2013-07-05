@@ -12,8 +12,9 @@ SECRET_KEY = app.config.get('SECRET_KEY')
 DB = SqliteDatabase(app.config.get('DATABASE_FILE'))
 
 __all__ = [ 'DB', 'User', 'user_login', 'user_logout', 'get_logged_in_user',
-            'Group', 'Post', 'PostType', 'Feed', 'FeedPermission', 'create_db',
-            'post_type_module']
+            'Group', 'Post', 'PostType', 'Feed', 'FeedPermission', 'create_all',
+            'post_type_module', 'by_id' ]
+
 
 class DBModel(Model):
     class Meta:
@@ -39,6 +40,9 @@ class User(DBModel):
 
     def set_password(self, password):
         self.passwordhash = bcrypt.encrypt(password + SECRET_KEY)
+
+    def __repr__(self):
+        return '<User:' + self.displayname + '>'
 
 ##########
 # login stuff:
@@ -82,17 +86,21 @@ def user_logout(name, uuid):
     UserSession.get(id=uuid, username=name).delete_instance()
     return True
 
+
+#########################################
+
 class Group(DBModel):
     name = CharField()
     display = BooleanField(default=True)
+
+    def __repr__(self):
+        return '<Group:' + self.name + \
+            ('(hidden)>' if not self.display else '>')
 
 class UserGroup(DBModel):
     # XREF
     user = ForeignKeyField(User)
     group = ForeignKeyField(Group)
-
-
-
 
 #############################################################################
 #
@@ -125,6 +133,9 @@ class Post(DBModel):
 
 class Feed(DBModel):
     name = CharField(default='New Feed')
+
+    def __repr__(self):
+        return '<Feed:' + self.name + '>'
 
     # Yes, I like comprehensions.
     def authors(self):
@@ -210,10 +221,25 @@ class Feed(DBModel):
         assert (user,group) != (None,None)
         assert (user and group) == None
         # first get previous permission, if there is one.
+
+        if permission == 'Read':
+            p = FeedPermission.read
+        elif permission == 'Write':
+            p = FeedPermission.write
+        elif permission == 'Publish':
+            p = FeedPermission.publish
+
         try:
-            perm = FeedPermission.select((FeedPermission.feed==self)
-                                        &((FeedPermission.user==user)
-                                        |(FeedPermission.group==group))).get()
+            if user:
+                perm = FeedPermission.get((FeedPermission.feed==self)
+                                         &(FeedPermission.user==user)
+                                         &(p==True))
+            elif group:
+                perm = FeedPermission.get((FeedPermission.feed==self)
+                                         &(FeedPermission.group==group)
+                                         &(p==True))
+            else:
+                raise Exception('You must specify either a user or a group!')
         except FeedPermission.DoesNotExist as e:
             perm = FeedPermission(feed=self, user=user, group=group)
 
@@ -232,22 +258,48 @@ class Feed(DBModel):
 
     # and some convenience functions:
     def set_authors(self, authorlist):
+        ''' set the complete authorlist. deletes previous set '''
+        
+        # delete old permissions first.
         FeedPermission.delete().where((FeedPermission.feed==self)
                                      &(FeedPermission.write==True)
                                      &(FeedPermission.user)).execute()
         for a in authorlist:
-            u = False
-            if type(a) == User:
-                u = a
-            elif a != None:
-                try:
-                    u = User().get(id=int(a))
-                except peewee.UserDoesNotExist as e:
-                    continue
-            
-            if u:
-                print 'granting write permission to ' + u.displayname
-                self.grant('Write', user=u)
+            assert(isinstance(a, User))
+            self.grant('Write', user=a)
+
+    def set_publishers(self, publisherlist):
+        ''' set the complete publisherlist. deletes previous set '''
+        # delete old permissions first.
+        FeedPermission.delete().where((FeedPermission.feed==self)
+                                     &(FeedPermission.publish==True)
+                                     &(FeedPermission.user)).execute()
+
+        for p in publisherlist:
+            assert(isinstance(p, User))
+            self.grant('Publish', user=p)
+
+    def set_author_groups(self, authorlist):
+        ''' set the complete author_groups list. deletes previous set '''
+        
+        # delete old permissions first.
+        FeedPermission.delete().where((FeedPermission.feed==self)
+                                     &(FeedPermission.publish==True)
+                                     &(FeedPermission.group)).execute()
+        for a in authorlist:
+            assert(isinstance(a, Group))
+            self.grant('Write', group=a)
+
+    def set_publisher_groups(self, publisherlist):
+        ''' set the complete publisher_groups list. deletes previous set '''
+        # delete old permissions first.
+        FeedPermission.delete().where((FeedPermission.feed==self)
+                                     &(FeedPermission.publish==True)
+                                     &(FeedPermission.group)).execute()
+
+        for p in publisherlist:
+            assert(isinstance(p, Group))
+            self.grant('Publish', group=p)
 
 def writeable_feeds(user):
     if user.is_admin:
@@ -282,3 +334,6 @@ def create_all():
         (User, UserSession, Group, UserGroup, Post, Feed, FeedPost,
          PostType, FeedPermission)]
 
+def by_id(model, ids):
+    ''' returns a list of objects, selected by id (list) '''
+    return [x for x in model.select().where(model.id << [int(i) for i in ids])]

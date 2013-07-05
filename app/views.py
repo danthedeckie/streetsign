@@ -3,11 +3,20 @@ from flask import render_template, url_for, request, session, redirect, \
 import app.user_session as user_session
 from importlib import import_module
 from app import app
-from app.models import User, Group, Feed, FeedPost, Post, PostType, \
-                       post_type_module, writeable_feeds
+from app.models import DB, User, Group, Feed, FeedPost, Post, PostType, \
+                       post_type_module, writeable_feeds, by_id
 
 ######################################################################
 # Basic App stuff:
+
+@app.before_request
+def attach_db():
+    DB.connect()
+
+@app.teardown_request
+def detach_db(exception):
+    DB.close()
+
 
 @app.route('/')
 @app.route('/index.html')
@@ -78,41 +87,37 @@ def feedlist():
 
     return render_template('feeds.html', feeds=Feed.select())
 
-@app.route('/feeds/<int:feedid>', methods=['GET','POST','DELETE'])
+@app.route('/feeds/<int:feedid>', methods=['GET','POST'])
 def feedpage(feedid):
     try:
-        feed = Feed.get(id=feedid).get()
+        feed = Feed.get(id=feedid)
     except:
         flash('invalid feed id! (' + feedid + ')')
         return redirect(url_for('feedlist'))
 
-    if request.method == 'GET':
-        return render_template('feed.html',
-                     feed=feed,
-                     allusers=User.select(),
-                     allgroups=Group.select()
-                )
-
-
-    elif request.method == 'POST':
+        
+    if request.method == 'POST':
         action = request.form.get('action','none')
 
         if action == 'edit':
             feed.name = request.form.get('title', feed.name).strip()
+            inlist = request.form.getlist
 
-            feed.set_authors(request.form.getlist('authors'))
-            feed.set_publishers(request.form.getlist('publishers'))
-            feed.set_author_groups(request.form.getlist('author_groups'))
-            feed.set_publisher_groups(request.form.getlist('publisher_groups'))
+            feed.set_authors(by_id(User, inlist('authors')))
+            feed.set_publishers(by_id(User, inlist('publishers')))
+            feed.set_author_groups(by_id(Group, inlist('author_groups')))
+            feed.set_publisher_groups(by_id(Group, inlist('publisher_groups')))
 
             feed.save()
+            flash('Saved')
         elif action == 'delete':
             feed.delete_instance()
 
-        return render_template('feeds.html', feeds=Feed.select())
-    elif request.method == 'DELETE':
-        # TODO;
-        pass
+    return render_template('feed.html',
+                     feed=feed,
+                     allusers=User.select(),
+                     allgroups=Group.select()
+                )
 
 
 
@@ -146,8 +151,23 @@ def post_new():
                 feedpost = FeedPost(feed=f, post=p).save()
         return redirect(url_for('postlist'))
 
+@app.route('/posts/<int:postid>', methods=['GET','POST'])
+def postpage():
+    try:
+        post = Post.get(Post.id==postid)
+    except Post.DoesNotExist as e:
+        flash('Sorry! Post id:{0} not found!'.format(postid))
+        return(redirect(url_for('postlist')))
+
+    if request.method == 'POST':
+        # TODO editing a post.
+    
+    # TODO: a post editing page. including useful stuff such as 
+    #       display times? etc.
+
 @app.route('/posts/edittype/<int:typeid>')
 def postedit_type(typeid):
+    ''' returns an editor page, of type typeid '''
     editor = post_type_module(typeid)
     user = user_session.get_user()
     return editor.form(request.form,
