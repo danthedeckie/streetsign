@@ -5,8 +5,10 @@
   <head>
     <title>{% block title %}TODO: TITLE{% endblock %}</title>
     {% block htmlhead %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='lib/chosen/chosen.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+      <link rel="stylesheet" href="{{ url_for('static',
+                                    filename='lib/chosen/chosen.min.css') }}" />
+      <link rel="stylesheet" href="{{ url_for('static',
+                                    filename='style.css') }}" />
     {% endblock %}
   </head>
 <body>
@@ -58,7 +60,7 @@
   <!-- jquery, ga, whatever goes here. -->
   {{ linkmacros.static_js('jquery.js') }}
   {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
-  {{ linkmacros.static_js('main.js') }}
+  {{ linkmacros.static_js('simplescreens/main.js') }}
 {% endblock %}
 </body>
 </html>

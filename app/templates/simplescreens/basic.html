@@ -1,0 +1,23 @@
+{%- import "link-macros.html" as linkmacros -%}
+{%- import "common_widgets.html"  as widgets -%}
+<!doctype html>
+<html>
+<head>
+  <title>Screen</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='simplescreens/main.css') }}" />
+</head>
+<body>
+<div id="zones" style="position:absolute;top:0;bottom:0;right:0;left:0;"></div>
+hi.
+<div id="graphics" class="zone" style="left: 10%; right: 50%; top: 10%; bottom: 10%;">
+</div>
+{% block end_of_page_javascript %}
+  {{ linkmacros.static_js('jquery.js') }}
+  {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
+  {{ linkmacros.static_js('simplescreens/main.js') }}
+  <script type="text/javascript">
+  zone('#zones', {"id": "main", "top": "20%", "left":"45%","right":"90%","bottom":"100%"});
+  </script>
+{% endblock %}
+</body>
+</html>

@@ -235,3 +235,16 @@ def postedit_type(typeid):
                            initial_feeds=initial_feeds,
                            feedlist = writeable_feeds(user),
                            form_content = editor.form(request.form))
+
+
+###########################################
+#
+# Start simple screen pages:
+
+@app.route('/simplescreens/<screenfile>')
+def simplescreen(screenfile):
+    return render_template('simplescreens/' + screenfile + '.html')
+
+@app.route('/json/feed/<int:feedid>')
+def api_feed(feedid):
+    return '{"id":{0}, "posts":[]}'.format(feedid)

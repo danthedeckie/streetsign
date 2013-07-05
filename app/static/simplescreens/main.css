@@ -1,0 +1,12 @@
+body {
+    margin: 0;
+    padding: 1em;
+    background: black;
+    color: white;
+    text-align: center;
+}
+div.zone {
+    position: absolute;
+    background-color: rgba(230,220,210,0.6);
+
+}
