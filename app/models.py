@@ -1,5 +1,5 @@
+from flask import json
 from peewee import *
-import peewee
 from importlib import import_module
 import sqlite3 # for catching an integrity error
 from passlib.hash import bcrypt # for passwords
@@ -130,6 +130,12 @@ class Post(DBModel):
 
     # Should it actually be displayed?
     active = BooleanField(default=True)
+
+    def __repr__(self):
+        return '<Post:{0}:{1}>'.format(self.type.handler, self.content[0:22])
+
+    def repr(self):
+        return json.loads(self.content)['content'][0:12] + '...(' + self.type.handler + ')'
 
 class Feed(DBModel):
     name = CharField(default='New Feed')

@@ -148,29 +148,39 @@ def post_new():
         p.save()
         for f in fs:
             if f.user_can_write(u):
-                feedpost = FeedPost(feed=f, post=p).save()
+                FeedPost(feed=f, post=p).save()
         return redirect(url_for('postlist'))
 
 @app.route('/posts/<int:postid>', methods=['GET','POST'])
-def postpage():
+def postpage(postid):
     try:
         post = Post.get(Post.id==postid)
-    except Post.DoesNotExist as e:
+        editor = post_type_module(post.type.id)
+        user = user_session.get_user()
+
+    except Post.DoesNotExist:
         flash('Sorry! Post id:{0} not found!'.format(postid))
         return(redirect(url_for('postlist')))
 
     if request.method == 'POST':
         # TODO editing a post.
+        pass
     
     # TODO: a post editing page. including useful stuff such as 
     #       display times? etc.
+    return render_template('post_editor.html',
+                            post = post,
+                            post_type = post.type.id,
+                            feedlist = writeable_feeds(user),
+                            current_feeds = [x.feed.id for x in post.feedsxref],
+                            form_content = editor.form(json.loads(post.content)))
 
 @app.route('/posts/edittype/<int:typeid>')
 def postedit_type(typeid):
     ''' returns an editor page, of type typeid '''
     editor = post_type_module(typeid)
     user = user_session.get_user()
-    return editor.form(request.form,
-                       post_type=typeid,
-                       feedlist=writeable_feeds(user))
-
+    return render_template('post_editor_loaded.html',
+                           post_type = typeid,
+                           feedlist = writeable_feeds(user),
+                           form_content = editor.form(request.form))

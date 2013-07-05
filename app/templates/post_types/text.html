@@ -1,7 +1,3 @@
-{% extends "post_editor.html" %}
-{% block title %}Plain Text Post{% endblock %}
-{% block form_body %}
 <label>Contents: (plain text only)<br/>
-  <input type="hidden" name="post_type" value="{{ post_type }}">
-<textarea name="content" rows="10" cols="80" style="width: 100%;"></textarea></label>
-{% endblock %}
+<textarea name="content" rows="10" cols="80" style="width: 100%;">{{content}}</textarea>
+</label>

@@ -1,7 +1,7 @@
-from flask import render_template, url_for, escape
+from flask import render_template, escape
 
-def form(data, **kwargs):
-    return render_template('post_types/text.html', **kwargs) 
+def form(data):
+    return render_template('post_types/text.html', **data)
 
 def receive(data):
     return {'type':'text', 'content': escape(data.get('content',''))}
