@@ -132,7 +132,11 @@ def postlist():
 @app.route('/posts/new', methods=['GET','POST'])
 def post_new():
     if request.method == 'GET':
+        feeds = []
+        if 'feeds' in request.args:
+            feeds = by_id(Feed, request.args.getlist('feeds'))
         return render_template('postnew.html',
+                initial_feeds=feeds,
                 post_types=PostType.select().dicts())
     else: # POST. new post!
         if not user_session.logged_in():
