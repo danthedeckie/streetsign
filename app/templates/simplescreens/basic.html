@@ -17,7 +17,7 @@
   <script type="text/javascript">
   POSTS_URL = "{{ url_for('simplescreens_posts_from_feeds',json_feeds_list='-1') }}";
   // TODO: load this from a screens json thingy.
-  var zones = [{"name": "main",
+  var pre_zones = [{"name": "main",
                    "top": "2%",
                   "left": "2%",
                  "right": "50%",
@@ -28,14 +28,16 @@
                   "left": "51%",
                  "right": "5%",
                 "bottom": "8%",
-                 "feeds": [1] },
+                 "feeds": [2] },
 
                 ];
 
-  for (var z in zones){
-    zone('#zones', zones[z]);
+  for (var z in pre_zones){
+    console.log('adding zone:' + z);
+    zone('#zones', pre_zones[z]);
     }
   update_zones_posts();
+  setTimeout(start_zones_scrolling, 2000);
   </script>
 {% endblock %}
 </body>
