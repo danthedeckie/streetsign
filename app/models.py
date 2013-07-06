@@ -1,10 +1,10 @@
 from flask import json
 from peewee import *
-from importlib import import_module
 import sqlite3 # for catching an integrity error
 from passlib.hash import bcrypt # for passwords
 from uuid import uuid4 # for unique session ids
 from datetime import datetime
+import app.post_types
 from app import app
 
 SECRET_KEY = app.config.get('SECRET_KEY')
@@ -12,13 +12,13 @@ SECRET_KEY = app.config.get('SECRET_KEY')
 DB = SqliteDatabase(app.config.get('DATABASE_FILE'))
 
 __all__ = [ 'DB', 'User', 'user_login', 'user_logout', 'get_logged_in_user',
-            'Group', 'Post', 'PostType', 'Feed', 'FeedPermission', 'create_all',
-            'post_type_module', 'by_id' ]
+            'Group', 'Post', 'Feed', 'FeedPermission', 'create_all',
+            'by_id' ]
 
 
 class DBModel(Model):
     class Meta:
-        database = DB 
+        database = DB
 
 ##############################################################################
 #
@@ -80,7 +80,7 @@ def get_logged_in_user(name, uuid):
     ''' either returns a logged in user, or raises an error '''
     session = UserSession.get(id=uuid, username=name)
     return session.user
-    
+
 def user_logout(name, uuid):
     ''' removes a session '''
     UserSession.get(id=uuid, username=name).delete_instance()
@@ -107,22 +107,8 @@ class UserGroup(DBModel):
 # Posts & Feeds:
 #
 
-class PostType(DBModel):
-    name = CharField(default='Post Data Type...')
-    module_name = CharField()
-    description = TextField(default='Type of data for posts.')
-    handler = CharField(default='text')
-
-def post_type_module(typeid):
-    return( import_module( 'app.post_types.' + \
-            PostType.select() \
-                    .where(PostType.id==typeid) \
-                    .get() \
-                    .module_name))
-
-
 class Post(DBModel):
-    type = ForeignKeyField(PostType)
+    type = TextField()
     content = TextField()
     author = ForeignKeyField(User)
 
@@ -132,10 +118,19 @@ class Post(DBModel):
     active = BooleanField(default=True)
 
     def __repr__(self):
-        return '<Post:{0}:{1}>'.format(self.type.handler, self.content[0:22])
+        return '<Post:{0}:{1}>'.format(self.type, self.content[0:22])
 
     def repr(self):
-        return json.loads(self.content)['content'][0:12] + '...(' + self.type.handler + ')'
+        return json.loads(self.content)['content'][0:12] + '...(' + self.type + ')'
+
+    def dict_repr(self):
+        ''' must give all info, for use on screens, etc. '''
+        return (
+            { 'id': self.id,
+              'type': self.type,
+              'content': json.loads(self.content),
+              'active': self.active
+            })
 
 class Feed(DBModel):
     name = CharField(default='New Feed')
@@ -357,7 +352,7 @@ def create_all():
     ''' initialises the database, creates all needed tables. '''
     [t.create_table(True) for t in
         (User, UserSession, Group, UserGroup, Post, Feed, FeedPost,
-         PostType, FeedPermission, TimeRestriction)]
+         FeedPermission, TimeRestriction)]
 
 def by_id(model, ids):
     ''' returns a list of objects, selected by id (list) '''

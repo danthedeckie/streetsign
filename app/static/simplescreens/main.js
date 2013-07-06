@@ -20,6 +20,7 @@ function zone(container, obj) {
 
 function update_zones_posts() {
     for (var z in window.zones) {
+        $.get(
         window.zones[z].el.innerHTML = 'updated';
     }
     setTimeout(update_zones_posts, 12000);

@@ -1,10 +1,11 @@
 from flask import render_template, url_for, request, session, redirect, \
                   flash, json
 import app.user_session as user_session
+import app.post_types as post_types
 from importlib import import_module
 from app import app
-from app.models import DB, User, Group, Feed, FeedPost, Post, PostType, \
-                       post_type_module, writeable_feeds, by_id
+from app.models import DB, User, Group, Feed, FeedPost, Post, \
+                       writeable_feeds, by_id
 
 ######################################################################
 # Basic App stuff:
@@ -141,15 +142,14 @@ def post_new():
             feeds = [int(x) for x in request.args.getlist('initial_feeds')]
         return render_template('postnew.html',
                 initial_feeds=feeds,
-                post_types=PostType.select().dicts())
+                post_types=post_types.types())
     else: # POST. new post!
-        editor = post_type_module(request.form.get('post_type'))
+        post_type = request.form.get('post_type')
 
         u = user_session.get_user()
         fs = by_id(Feed, request.form.getlist('post_feeds'))
-        p = Post(type=request.form.get('post_type'),
-                 content=json.dumps(editor.receive(request.form)),
-                 author=u)
+        p = Post(type=post_type, author=u)
+        p.content=json.dumps(post_types.receive(post_type, request.form))
         p.save()
         for f in fs:
             if f.user_can_write(u):
@@ -164,7 +164,7 @@ def postpage(postid):
 
     try:
         post = Post.get(Post.id==postid)
-        editor = post_type_module(post.type.id)
+        editor = post_types.load(post.type)
         user = user_session.get_user()
 
     except Post.DoesNotExist:
@@ -219,15 +219,15 @@ def postpage(postid):
 
     return render_template('post_editor.html',
                             post = post,
-                            post_type = post.type.id,
+                            post_type = post.type,
                             feedlist = writeable_feeds(user),
                             current_feeds = [x.feed.id for x in post.feedsxref if x],
                             form_content = editor.form(json.loads(post.content)))
 
-@app.route('/posts/edittype/<int:typeid>')
+@app.route('/posts/edittype/<typeid>')
 def postedit_type(typeid):
     ''' returns an editor page, of type typeid '''
-    editor = post_type_module(typeid)
+    editor = post_types.load(typeid)
     user = user_session.get_user()
     initial_feeds=json.loads(request.args.get('initial_feeds'))
     return render_template('post_editor_loaded.html',
@@ -244,6 +244,15 @@ def postedit_type(typeid):
 @app.route('/simplescreens/<screenfile>')
 def simplescreen(screenfile):
     return render_template('simplescreens/' + screenfile + '.html')
+
+@app.route('/simplescreens/posts_from_feeds/<json_feeds_list>')
+def simplescreens_posts_from_feeds(json_feeds_list):
+    feeds_list = json.loads(json_feeds_list)
+    posts = [p.dict_repr() for p in
+             Post.select().join(FeedPost)
+             .where((FeedPost.feed << feeds_list)
+                   &(Post.active == True))]
+    return json.dumps({'posts':posts})
 
 @app.route('/json/feed/<int:feedid>')
 def api_feed(feedid):
