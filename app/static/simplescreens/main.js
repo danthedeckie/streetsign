@@ -1,3 +1,7 @@
+function url_insert(url, data) {
+    return url.replace(/-1/, data);
+}
+
 window.zones = [];
 
 function zone_html(id, top, left, bottom, right) {
@@ -19,9 +23,13 @@ function zone(container, obj) {
 }
 
 function update_zones_posts() {
-    for (var z in window.zones) {
-        $.get(
-        window.zones[z].el.innerHTML = 'updated';
+    for (var i in window.zones) {
+        var zone = window.zones[i];
+        function update(data){ zone.el.innerHTML = data; }
+
+        $.get(url_insert(POSTS_URL, JSON.stringify(zone.feeds)), update);
+        //window.zones[z].el.innerHTML = 'updated';
     }
-    setTimeout(update_zones_posts, 12000);
+    // TODO: get this value from somewhere:
+    setTimeout(update_zones_posts, 32000);
 }

@@ -15,6 +15,7 @@
   {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
   {{ linkmacros.static_js('simplescreens/main.js') }}
   <script type="text/javascript">
+  POSTS_URL = "{{ url_for('simplescreens_posts_from_feeds',json_feeds_list='-1') }}";
   // TODO: load this from a screens json thingy.
   var zones = [{"name": "main",
                    "top": "2%",
