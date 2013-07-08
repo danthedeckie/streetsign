@@ -39,6 +39,10 @@ def make():
     #################################
     # default feeds:
 
-    app.models.Feed(name='News').save()
+    news = app.models.Feed(name='News')
+
+    news.save()
+
+    app.models.Post(type='html', feed=news, content='{"content":"First Post"}').save()
 
     app.models.Screen().save()

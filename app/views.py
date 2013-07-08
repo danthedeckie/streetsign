@@ -140,10 +140,12 @@ def post_new():
 
     if request.method == 'GET':
         feeds = []
-        if 'initial_feeds' in request.args:
-            feeds = [int(x) for x in request.args.getlist('initial_feeds')]
+        if 'initial_feed' in request.args:
+            feed = int(request.args.get('initial_feed'))
+        else:
+            feed = 0
         return render_template('postnew.html',
-                initial_feeds=feeds,
+                initial_feed=feed,
                 post_types=post_types.types())
     else: # POST. new post!
         post_type = request.form.get('post_type')
@@ -232,7 +234,7 @@ def postedit_type(typeid):
 
     return render_template('post_editor_loaded.html',
                            post_type = typeid,
-                           initial_feed=request.args.get('initial_feed'),
+                           initial_feed=int(request.args.get('initial_feed')),
                            feedlist = writeable_feeds(user),
                            form_content = editor.form(request.form))
 

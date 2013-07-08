@@ -10,7 +10,7 @@
     {% if not feedlist %}
         You do NOT have permission to write to any feeds! Sorry!
     {% else %}
-        <label>Feed to post to:<select name="post_feed" class="chosen">
+        <label>Feed to post to:<select name="post_feed" class="chosen" autocomplete="off">
         {% for feed in feedlist %}
             <option {{ 'selected' if feed.id == initial_feed }}  value="{{ feed.id }}">{{ feed.name }}</option>
         {% endfor %}

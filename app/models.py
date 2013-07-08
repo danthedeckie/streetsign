@@ -320,8 +320,10 @@ class Post(DBModel):
     # are these restrictions "Only show during these times" or
     #                        "Do not show during these times" ?
     time_restrictions_exclude = BooleanField(default=True)
+
     # and the actual restrictions:
     time_restrictions = TextField(default='[]')
+    # {"start_time", "end_time", "note"}
 
     # For how long should it be displayed?
     display_time = IntegerField(default=8)

@@ -16,6 +16,8 @@
             <option value="{{ feed.id }}" {{ 'selected' if feed.id == current_feed }}>{{ feed.name }}</option>
         {% endfor %}
         </select></label>
+        <hr/>
+        {% include "post_times_editor.html" %}
         <input type="submit" value="Post!" />
     {% endif %}
   </form>

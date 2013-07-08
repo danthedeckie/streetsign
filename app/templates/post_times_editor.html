@@ -1,0 +1,18 @@
+{% import "link-macros.html" as linkmacros -%}
+<h2>Display time restrictions <a href="#" data-bind="click: $root.addTime">New</a></h2>
+
+<style rel="css">
+input.third { max-width: 28%;};
+</style>
+<label>Active From: <input type="datetime" /></label>
+
+<ul data-bind="foreach: times">
+    <li><input class="third" type="time" data-bind="value: start" />
+        <input class="third" type="time" data-bind="value: end" />
+        <input class="third" data-bind="value: note" />
+        <a href="#" data-bind="click: $root.removeTime">X</a>
+    </li>
+</ul>
+
+{{ linkmacros.static_js('lib/knockout-2.2.1.js') }}
+{{ linkmacros.static_js('post_times_editor.js') }}
