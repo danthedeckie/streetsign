@@ -3,7 +3,7 @@
 
 {% block body %}
 <h1>Feed: {{ feed.name }} </h1>
-<h2>Posts: <a href="{{ url_for('post_new') }}?initial_feeds={{ feed.id }}">NEW</a></h2>
+<h2>Posts: <a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}">NEW</a></h2>
 <table>
 <thead>
   <tr>
@@ -14,10 +14,10 @@
   </tr>
 </thead>
 <tbody>
-{% for postx in feed.postsxref %}
+{% for post in feed.posts %}
     <tr>
-        <td>{{ linkmacros.post(postx.post) }}</td>
-        <td>{{ linkmacros.user(postx.post.author) }}</td>
+        <td>{{ linkmacros.post(post) }}</td>
+        <td>{{ linkmacros.user(post.author) }}</td>
         <td><form method="POST" action="" >
             <input type="hidden" name="action" value="delete" />
             <input type="submit" value="X"></form></td>

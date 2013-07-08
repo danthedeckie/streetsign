@@ -107,54 +107,6 @@ class UserGroup(DBModel):
 #
 # Posts & Feeds:
 #
-
-class Post(DBModel):
-    type = TextField()
-    content = TextField()
-    feed = ForeignKeyField(Feed)
-
-    author = ForeignKeyField(User)
-
-    write_date = DateTimeField(default=datetime.now)
-
-    #publisher info:
-    published = BooleanField(default=False)
-    publish_date = DateTimeField(null=True)
-    publisher = ForeignKeyField(User, null=True)
-
-    # Should it actually be displayed?
-    active = BooleanField(default=True)
-
-    # When should the feed actually be shown:
-    active_start = DateTimeField(null=True)
-    active_end = DateTimeField(null=True)
-
-    # Time restrictions don't need to be cross queried, and honestly
-    # are easier just left in javascript/JSON land:
-    # are these restrictions "Only show during these times" or
-    #                        "Do not show during these times" ?
-    time_restrictions_exclude = BooleanField(default=True)
-    # and the actual restrictions:
-    time_restrictions = TextField(default='[]')
-
-    # For how long should it be displayed?
-    display_time = IntegerField(default=8)
-
-    def __repr__(self):
-        return '<Post:{0}:{1}>'.format(self.type, self.content[0:22])
-
-    def repr(self):
-        return json.loads(self.content)['content'][0:12] + '...(' + self.type + ')'
-
-    def dict_repr(self):
-        ''' must give all info, for use on screens, etc. '''
-        return (
-            { 'id': self.id,
-              'type': self.type,
-              'content': json.loads(self.content),
-              'active': self.active
-            })
-
 class Feed(DBModel):
     name = CharField(default='New Feed')
 
@@ -341,6 +293,54 @@ class FeedPermission(DBModel):
     read = BooleanField(default=True)
     write = BooleanField(default=False)
     publish = BooleanField(default=False)
+
+class Post(DBModel):
+    type = TextField()
+    content = TextField()
+    feed = ForeignKeyField(Feed, related_name='posts')
+
+    author = ForeignKeyField(User)
+
+    write_date = DateTimeField(default=datetime.now)
+
+    #publisher info:
+    published = BooleanField(default=False)
+    publish_date = DateTimeField(null=True)
+    publisher = ForeignKeyField(User, null=True)
+
+    # Should it actually be displayed?
+    active = BooleanField(default=True)
+
+    # When should the feed actually be shown:
+    active_start = DateTimeField(null=True)
+    active_end = DateTimeField(null=True)
+
+    # Time restrictions don't need to be cross queried, and honestly
+    # are easier just left in javascript/JSON land:
+    # are these restrictions "Only show during these times" or
+    #                        "Do not show during these times" ?
+    time_restrictions_exclude = BooleanField(default=True)
+    # and the actual restrictions:
+    time_restrictions = TextField(default='[]')
+
+    # For how long should it be displayed?
+    display_time = IntegerField(default=8)
+
+    def __repr__(self):
+        return '<Post:{0}:{1}>'.format(self.type, self.content[0:22])
+
+    def repr(self):
+        return json.loads(self.content)['content'][0:12] + '...(' + self.type + ')'
+
+    def dict_repr(self):
+        ''' must give all info, for use on screens, etc. '''
+        return (
+            { 'id': self.id,
+              'type': self.type,
+              'content': json.loads(self.content),
+              'active': self.active
+            })
+
 
 
 

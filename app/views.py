@@ -147,12 +147,16 @@ def post_new():
         post_type = request.form.get('post_type')
 
         u = user_session.get_user()
-        fs = by_id(Feed, request.form.getlist('post_feeds'))
         p = Post(type=post_type, author=u)
-        p.content=json.dumps(post_types.receive(post_type, request.form))
-        for f in fs:
+
+        try:
+            f = Feed(id=request.form.get('post_feed'))
             if f.user_can_write(u):
                 p.feed = f
+        except Feed.DoesNotExist:
+            flash('Invalid Feed ID!')
+
+        p.content=json.dumps(post_types.receive(post_type, request.form))
 
         p.save()
         return redirect(url_for('postlist'))
@@ -174,35 +178,33 @@ def postpage(postid):
 
     if request.method == 'POST':
         # TODO: DF-HERE...
-        for fx in post.feedsxref:
-            if fx.feed not in feeds:
-                if fx.feed.user_can_write(user):
-                    fx.delete().execute()
-
-        for f in feeds:
-            # if we don't have write permission, then this isn't our post!
-            if not f.user_can_write(user):
-                flash("Sorry, this post is in feed '{0}', which"
-                      " you don't have permission to post to."
-                      " Edit cancelled.".format(f.name))
+        if not post.feed and 'feedid' in request.form:
+            # new feed.
+            feed = Feed(id = request.form.get(feedid))
+            if feed.user_can_write(user):
+                post.feed = feed
+                flash('Posted to {0}'.format(feed.name))
+            else:
+                # This shouldn't happen very often - so don't worry about
+                # losing post data.  If it's an issue, refactor so it's stored
+                # but not written to the feed...
+                flash("Sorry, you don't have permission to write to {0}"
+                      .format(feed.name))
                 return redirect(url_for('index'))
 
-            # if this post is already published, be careful about editing it!
-            try:
-                if post.published and not f.user_can_publish(user):
-                    # TODO! TODO TODO roll back transaction, and refuse the
-                    # edit, don't just unpublish  the link!
-                    flash('Oops! You cannot post to {0}. Someone already'
-                          'approved the post, but since you edited, it will'
-                          'now get unpublished from that feed.'.format(f.name))
-                    post.published = False
-                    post.publish_date = None
-                    post.publisher = None
+        # if we don't have write permission, then this isn't our post!
+        if not post.feed.user_can_write(user):
+            flash("Sorry, this post is in feed '{0}', which"
+                  " you don't have permission to post to."
+                  " Edit cancelled.".format(post.feed.name))
+            return redirect(url_for('postpage', postid=postid))
 
-            # new feed for this post! yay!
-            except post
-                post.feed = f
-                flash('Posted to {0}'.format(f.name))
+        # if this post is already published, be careful about editing it!
+        if post.published and not post.feed.user_can_publish(user):
+            flash('Sorry, this post is published, and you do not have'
+                  'permission to edit published posts in "{0}".'.format(f.name))
+            return redirect(url_for('postpage', postid=postid))
+
 
         # finally get around to editing the content of the post...
         try:
@@ -219,7 +221,6 @@ def postpage(postid):
                             post = post,
                             post_type = post.type,
                             feedlist = writeable_feeds(user),
-                            current_feeds = [x.feed.id for x in post.feedsxref if x],
                             form_content = editor.form(json.loads(post.content)))
 
 @app.route('/posts/edittype/<typeid>')
@@ -227,10 +228,10 @@ def postedit_type(typeid):
     ''' returns an editor page, of type typeid '''
     editor = post_types.load(typeid)
     user = user_session.get_user()
-    initial_feeds=json.loads(request.args.get('initial_feeds'))
+
     return render_template('post_editor_loaded.html',
                            post_type = typeid,
-                           initial_feeds=initial_feeds,
+                           initial_feed=request.args.get('initial_feed'),
                            feedlist = writeable_feeds(user),
                            form_content = editor.form(request.form))
 
@@ -246,9 +247,9 @@ def simplescreen(screenfile):
 @app.route('/simplescreens/posts_from_feeds/<json_feeds_list>')
 def simplescreens_posts_from_feeds(json_feeds_list):
     feeds_list = json.loads(json_feeds_list)
-    posts = [p.dict_repr() for p in
-             Post.select().join(FeedPost)
-             .where((FeedPost.feed << feeds_list)
+    posts = [p.dict_repr() for p in 
+             Post.select().join(Feed)
+             .where((Feed.id << feeds_list)
                    &(Post.active == True))]
     return json.dumps({'posts':posts})
 

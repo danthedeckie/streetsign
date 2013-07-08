@@ -17,10 +17,10 @@
     {{ linkmacros.static_js('post_editor.js') }}
     <script type="text/javascript">
     // As the static js is static, we need in inject URLs here.
-    INITIAL_FEEDS="?initial_feeds={{ initial_feeds|tojson|urlencode }}";
+    INITIAL_FEED="?initial_feed={{ initial_feed }}";
     POST_TYPE_URL=function(id) {
         var o="{{url_for('postedit_type', typeid='-1')}}";
-        return o.replace(/-1/, id)+INITIAL_FEEDS;
+        return o.replace(/-1/, id)+INITIAL_FEED;
     };
 </script>
 

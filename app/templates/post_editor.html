@@ -10,10 +10,10 @@
     {% if not feedlist %}
         You do NOT have permission to write to any feeds! Sorry!
     {% else %}
-        <label id="post_feeds">Feeds to post to: {%- if not current_feeds %}<span class="warning" id="no_feeds">Currently not in any feeds!</span>{% endif %}
-        <select multiple name="post_feeds" class="chosen" autocomplete="false" data-placeholder="Please select which feeds this post should appear on">
+        <label>Feed to post to: 
+        <select name="post_feed" class="chosen" autocomplete="false" data-placeholder="Please select which feed this post should appear on">
         {% for feed in feedlist %}
-            <option value="{{ feed.id }}" {{ 'selected' if feed.id in current_feeds }}>{{ feed.name }}</option>
+            <option value="{{ feed.id }}" {{ 'selected' if feed.id == current_feed }}>{{ feed.name }}</option>
         {% endfor %}
         </select></label>
         <input type="submit" value="Post!" />
