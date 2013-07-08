@@ -7,32 +7,47 @@
 {% endblock %}
 {% block title %}Edit Screen:{{ screen.id }}{% endblock %}
 {% block body %}
-Screen ID:{{ screen.id }}
-<select name="background">
-{% for bg in backgrounds %}
-    <option value="{{bg.filename}}">{{bg.filename}}</option>
-{% endfor %}
-</select>
-<div id="json_container">
-Settings:
-<div id="json_settings">hi.</div>
-Zones:
-<div id="json_zones">zones.</div>
-</div>
-<input type="submit" value="Save" />
+<form id="screen_form" method="post">
+    Screen ID:{{ screen.id }}
+    <select name="background">
+    {% for bg in backgrounds %}
+        <option value="{{bg.filename}}">{{bg.filename}}</option>
+    {% endfor %}
+    </select>
+    <div id="json_container">
+    Settings:
+    <div id="json_settings">hi.</div>
+    Zones:
+    <div id="json_zones">zones.</div>
+    </div>
+    <input type="text" name="settings" value="{{ screen.settings }}" />
+    <input type="text" name="zones" value="{{ screen.zones}}" />
+    <input type="submit" id="save_btn">Save</button>
+</form>
 {% endblock %}
 
 {% block end_of_page_javascript %}
 {{ super() }}
 {{ linkmacros.static_js('lib/jsoneditor-2.1.1.min/jsoneditor-min.js') }}
 <script type="text/javascript">
-var settings = new jsoneditor.JSONEditor($('#json_settings')[0]);
-settings.set( {{ screen.settings if screen.settings else '{}'}} );
-settings.setName('Settings');
 
-var zones = new jsoneditor.JSONEditor($('#json_zones')[0]);
-zones.set( {{ screen.zones|safe }});
-zones.setName('Zones');
+screen_settings = new jsoneditor.JSONEditor($('#json_settings')[0]);
+screen_settings.set( {{ screen.settings|safe if screen.settings else '{}'}} );
+screen_settings.setName('Settings');
+
+screen_zones = new jsoneditor.JSONEditor($('#json_zones')[0]);
+screen_zones.set( {{ screen.zones|safe }});
+screen_zones.setName('Zones');
+screen_zones.expandAll();
+
+function save_page () {
+          $('[name=settings]').val(JSON.stringify(screen_settings.get()));
+          $('[name=zones]').val(JSON.stringify(screen_zones.get()));
+}
+$('#screen_form').submit(function(el){
+    save_page();
+});
+
 </script>
 
 {% endblock %}

@@ -18,7 +18,7 @@
   POSTS_URL = "{{ url_for('simplescreens_posts_from_feeds',json_feeds_list='-1') }}";
   // TODO: load this from a screens json thingy.
   var screen_data = {
-        background:'url("{{ url_for('static',filename='user_files/teenstreet_crowd.jpg')}}")',
+        background:'url("{{ url_for('static',filename='user_files/crowd_jib_and_blocks.png')}}")',
         css:'',
         defaults: {'no_posts_wait': 10000,
                    'update_zones_timer': 96000,
@@ -31,7 +31,7 @@
                   "left": "0",
                   "bottom": "90%",
                   "right": "0",
-                  "css": {background: /*"rgba(0,0,0,0.7)",*/'black',
+                  "css": {"background": "rgba(0,0,0,0.7)",
                           "text-align": "left",
                           "padding-left": "1em"
                         },
@@ -47,7 +47,8 @@
                   "left": "51%",
                  "right": "5%",
                 "bottom": "8%",
-                 "feeds": [2] },
+                   "css": { "color": "black" },
+                 "feeds": [2] }
 
                 ]
                 };

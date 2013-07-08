@@ -243,6 +243,13 @@ def postedit_type(typeid):
 #
 # Start simple screen pages:
 
+def form_json(name, default):
+    ''' make sure form input is valid JSON '''
+    try:
+        return json.dumps(json.loads(request.form.get(name,json.dumps(default))))
+    except:
+        return json.dumps(default)
+
 @app.route('/simplescreens/edit/<int:screenid>', methods=['GET','POST'])
 def simplescreenedit(screenid):
     try:
@@ -250,6 +257,13 @@ def simplescreenedit(screenid):
     except Screen.DoesNotExist:
         flash('Invalid Screen ID! Screen does NOT exist!')
         return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        screen.settings = form_json('settings',{'css':[]})
+        screen.zones = form_json('zones',{})
+        screen.save()
+        flash('saved.')
+
     return render_template('screen_editor.html',
                 screen=screen)
 

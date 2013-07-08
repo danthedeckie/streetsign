@@ -359,9 +359,9 @@ class Screen(DBModel):
 
     background = CharField(null=True)
     # JSON:
-    settings = CharField(default={})
-    defaults = CharField(default={})
-    zones = CharField(default={})
+    settings = TextField(default={})
+    defaults = TextField(default={})
+    zones = TextField(default={})
 
 ##############################################################################
 
