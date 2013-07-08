@@ -4,7 +4,7 @@ import app.user_session as user_session
 import app.post_types as post_types
 from importlib import import_module
 from app import app
-from app.models import DB, User, Group, Feed, Post, \
+from app.models import DB, User, Group, Feed, Post, Screen, \
                        writeable_feeds, by_id
 
 ######################################################################
@@ -241,9 +241,14 @@ def postedit_type(typeid):
 #
 # Start simple screen pages:
 
-@app.route('/simplescreens/<screenfile>')
-def simplescreen(screenfile):
-    return render_template('simplescreens/' + screenfile + '.html')
+@app.route('/simplescreens/edit/<int:screenid>', methods=['GET','POST'])
+def simplescreenedit(screenid):
+    pass
+
+@app.route('/simplescreens/<template>/<int:screenid>')
+def simplescreen(template='basic', screenid=0):
+    return render_template('simplescreens/' + template + '.html',
+                           screendata=Screen(id=screenid))
 
 @app.route('/simplescreens/posts_from_feeds/<json_feeds_list>')
 def simplescreens_posts_from_feeds(json_feeds_list):

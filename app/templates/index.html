@@ -29,6 +29,8 @@
     </ul>
     {% endblock %}
   </nav>
+  <a href="#" id="user_login_button">{{ session.username if session.logged_in else 'Login' }}</a>
+  <div class="cf"></div>
 </header>
 <article>
 {% block body %}{% endblock %}
@@ -39,7 +41,7 @@
 {% endfor %}
 </ul>
 <footer>
-<div class="footerbox">
+<div id="login_box">
 {% if session.logged_in %}
     Logged in as {{ session.username }}.
     <form action="{{ url_for('logout') }}" method="POST">

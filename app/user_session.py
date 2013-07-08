@@ -33,6 +33,7 @@ def logout():
         pass # somehow the session expired. but we're logging out anyway.
     session.pop('username', None)
     session.pop('sessionid', None)
+    session.pop('display_admin_stuff', None)
     session.pop('logged_in', None)
 
 def is_admin():

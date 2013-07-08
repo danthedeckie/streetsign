@@ -3,7 +3,10 @@
 
 body {
     font-family: Sans-Serif;
-    background-color: #9a9;
+    /*background-color: #9a9;*/
+    background: url('resources/tweed/tweed.png');
+    margin: 0;
+    padding: 0;
 }
 h1, h2 {
     text-align: center;
@@ -48,23 +51,28 @@ thead > tr {
 /*************************************************************************/
 /* Specific Areas (main stuff, common to all pages.) */
 header {
-    width: 90%;
-    margin: auto;
-    background: #234;
-    padding: 10px;
+    /*width: 100%;*/
+    margin: none;
+    background: rgba(10,20,50,0.5);
+    padding: 1em;
     color: #eff;
     text-align: center;
-    border-radius: 10px 10px 0 0;
     border: 1px solid #123;
 }
 header h1 {
     color: white;
     display: block;
     float: left;
+    padding: 0px;
+    margin: 0px;
 }
 header a {
     color: white;
 }
+header > nav {
+    display: block;
+    float: left;
+    }
 header > nav > ul {
     display: block;
 }
@@ -84,6 +92,11 @@ header > nav > ul > li:first-of-type {
 header > nav > ul > li:last-of-type {
     border-radius: 0 10px 10px 0;
 }
+#user_login_button {
+    display: block;
+    float: right;
+}
+
 #flashed_notices {
     position: absolute;
     top: 0;
@@ -120,6 +133,25 @@ article {
 
 }
 
+#login_box {
+    display: block;
+    position: absolute;
+    top: 2em;
+    right: 0;
+    border: 2px solid black;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border-radius: 15px;
+    text-align: center;
+    padding: 1em;
+    display: none;
+}
+#login_box > h2 {
+    display: none;
+}
+#login_box input {
+    margin: 0.2em;
+}
 div.footerbox {
     width: 25%;
     border: 1px solid #123;

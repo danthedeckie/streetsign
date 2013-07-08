@@ -7,8 +7,8 @@ UPDATE_ZONES_TIMER = 6000; // how often to check for new posts?
 post_renderers = {
     html: function(zone, data) {
         console.log('making html');
-        return ($('<div class="post post_html">' + data.content.content + '</div>')
-            .prependTo(zone));
+        return $('<div class="post post_html">' + data.content.content + '</div>')
+            .prependTo(zone);
     },
     text: function(zone, data) {
         console.log('making text');
@@ -54,6 +54,9 @@ function zone(container, obj) {
     obj.el = $(zone_html(obj.name, obj.top, obj.left, obj.bottom, obj.right))
               .prependTo(container)[0];
 
+    $(obj.el).addClass(obj.classes);
+    $(obj.el).css(obj.css);
+
     //obj.el.innerHTML = '<div>'+obj.el.innerHTML + '<br/>(initialising)</div>';
 }
 
@@ -62,7 +65,8 @@ function next_post(zone) {
     if (!('current_post' in zone))
         zone.current_post = -1;
     else
-        $(zone.posts[zone.current_post]._el).fadeOut();
+        if ((zone.posts)&&(zone.posts.length > 1))
+            $(zone.posts[zone.current_post]._el).fadeOut();
     // increment
     zone.current_post++;
     if ((!('posts' in zone)) || (zone.posts.length == 0)) {
@@ -83,6 +87,8 @@ function next_post(zone) {
 }
 
 function init_screen(screen_data, element) {
+
+    $(element).css('background-image',screen_data.background);
 
     for (var z in screen_data.zones) {
         // copy 'default' data in, if it needs it ONLY.
@@ -106,7 +112,10 @@ function start_zones_scrolling() {
 
 
 function make_updater(z){
-    // Captures zone (z) within a closure, for passing to a callback.
+    // Returns the 'update' closure, a function which is called
+    //    when we get new data (posts) from the server, and adds
+    //    them into a zone. Captures zone (z) within the closure,
+    //    so it can be passed to the $.getJSON(...) callback.
     var zone = z;
     return function(data) {
         //zone.el.innerHTML = data.posts.length;
@@ -137,8 +146,15 @@ function make_updater(z){
             var new_data = data.posts[i];
             if (!($.inArray(new_data.id, current_posts)!=-1)) {
                 var n = zone.posts.push(new_data) - 1;
-                zone.posts[n]._el = 
-                    post_renderers[zone.posts[n].type](zone.el, zone.posts[n])[0];
+                var el =
+                    post_renderers[zone.posts[n].type](zone.el, zone.posts[n]);
+                var zone_height = $(zone.el).height();
+                var my_height =el.height();
+                if (my_height < zone_height) {
+                    el.css('top', (zone_height/2)-(my_height/2));
+                }
+                zone.posts[n]._el = el[0];
+
             }
         }
     }

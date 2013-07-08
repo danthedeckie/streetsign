@@ -20,9 +20,11 @@
 {% endfor %}
 </tbody>
 </table>
-<form action="{{ url_for('feedlist') }}" method="POST">
-<h2> New Feed </h2>
-<label>Title:<input name="title" placeholder="new feed name..."/></label>
-<input type="submit" value="Create!" />
-</form>
+<div>
+    <form action="{{ url_for('feedlist') }}" method="POST">
+    <h2> New Feed </h2>
+    <label>Title:<input name="title" placeholder="new feed name..."/></label>
+    <input type="submit" value="Create!" />
+    </form>
+</div>
 {% endblock %}

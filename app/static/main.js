@@ -17,3 +17,8 @@ $('#flashed_notices > li').click(function(){
 $('#flashed_notices > li').delay(15000).fadeOut('slow');
 
 $('select.chosen').chosen({'width':'100%'});
+$('#user_login_button').click( function ()
+{
+    $('#login_box').fadeToggle();
+}
+);
