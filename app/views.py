@@ -4,7 +4,7 @@ import app.user_session as user_session
 import app.post_types as post_types
 from importlib import import_module
 from app import app
-from app.models import DB, User, Group, Feed, FeedPost, Post, \
+from app.models import DB, User, Group, Feed, Post, \
                        writeable_feeds, by_id
 
 ######################################################################
@@ -150,10 +150,11 @@ def post_new():
         fs = by_id(Feed, request.form.getlist('post_feeds'))
         p = Post(type=post_type, author=u)
         p.content=json.dumps(post_types.receive(post_type, request.form))
-        p.save()
         for f in fs:
             if f.user_can_write(u):
-                FeedPost(feed=f, post=p).save()
+                p.feed = f
+
+        p.save()
         return redirect(url_for('postlist'))
 
 @app.route('/posts/<int:postid>', methods=['GET','POST'])
@@ -172,9 +173,7 @@ def postpage(postid):
         return(redirect(url_for('postlist')))
 
     if request.method == 'POST':
-
-        feeds = by_id(Feed, request.form.getlist('post_feeds'))
-
+        # TODO: DF-HERE...
         for fx in post.feedsxref:
             if fx.feed not in feeds:
                 if fx.feed.user_can_write(user):
@@ -190,20 +189,19 @@ def postpage(postid):
 
             # if this post is already published, be careful about editing it!
             try:
-                xref = FeedPost.get(feed=f, post=post)
-                if xref.published and not f.user_can_publish(user):
+                if post.published and not f.user_can_publish(user):
                     # TODO! TODO TODO roll back transaction, and refuse the
                     # edit, don't just unpublish  the link!
                     flash('Oops! You cannot post to {0}. Someone already'
                           'approved the post, but since you edited, it will'
                           'now get unpublished from that feed.'.format(f.name))
-                    xref.published = False
-                    xref.publish_date = None
-                    xref.publisher = None
+                    post.published = False
+                    post.publish_date = None
+                    post.publisher = None
 
             # new feed for this post! yay!
-            except FeedPost.DoesNotExist:
-                FeedPost(feed=f, post=post).save()
+            except post
+                post.feed = f
                 flash('Posted to {0}'.format(f.name))
 
         # finally get around to editing the content of the post...

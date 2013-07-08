@@ -11,9 +11,10 @@ SECRET_KEY = app.config.get('SECRET_KEY')
 
 DB = SqliteDatabase(app.config.get('DATABASE_FILE'))
 
-__all__ = [ 'DB', 'User', 'user_login', 'user_logout', 'get_logged_in_user',
-            'Group', 'Post', 'Feed', 'FeedPermission', 'create_all',
-            'by_id' ]
+__all__ = [ 'DB', 'user_login', 'user_logout', 'get_logged_in_user',
+            'User', 'Group', 'Post', 'Feed', 'FeedPermission', 
+            'ConfigVar', 'Screen',
+            'create_all', 'by_id' ]
 
 
 class DBModel(Model):
@@ -110,12 +111,34 @@ class UserGroup(DBModel):
 class Post(DBModel):
     type = TextField()
     content = TextField()
+    feed = ForeignKeyField(Feed)
+
     author = ForeignKeyField(User)
 
     write_date = DateTimeField(default=datetime.now)
 
+    #publisher info:
+    published = BooleanField(default=False)
+    publish_date = DateTimeField(null=True)
+    publisher = ForeignKeyField(User, null=True)
+
     # Should it actually be displayed?
     active = BooleanField(default=True)
+
+    # When should the feed actually be shown:
+    active_start = DateTimeField(null=True)
+    active_end = DateTimeField(null=True)
+
+    # Time restrictions don't need to be cross queried, and honestly
+    # are easier just left in javascript/JSON land:
+    # are these restrictions "Only show during these times" or
+    #                        "Do not show during these times" ?
+    time_restrictions_exclude = BooleanField(default=True)
+    # and the actual restrictions:
+    time_restrictions = TextField(default='[]')
+
+    # For how long should it be displayed?
+    display_time = IntegerField(default=8)
 
     def __repr__(self):
         return '<Post:{0}:{1}>'.format(self.type, self.content[0:22])
@@ -320,39 +343,33 @@ class FeedPermission(DBModel):
     publish = BooleanField(default=False)
 
 
-class FeedPost(DBModel):
-    feed = ForeignKeyField(Feed, related_name='postsxref')
-    post = ForeignKeyField(Post, related_name='feedsxref')
 
-    # When should the feed actually be shown:
-    active_start = DateTimeField(null=True)
-    active_end = DateTimeField(null=True)
+##############################################################################
 
-    # Time restrictions are defined in TimeRestriction.
+class ConfigVar(DBModel):
+    ''' place to store site-wide front-end-editable settings. '''
+    id = CharField(primary_key=True)
+    value = CharField(null=True)
+    description = CharField(default="Setting")
 
-    # For how long should it be displayed?
-    display_time = IntegerField(default=8)
+class Screen(DBModel):
+    # Since most of the settings here are made with a JS interface,
+    # and sent as json packets to another JS interface for display,
+    # and don't need to be queried against, just leave 'em as JSON.
 
-
-    #publisher info:
-    published = BooleanField(default=False)
-    publish_date = DateTimeField(null=True)
-    publisher = ForeignKeyField(User, null=True)
-
-
-class TimeRestriction(DBModel):
-    start_time = TimeField(null=True)
-    end_time = TimeField(null=True)
-
-    feedpost = ForeignKeyField(FeedPost, related_name='time_restrictions')
+    background = CharField(null=True)
+    # JSON:
+    settings = CharField(default={})
+    defaults = CharField(default={})
+    zones = CharField(default={})
 
 ##############################################################################
 
 def create_all():
     ''' initialises the database, creates all needed tables. '''
     [t.create_table(True) for t in
-        (User, UserSession, Group, UserGroup, Post, Feed, FeedPost,
-         FeedPermission, TimeRestriction)]
+        (User, UserSession, Group, UserGroup, Post, Feed,
+         FeedPermission, ConfigVar, Screen)]
 
 def by_id(model, ids):
     ''' returns a list of objects, selected by id (list) '''
