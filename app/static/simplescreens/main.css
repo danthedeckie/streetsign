@@ -8,5 +8,19 @@ body {
 div.zone {
     position: absolute;
     background-color: rgba(230,220,210,0.6);
+    font-size: 40pt;
+    text-align: center;
+    overflow: hidden;
+    display: table-cell;
+    vertical-align: middle;
+}
 
+div.post {
+    position: absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    margin: auto;
+    display: none;
 }

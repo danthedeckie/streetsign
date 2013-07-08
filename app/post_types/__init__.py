@@ -4,6 +4,8 @@ from glob import glob
 
 PATH = dirname(__file__)
 
+_editors = {}
+
 def path_to_module(path):
     return splitext(basename(path))[0]
 
@@ -21,9 +23,18 @@ def types():
     return [ module_dict(m) for m in modules() ]
 
 def load(type_name):
+    if type_name in _editors:
+        return _editors[type_name]
+
     #if isfile(PATH + '/' + type_name):
-    return( import_module( 'app.post_types.' +  type_name ))
+    e = import_module( 'app.post_types.' +  type_name )
+    _editors[type_name] = e
+    return(e)
 
 def receive(posttype, form):
     editor = load(posttype)
     return(editor.receive(form))
+
+def renderer_js(posttype):
+    editor = load(posttype)
+    return(editor.renderer_js())
