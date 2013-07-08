@@ -57,6 +57,11 @@ header {
     border-radius: 10px 10px 0 0;
     border: 1px solid #123;
 }
+header h1 {
+    color: white;
+    display: block;
+    float: left;
+}
 header a {
     color: white;
 }

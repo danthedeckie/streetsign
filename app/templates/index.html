@@ -13,16 +13,17 @@
   </head>
 <body>
 <header>
-  <h1>{{ display_title }}</h1>
+  <h1>{{ g.site_vars.site_title }}:{{ display_title }}</h1>
   <nav>
     {% block nav %}
     <ul>
         {% macro navitem(view, text) -%}
             <li><a href="{{ url_for(view) }}">{{text}}</a></li>
         {%- endmacro %}
-
-        {{ navitem('userlist',  'User list') }}
-        {{ navitem('grouplist', 'Group list') }}
+        {% if session.display_admin_stuff %}
+            {{ navitem('userlist',  'User list') }}
+            {{ navitem('grouplist', 'Group list') }}
+        {% endif %}
         {{ navitem('feedlist',  'Feed list') }}
         {{ navitem('postlist',  'Post list') }}
     </ul>

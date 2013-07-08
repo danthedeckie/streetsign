@@ -5,11 +5,14 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from flask import Flask
+import flask
 #from flask_peewee.admin import Admin
 #from flask_peewee.auth import Auth
+import config
 
 app = Flask(__name__)
 app.config.from_object('config')
+
 
 from app import models
 from app import views

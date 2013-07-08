@@ -1,5 +1,5 @@
 from flask import render_template, url_for, request, session, redirect, \
-                  flash, json
+                  flash, json, g
 import app.user_session as user_session
 import app.post_types as post_types
 from importlib import import_module
@@ -12,6 +12,8 @@ from app.models import DB, User, Group, Feed, Post, \
 
 @app.before_request
 def attach_db():
+
+    g.site_vars = app.config.get('SITE_VARS')
     DB.connect()
 
 @app.teardown_request
@@ -177,7 +179,6 @@ def postpage(postid):
         return(redirect(url_for('postlist')))
 
     if request.method == 'POST':
-        # TODO: DF-HERE...
         if not post.feed and 'feedid' in request.form:
             # new feed.
             feed = Feed(id = request.form.get(feedid))
