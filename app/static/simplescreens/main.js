@@ -1,7 +1,5 @@
 // TODO: get these from somewhere?
-NO_POSTS_WAIT = 10000; // if no posts, how long to wait?
 UPDATE_ZONES_TIMER = 6000; // how often to check for new posts?
-DEFAULT_POST_TIME = 1000; // default of length for a post to be visible
 
 // These will eventually be loaded from their plugin files, rather than being
 // hard-coded in here.
@@ -69,7 +67,7 @@ function next_post(zone) {
     zone.current_post++;
     if ((!('posts' in zone)) || (zone.posts.length == 0)) {
         // there are no posts! I guess we'll sit around and wait for some.
-        setTimeout(function(){next_post(zone);}, NO_POSTS_WAIT);
+        setTimeout(function(){next_post(zone);}, zone.no_posts_wait);
         console.log('no posts!');
         return;
         }
@@ -81,13 +79,27 @@ function next_post(zone) {
     //zone.el.innerHTML = zone.posts[zone.current_post].content.content;
     $(zone.posts[zone.current_post]._el).fadeIn();
     //zone.el.innerHTML = 'postid:' + zone.current_post;
+    setTimeout(function(){next_post(zone);}, zone.post_time);
+}
 
-    setTimeout(function(){next_post(zone);}, DEFAULT_POST_TIME);
+function init_screen(screen_data, element) {
+
+    for (var z in screen_data.zones) {
+        // copy 'default' data in, if it needs it ONLY.
+        for (var d in screen_data.defaults) {
+            if (! (d in screen_data.zones[z])){
+                screen_data.zones[z][d] = screen_data.defaults[d];
+            }
+        }
+        console.log('adding zone:' + screen_data.zones[z].name);
+        zone(element, screen_data.zones[z]);
+    }
+
+    update_zones_posts();
 }
 
 function start_zones_scrolling() {
     for (var i=0;i<window.zones.length;i++) {
-        console.log('start:' + i);
         next_post(window.zones[i]);
     }
 }
@@ -106,13 +118,11 @@ function make_updater(z){
         for (var i in data.posts){
             new_posts.push(data.posts[i].id);
         }
-        console.log('new posts:' + JSON.stringify(new_posts));
         // what posts are currently in the zone?
         var current_posts = [];
         for (var i in zone.posts){
             // keep current posts, and delete no-longer needed posts:
             if ($.inArray(zone.posts[i].id, new_posts)!=-1) {
-                console.log('ok.' + i + ' in new list');
                 current_posts.push(zone.posts[i].id);
             } else {
                 console.log('deleting post:' + i);
@@ -121,8 +131,6 @@ function make_updater(z){
             }
 
         }
-
-        console.log('current posts:' + JSON.stringify(current_posts));
 
         // add new posts to the list!
         for (var i in data.posts) {
