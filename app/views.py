@@ -237,13 +237,21 @@ def postedit_type(typeid):
                            form_content = editor.form(request.form))
 
 
+##################################################################
+
 ###########################################
 #
 # Start simple screen pages:
 
 @app.route('/simplescreens/edit/<int:screenid>', methods=['GET','POST'])
 def simplescreenedit(screenid):
-    pass
+    try:
+        screen = Screen(id=screenid).get()
+    except Screen.DoesNotExist:
+        flash('Invalid Screen ID! Screen does NOT exist!')
+        return redirect(url_for('index'))
+    return render_template('screen_editor.html',
+                screen=screen)
 
 @app.route('/simplescreens/<template>/<int:screenid>')
 def simplescreen(template='basic', screenid=0):

@@ -1,0 +1,38 @@
+{% extends "index.html" %}
+
+{% block htmlhead %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static',
+                filename='lib/jsoneditor-2.1.1.min/jsoneditor-min.css') }}" />
+{% endblock %}
+{% block title %}Edit Screen:{{ screen.id }}{% endblock %}
+{% block body %}
+Screen ID:{{ screen.id }}
+<select name="background">
+{% for bg in backgrounds %}
+    <option value="{{bg.filename}}">{{bg.filename}}</option>
+{% endfor %}
+</select>
+<div id="json_container">
+Settings:
+<div id="json_settings">hi.</div>
+Zones:
+<div id="json_zones">zones.</div>
+</div>
+<input type="submit" value="Save" />
+{% endblock %}
+
+{% block end_of_page_javascript %}
+{{ super() }}
+{{ linkmacros.static_js('lib/jsoneditor-2.1.1.min/jsoneditor-min.js') }}
+<script type="text/javascript">
+var settings = new jsoneditor.JSONEditor($('#json_settings')[0]);
+settings.set( {{ screen.settings if screen.settings else '{}'}} );
+settings.setName('Settings');
+
+var zones = new jsoneditor.JSONEditor($('#json_zones')[0]);
+zones.set( {{ screen.zones|safe }});
+zones.setName('Zones');
+</script>
+
+{% endblock %}

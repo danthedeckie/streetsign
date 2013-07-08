@@ -40,3 +40,5 @@ def make():
     # default feeds:
 
     app.models.Feed(name='News').save()
+
+    app.models.Screen().save()
