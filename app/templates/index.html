@@ -24,6 +24,7 @@
         {% endif %}
         {{ navitem('feedlist',  'Feed list') }}
         {{ navitem('postlist',  'Post list') }}
+        {{ navitem('screenslist', 'Screens') }}
     </ul>
     {% endblock %}
   </nav>
@@ -60,6 +61,7 @@
 {% block end_of_page_javascript %}
   <!-- jquery, ga, whatever goes here. -->
   {{ linkmacros.static_js('lib/jquery.js') }}
+  {{ linkmacros.static_js('lib/knockout-2.2.1.js') }}
   {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
   {{ linkmacros.static_js('main.js') }}
 {% endblock %}

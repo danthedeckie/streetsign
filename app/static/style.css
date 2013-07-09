@@ -149,7 +149,7 @@ article {
 #login_box > h2 {
     display: none;
 }
-#login_box input {
+input {
     margin: 0.2em;
 }
 div.footerbox {
@@ -190,4 +190,52 @@ div.free_blocks {
     background-color: black;
     text-shadow: black 10;
     padding: 0.2em;
+}
+
+.itemlist {
+    display: block;
+    max-width: 17em;;
+}
+ul.itemlist > li {
+    background: #ddd;
+    border-radius: 5px;
+    margin: 0.2em;
+    border: 1px solid grey;
+    padding: 0.5em;
+}
+
+div.sizes_box {
+    display: block;
+    text-align: center;
+    max-width: 10em;
+    padding: 0.3em;
+}
+.sizes_box input {
+    max-width: 3em;
+}
+
+.fake_screen {
+    display: block;
+    position: relative;
+    background-color: black;
+    width: 400px;
+    height: 275px;
+}
+.fake_zone {
+    display: block;
+    position: absolute;
+    border: 1px dashed white;
+    color: white;
+    text-align: center;
+}
+.rightside {
+    /* TODO: only on big enough media screen sizes */
+    max-width: 48%;
+    clear: right;
+    float: right;
+}
+.leftside {
+    max-width: 48%;
+    clear: left;
+    float: left;
 }

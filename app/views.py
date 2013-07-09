@@ -3,6 +3,7 @@ from flask import render_template, url_for, request, session, redirect, \
 import app.user_session as user_session
 import app.post_types as post_types
 from importlib import import_module
+import urllib
 from app import app
 from app.models import DB, User, Group, Feed, Post, Screen, \
                        writeable_feeds, by_id
@@ -252,27 +253,46 @@ def form_json(name, default):
     except:
         return json.dumps(default)
 
+@app.route('/simplescreens/')
+def screenslist():
+    return render_template('screenslist.html',
+        screens=Screen.select())
+
 @app.route('/simplescreens/edit/<int:screenid>', methods=['GET','POST'])
 def simplescreenedit(screenid):
     try:
-        screen = Screen(id=screenid).get()
+        if screenid == -1:
+            screen = Screen()
+        else:
+            screen = Screen(id=screenid).get()
     except Screen.DoesNotExist:
         flash('Invalid Screen ID! Screen does NOT exist!')
         return redirect(url_for('index'))
 
     if request.method == 'POST':
+        if not user_session.logged_in():
+            flash("You're not logged in!")
+            return redirect(url_for(postlist))
+
+        user = user_session.get_user()
+        if not user.is_admin:
+            flash('Sorry. You are NOT an admin!')
+            redirect(url_for('index'))
+
+        screen.urlname = urllib.quote(request.form.get('urlname'),'')
         screen.settings = form_json('settings',{'css':[]})
         screen.zones = form_json('zones',{})
         screen.save()
         flash('saved.')
 
     return render_template('screen_editor.html',
+                feeds=Feed.select(),
                 screen=screen)
 
-@app.route('/simplescreens/<template>/<int:screenid>')
-def simplescreen(template='basic', screenid=0):
+@app.route('/simplescreens/<template>/<screenname>')
+def simplescreen(template, screenname):
     return render_template('simplescreens/' + template + '.html',
-                           screendata=Screen(id=screenid))
+                           screendata=Screen.get(urlname=screenname))
 
 @app.route('/simplescreens/posts_from_feeds/<json_feeds_list>')
 def simplescreens_posts_from_feeds(json_feeds_list):

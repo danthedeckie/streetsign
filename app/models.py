@@ -359,6 +359,7 @@ class Screen(DBModel):
     # and sent as json packets to another JS interface for display,
     # and don't need to be queried against, just leave 'em as JSON.
 
+    urlname = CharField(unique=True, null=False)
     background = CharField(null=True)
     # JSON:
     settings = TextField(default={})

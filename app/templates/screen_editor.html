@@ -2,51 +2,95 @@
 
 {% block htmlhead %}
     {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static',
-                filename='lib/jsoneditor-2.1.1.min/jsoneditor-min.css') }}" />
 {% endblock %}
 {% block title %}Edit Screen:{{ screen.id }}{% endblock %}
 {% block body %}
+
+<div class="rightside">
+<div class="fake_screen">
+<!-- ko foreach: zones -->
+<div class="fake_zone" data-bind="style: { top: top, left: left, right: right, bottom: bottom}, text: name"></div>
+<!-- /ko -->
+</div>
+Aspect Ratio:<select id="aspect">
+<option value=0.6>4:3</option>
+<option selected value=0.7>16:9</option>
+</select>
+<!--<textarea style="float: right;clear:right; max-width: 30%" data-bind="value: ko.mapping.toJSON($root, null, 2)"></textarea>-->
+
+<h2>Screen ID:{{ screen.id }}</h2>
+
 <form id="screen_form" method="post">
-    Screen ID:{{ screen.id }}
-    <select name="background">
-    {% for bg in backgrounds %}
+<label>Name<input type="text" value="{{ screen.urlname }}" /></label>
+<label style="display:block; width: 40%;">Background:
+    <select name="background" autocomplete="off" class="chosen">
+      {% for bg in backgrounds %}
         <option value="{{bg.filename}}">{{bg.filename}}</option>
-    {% endfor %}
+      {% endfor %}
     </select>
-    <div id="json_container">
-    Settings:
-    <div id="json_settings">hi.</div>
-    Zones:
-    <div id="json_zones">zones.</div>
+</label>
+Other Settings:<br/>
+<textarea name="settings" data-bind="value: other_settings" style="width: 100%"></textarea>
+CSS:<br/>
+<textarea name="css" data-bind="value: css" style="width: 100%"></textarea>
+<!-- where the actual saved data happens -->
+    <input type="hidden" name="background" data-bind="value: background"/>
+    <input type="hidden" name="zones" data-bind="value: ko.mapping.toJSON(zones)"/>
+    <input type="submit" id="save_btn" value="Save" />
+  </form>
+</div>
+
+<div id="zones_container">
+    <h3>Zones:<button data-bind="click: addZone">New Zone</button></h3>
+<ul data-bind="foreach: zones" class="itemlist">
+  <li>
+    <label>Name:<input name="urlname" data-bind="value: name" /></label><br/>
+    <label>Size:</label>
+    <div class="sizes_box">
+        <input data-bind="value: top" /><br/>
+        <input data-bind="value: left" />-<input data-bind="value:right" /><br/>
+        <input data-bind="value: bottom" /><br/>
     </div>
-    <input type="text" name="settings" value="{{ screen.settings }}" />
-    <input type="text" name="zones" value="{{ screen.zones}}" />
-    <input type="submit" id="save_btn">Save</button>
-</form>
+    <label>Feeds:
+        <select multiple autocomplete="off"
+                data-bind="options: AVAILABLE_FEEDS, optionsText:'name',
+                           optionsValue: 'id', selectedOptions: feeds" >
+        </select>
+    </label>
+  <div>
+  <label>CSS:
+      <textarea data-bind="value: css" ></textarea></label>
+  </div>
+  </li>
+</ul>
+<br/>
+
+</div>
+<div class="cf"></div>
+
+
 {% endblock %}
 
 {% block end_of_page_javascript %}
 {{ super() }}
-{{ linkmacros.static_js('lib/jsoneditor-2.1.1.min/jsoneditor-min.js') }}
+{{ linkmacros.static_js('lib/knockout.mapping-latest.js') }}
+{{ linkmacros.static_js('model_zones.js') }}
 <script type="text/javascript">
+BG="{{ screen.background }}";
+CSS=JSON.stringify({{ screen.css|safe }});
+SETTINGS=JSON.stringify({{ screen.settings|safe if screen.settings else ''}});
+ZONES={{ screen.zones|safe if screen.zones else '{}' }};
+AVAILABLE_FEEDS = [
+    {%- for feed in feeds -%}
+        {id: "{{ feed.id }}", name: "{{ feed.name}}"} {{- ',' if not loop.last -}}
+    {%- endfor -%} ];
 
-screen_settings = new jsoneditor.JSONEditor($('#json_settings')[0]);
-screen_settings.set( {{ screen.settings|safe if screen.settings else '{}'}} );
-screen_settings.setName('Settings');
 
-screen_zones = new jsoneditor.JSONEditor($('#json_zones')[0]);
-screen_zones.set( {{ screen.zones|safe }});
-screen_zones.setName('Zones');
-screen_zones.expandAll();
 
-function save_page () {
-          $('[name=settings]').val(JSON.stringify(screen_settings.get()));
-          $('[name=zones]').val(JSON.stringify(screen_zones.get()));
-}
-$('#screen_form').submit(function(el){
-    save_page();
-});
+var viewScreenModel = new ScreenModel(BG, SETTINGS, CSS, ZONES);
+//ko.mapping.fromJS(ZONES, [], viewZonesModel.zones);
+//ko.mapping.fromJS(AVAILABLE_FEEDS, [], viewZonesModel.availableFeeds);
+ko.applyBindings(viewScreenModel);
 
 </script>
 

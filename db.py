@@ -43,6 +43,6 @@ def make():
 
     news.save()
 
-    app.models.Post(type='html', feed=news, content='{"content":"First Post"}').save()
+    app.models.Post(type='html', feed=news, author=User(id=1), content='{"content":"First Post"}').save()
 
-    app.models.Screen().save()
+    app.models.Screen(urlname='Default').save()
