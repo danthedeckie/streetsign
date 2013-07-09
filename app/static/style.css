@@ -220,6 +220,7 @@ div.sizes_box {
     background-color: black;
     width: 400px;
     height: 275px;
+    background-size: cover;
 }
 .fake_zone {
     display: block;

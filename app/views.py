@@ -2,6 +2,8 @@ from flask import render_template, url_for, request, session, redirect, \
                   flash, json, g
 import app.user_session as user_session
 import app.post_types as post_types
+from glob import glob
+from os.path import basename, dirname
 from importlib import import_module
 import urllib
 from app import app
@@ -265,6 +267,8 @@ def simplescreenedit(screenid):
             screen = Screen()
         else:
             screen = Screen(id=screenid).get()
+            backgrounds = [basename(x) for x in glob(app.config['SITE_VARS']['user_dir']+ '*')]
+    
     except Screen.DoesNotExist:
         flash('Invalid Screen ID! Screen does NOT exist!')
         return redirect(url_for('index'))
@@ -279,6 +283,7 @@ def simplescreenedit(screenid):
             flash('Sorry. You are NOT an admin!')
             redirect(url_for('index'))
 
+        screen.background = request.form.get('background')
         screen.urlname = urllib.quote(request.form.get('urlname'),'')
         screen.settings = form_json('settings',{'css':[]})
         screen.zones = form_json('zones',{})
@@ -287,6 +292,7 @@ def simplescreenedit(screenid):
 
     return render_template('screen_editor.html',
                 feeds=Feed.select(),
+                backgrounds = backgrounds,
                 screen=screen)
 
 @app.route('/simplescreens/<template>/<screenname>')

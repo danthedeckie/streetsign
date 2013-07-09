@@ -15,10 +15,15 @@
   {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
   {{ linkmacros.static_js('simplescreens/main.js') }}
   <script type="text/javascript">
+
+  ZONES={{ screendata.zones|safe }};
+
+  BG="url({{url_for('static',filename='user_files/' + screendata.background)}})"
+
   POSTS_URL = "{{ url_for('simplescreens_posts_from_feeds',json_feeds_list='-1') }}";
   // TODO: load this from a screens json thingy.
   var screen_data = {
-        background:'url("{{ url_for('static',filename='user_files/crowd_jib_and_blocks.png')}}")',
+        background: BG,
         css:'',
         defaults: {'no_posts_wait': 10000,
                    'update_zones_timer': 96000,
@@ -26,31 +31,7 @@
                    'classes':'text_dropshadow',
                    'css':{}},
 
-        zones: [{"name": "day",
-                  "top": "0",
-                  "left": "0",
-                  "bottom": "90%",
-                  "right": "0",
-                  "css": {"background": "rgba(0,0,0,0.7)",
-                          "text-align": "left",
-                          "padding-left": "1em"
-                        },
-                  "feeds":[3]},
-                {"name": "main",
-                   "top": "15%",
-                  "left": "2%",
-                 "right": "50%",
-                "bottom": "8%",
-                 "feeds": [1,2,3] },
-                {"name": "sidebar",
-                   "top": "16%",
-                  "left": "51%",
-                 "right": "5%",
-                "bottom": "8%",
-                   "css": { "color": "black" },
-                 "feeds": [2] }
-
-                ]
+        zones: ZONES 
                 };
 
 init_screen(screen_data, '#zones')

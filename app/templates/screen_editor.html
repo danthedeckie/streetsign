@@ -7,7 +7,7 @@
 {% block body %}
 
 <div class="rightside">
-<div class="fake_screen">
+<div id="my_fake_screen" class="fake_screen">
 <!-- ko foreach: zones -->
 <div class="fake_zone" data-bind="style: { top: top, left: left, right: right, bottom: bottom}, text: name"></div>
 <!-- /ko -->
@@ -21,11 +21,11 @@ Aspect Ratio:<select id="aspect">
 <h2>Screen ID:{{ screen.id }}</h2>
 
 <form id="screen_form" method="post">
-<label>Name<input type="text" value="{{ screen.urlname }}" /></label>
+<label>Name<input type="text" name="urlname" value="{{ screen.urlname }}" /></label>
 <label style="display:block; width: 40%;">Background:
-    <select name="background" autocomplete="off" class="chosen">
+    <select  name="background" id="background" autocomplete="off" class="chosen">
       {% for bg in backgrounds %}
-        <option value="{{bg.filename}}">{{bg.filename}}</option>
+        <option {{ 'selected' if bg == screen.background }} value="{{bg}}">{{bg}}</option>
       {% endfor %}
     </select>
 </label>
@@ -34,7 +34,6 @@ Other Settings:<br/>
 CSS:<br/>
 <textarea name="css" data-bind="value: css" style="width: 100%"></textarea>
 <!-- where the actual saved data happens -->
-    <input type="hidden" name="background" data-bind="value: background"/>
     <input type="hidden" name="zones" data-bind="value: ko.mapping.toJSON(zones)"/>
     <input type="submit" id="save_btn" value="Save" />
   </form>
@@ -91,6 +90,10 @@ var viewScreenModel = new ScreenModel(BG, SETTINGS, CSS, ZONES);
 //ko.mapping.fromJS(ZONES, [], viewZonesModel.zones);
 //ko.mapping.fromJS(AVAILABLE_FEEDS, [], viewZonesModel.availableFeeds);
 ko.applyBindings(viewScreenModel);
+
+$('#background').change(function(){
+    $('#my_fake_screen').css('background-image', "{{ g.site_vars.user_dir }}" + $('#background').val());
+});
 
 </script>
 
