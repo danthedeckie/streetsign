@@ -1,3 +1,4 @@
+{% import "link-macros.html" as linkmacros -%}
 <!doctype html>
 <html>
 <head>
@@ -5,22 +6,15 @@
 <body>
 {% block body %}
   <form action="{{ form_action }}" method="POST">
-    <input type="hidden" name="post_type" value="{{ post_type }}">
-    {{ form_content|safe }}
-    {% if not feedlist %}
-        You do NOT have permission to write to any feeds! Sorry!
-    {% else %}
-        <label>Feed to post to:<select name="post_feed" class="chosen" autocomplete="off">
-        {% for feed in feedlist %}
-            <option {{ 'selected' if feed.id == initial_feed }}  value="{{ feed.id }}">{{ feed.name }}</option>
-        {% endfor %}
-        </select></label>
-        <input style="float:right" type="submit" value="Post!" />
-    {% endif %}
+  {% include "post_editor_form.html" %}
   </form>
 {% endblock %}
 
 {% block scripts %}
+
+{{ linkmacros.static_js('lib/knockout-2.2.1.js') }}
+{{ linkmacros.static_js('post_times_editor.js') }}
+
 <script type="text/javascript">
     $('select').chosen({'width':'100%'});
 </script>

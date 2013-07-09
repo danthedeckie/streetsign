@@ -2,27 +2,16 @@
 {% block title %} Edit Post: {{ post.id }} {% endblock %}
 {% block body %}
   <h1> Edit Post </h1>
-  <form action="{{ form_action }}" method="POST">
-    <input type="hidden" name="post_type" value="{{ post_type }}" />
-    <input type="hidden" name="action" value="update" />
-    {{ form_content|safe }}
-
-    {% if not feedlist %}
-        You do NOT have permission to write to any feeds! Sorry!
-    {% else %}
-        <label>Feed to post to: 
-        <select name="post_feed" class="chosen" autocomplete="false" data-placeholder="Please select which feed this post should appear on">
-        {% for feed in feedlist %}
-            <option value="{{ feed.id }}" {{ 'selected' if feed.id == current_feed }}>{{ feed.name }}</option>
-        {% endfor %}
-        </select></label>
-        <hr/>
-        {% include "post_times_editor.html" %}
-        <input type="submit" value="Post!" />
-    {% endif %}
-  </form>
+ 
+ 
+ <form action="{{ form_action }}" method="POST">
+  <input type="hidden" name="action" value="update" />
+  {% include "post_editor_form.html" %}
+</form>
 {% endblock %}
 
-{% block end_of_page_scripts %}
+{% block end_of_page_javascript %}
 {{ super() }}
+{{ linkmacros.static_js('lib/knockout-2.2.1.js') }}
+{{ linkmacros.static_js('post_times_editor.js') }}
 {% endblock %}
