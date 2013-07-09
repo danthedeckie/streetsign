@@ -91,9 +91,12 @@ var viewScreenModel = new ScreenModel(BG, SETTINGS, CSS, ZONES);
 //ko.mapping.fromJS(AVAILABLE_FEEDS, [], viewZonesModel.availableFeeds);
 ko.applyBindings(viewScreenModel);
 
+
+
 $('#background').change(function(){
-    $('#my_fake_screen').css('background-image', "{{ g.site_vars.user_dir }}" + $('#background').val());
-});
+    var newbg="url(/static/user_files/" + $('#background').val() + ')';
+    $('#my_fake_screen').css('background-image', newbg );
+}).change();
 
 </script>
 

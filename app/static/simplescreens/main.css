@@ -14,6 +14,7 @@ div.zone {
     overflow: hidden;
     display: table-cell;
     vertical-align: middle;
+    background-size: cover;
 }
 
 div.post {
