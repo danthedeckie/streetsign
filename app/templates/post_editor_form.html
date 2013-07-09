@@ -1,0 +1,34 @@
+<input type="hidden" name="post_type" value="{{ post_type }}" />
+
+{{ form_content|safe }}
+
+{% if not feedlist %}
+    You do NOT have permission to write to any feeds! Sorry!
+{% else %}
+    <label>Feed to post to: 
+    <select name="post_feed" class="chosen" autocomplete="false" data-placeholder="Please select which feed this post should appear on">
+    {% for feed in feedlist %}
+    <option value="{{ feed.id }}" {{ 'selected' if feed.id == current_feed }}>{{ feed.name }}</option>
+    {% endfor %}
+    </select></label>
+    <hr/>
+{% endif %}
+<h2>Display time restrictions <a href="#" data-bind="click: $root.addTime">New</a></h2>
+
+<style rel="css">
+input.third { max-width: 28%;};
+</style>
+<label>Active From: <input type="datetime" /></label>
+
+<ul data-bind="foreach: times">
+    <li><input class="third" type="time" data-bind="value: start" />
+        <input class="third" type="time" data-bind="value: end" />
+        <input class="third" data-bind="value: note" />
+        <a href="#" data-bind="click: $root.removeTime">X</a>
+    </li>
+</ul>
+
+
+{% if feedlist %}
+    <input type="submit" value="Post!" />
+{% endif %}
