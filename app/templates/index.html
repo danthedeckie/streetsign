@@ -3,7 +3,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>{% block title %}TODO: TITLE{% endblock %}</title>
+    <title>{% block title %}{{ g.site_vars.site_title }}{% endblock %}</title>
     {% block htmlhead %}
         {{ linkmacros.static_css('lib/chosen/chosen.min.css') }}
         {{ linkmacros.static_css('style.css') }}
@@ -21,6 +21,7 @@
         {% if session.display_admin_stuff %}
             {{ navitem('userlist',  'User list') }}
             {{ navitem('grouplist', 'Group list') }}
+            {{ navitem('user_files_list', 'Uploaded Files') }}
         {% endif %}
         {{ navitem('feedlist',  'Feed list') }}
         {{ navitem('postlist',  'Post list') }}

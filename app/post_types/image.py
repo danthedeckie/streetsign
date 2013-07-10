@@ -1,11 +1,33 @@
-from flask import render_template, url_for, json
+from flask import render_template, url_for, json, request, g
+from werkzeug import secure_filename
+from os.path import splitext, join as pathjoin, isdir
+from os import makedirs
+
+
+def allow_filetype(filename):
+    return splitext(filename)[-1].lower() in \
+        ['.png','.jpg','.jpeg','.gif','.bmp','.svg']
 
 def form(data, **kwargs):
     return render_template('post_types/image.html', **kwargs)
 
 def receive(data):
-    return {'content': data.get('content','')}
+    f = request.files['image_file']
+    if f and allow_filetype(f.filename):
+        filename = secure_filename(f.filename)
+        where = pathjoin(g.site_vars['user_dir'],'post_images')
+        if not isdir(where):
+            makedirs(where)
+
+        f.save(pathjoin(where, filename))
+    else:
+        raise IOError('Invalid file. Sorry')
+
+    return {'content': filename,
+            'filename': filename,
+            'file_url': g.site_vars['user_url']+'/post_images/'+filename}
 
 def display(data):
-    return data['content']
+    return ('<img class="post_image" src="{0}"'
+           ' style="width:100%;height:auto" />'.format(data['file_url']))
 

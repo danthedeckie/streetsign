@@ -4,7 +4,7 @@
   <h1> Edit Post </h1>
  
  
- <form action="{{ form_action }}" method="POST">
+ <form action="{{ form_action }}" method="POST" enctype="multipart/form-data">
   <input type="hidden" name="action" value="update" />
   {% include "post_editor_form.html" %}
 </form>

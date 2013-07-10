@@ -5,7 +5,7 @@
 </head>
 <body>
 {% block body %}
-  <form action="{{ form_action }}" method="POST">
+  <form action="{{ form_action }}" method="POST" enctype="multipart/form-data">
   {% include "post_editor_form.html" %}
   </form>
 {% endblock %}

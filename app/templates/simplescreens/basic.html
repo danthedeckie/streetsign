@@ -17,8 +17,11 @@
   <script type="text/javascript">
 
   ZONES={{ screendata.zones|safe }};
-
-  BG="url({{url_for('static',filename='user_files/' + screendata.background)}})"
+  {% if screendata.background %}
+      BG="url({{url_for('static',filename='user_files/' + screendata.background)}})"
+  {% else %}
+      BG="black"
+  {% endif %}
 
   POSTS_URL = "{{ url_for('simplescreens_posts_from_feeds',json_feeds_list='-1') }}";
   // TODO: load this from a screens json thingy.

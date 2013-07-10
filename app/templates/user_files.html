@@ -1,0 +1,35 @@
+{% extends "index.html" %}
+{% block title %} User Uploaded Files {{ dirname }} {% endblock %}
+
+{% block body %}
+<pre>{{ dirname }}</pre>
+<table>
+<thead>
+  <tr>
+    <td>Filename</td>
+    <td>Size</td>
+    <td></td>
+  </tr>
+</thead>
+<tbody>
+{% for f in file_list %}
+    <tr>
+        <td><a href="{{ f.url }}" rel=new>{{f.name}}</a></td>
+        <td>{{ f.size }}</td>
+        <td><form method="POST">
+            <input type="hidden" name="filename" value="{{f.name}}" />
+            <input type="hidden" name="action" value="delete" />
+            <input type="submit" value="X"></form></td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+<div>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="upload" />
+    <h2>Upload new file</h2>
+        <input type="file" name="image_file" id="image_file" accept="image/*" />
+    <input type="submit" value="Upload" />
+  </form>
+</div>
+{% endblock %}
