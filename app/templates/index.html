@@ -19,13 +19,13 @@
             <li><a href="{{ url_for(view) }}">{{text}}</a></li>
         {%- endmacro %}
         {% if session.display_admin_stuff %}
-            {{ navitem('userlist',  'User list') }}
-            {{ navitem('grouplist', 'Group list') }}
+            {{ navitem('users',  'User list') }}
+            {{ navitem('groups', 'Group list') }}
             {{ navitem('user_files_list', 'Uploaded Files') }}
         {% endif %}
-        {{ navitem('feedlist',  'Feed list') }}
-        {{ navitem('postlist',  'Post list') }}
-        {{ navitem('screenslist', 'Screens') }}
+        {{ navitem('feeds',  'Feeds') }}
+        {{ navitem('posts',  'Posts') }}
+        {{ navitem('screens', 'Screens') }}
     </ul>
     {% endblock %}
   </nav>

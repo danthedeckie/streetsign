@@ -1,0 +1,31 @@
+{% extends "index.html" %}
+{% block title %} Screens {% endblock %}
+
+{% block body %}
+<table>
+<thead>
+  <tr>
+    <td>View URL</td>
+    <td>Feed ID</td>
+    <td></td>
+  </tr>
+</thead>
+<tbody>
+{% for s in screens %}
+    <tr>
+        <td><a href="{{url_for('screendisplay', template='basic', screenname=s.urlname)}}">{{url_for('screendisplay', template='basic', screenname=s.urlname)}}</a>
+        <td><a href="{{url_for('screendisplay', template='basic', screenname=s.urlname)}}">View</a>{% if session.display_admin_stuff %} - <a href="{{url_for('screenedit', screenid=s.id)}}">Edit</a>{% endif %}</td>
+        <td><form method="POST" action="{{ url_for('screenedit', screenid=s.id) }}">
+            <input type="hidden" name="action" value="delete" />
+            <input type="submit" value="X"></form></td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+<div>
+    <form action="{{ url_for('screenedit', screenid=-1) }}" method="POST">
+    <h2> New Screen </h2>
+    <input type="submit" value="Create!" />
+    </form>
+</div>
+{% endblock %}

@@ -23,13 +23,13 @@ def form_json(name, default):
     except:
         return json.dumps(default)
 
-@app.route('/simplescreens/')
-def screenslist():
-    return render_template('screenslist.html',
+@app.route('/screens/')
+def screens():
+    return render_template('screens.html',
         screens=Screen.select())
 
-@app.route('/simplescreens/edit/<int:screenid>', methods=['GET','POST'])
-def simplescreenedit(screenid):
+@app.route('/screens/edit/<int:screenid>', methods=['GET','POST'])
+def screenedit(screenid):
     try:
         if screenid == -1:
             screen = Screen()
@@ -37,7 +37,7 @@ def simplescreenedit(screenid):
             screen = Screen(id=screenid).get()
             backgrounds = [basename(x) for x in \
                            glob(app.config['SITE_VARS']['user_dir']+ '*')]
-    
+
     except Screen.DoesNotExist:
         flash('Invalid Screen ID! Screen does NOT exist!')
         return redirect(url_for('index'))
@@ -45,7 +45,7 @@ def simplescreenedit(screenid):
     if request.method == 'POST':
         if not user_session.logged_in():
             flash("You're not logged in!")
-            return redirect(url_for(postlist))
+            return redirect(url_for('posts'))
 
         user = user_session.get_user()
         if not user.is_admin:
@@ -64,15 +64,15 @@ def simplescreenedit(screenid):
                 backgrounds = backgrounds,
                 screen=screen)
 
-@app.route('/simplescreens/<template>/<screenname>')
-def simplescreen(template, screenname):
-    return render_template('simplescreens/' + template + '.html',
+@app.route('/screens/<template>/<screenname>')
+def screendisplay(template, screenname):
+    return render_template('screens/' + template + '.html',
                            screendata=Screen.get(urlname=screenname))
 
-@app.route('/simplescreens/posts_from_feeds/<json_feeds_list>')
-def simplescreens_posts_from_feeds(json_feeds_list):
+@app.route('/screens/posts_from_feeds/<json_feeds_list>')
+def screens_posts_from_feeds(json_feeds_list):
     feeds_list = json.loads(json_feeds_list)
-    posts = [p.dict_repr() for p in 
+    posts = [p.dict_repr() for p in \
              Post.select().join(Feed)
              .where((Feed.id << feeds_list)
                    &(Post.active == True))]

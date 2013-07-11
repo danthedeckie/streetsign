@@ -11,18 +11,18 @@ from app.models import DB, User, Group, Feed, Post, Screen, \
 # Feeds & Posts:
 
 @app.route('/feeds', methods=['GET','POST'])
-def feedlist():
+def feeds():
     if request.method == 'POST':
         if not user_session.is_admin():
             flash('Only Admins can do this!')
-            return redirect(url_for('feedlist'))
+            return redirect(url_for('feeds'))
 
         action = request.form.get('action','create')
 
         if action == 'create':
             if not request.form.get('title','').strip():
                 flash("I'm not making you an un-named feed!")
-                return redirect(url_for('feedlist'))
+                return redirect(url_for('feeds'))
             Feed(name=request.form.get('title','blank').strip()).save()
 
     return render_template('feeds.html', feeds=Feed.select())
@@ -33,7 +33,7 @@ def feedpage(feedid):
         feed = Feed.get(id=feedid)
     except:
         flash('invalid feed id! (' + feedid + ')')
-        return redirect(url_for('feedlist'))
+        return redirect(url_for('feeds'))
 
         
     if request.method == 'POST':
@@ -66,7 +66,7 @@ def feedpage(feedid):
 
 
 @app.route('/posts')
-def postlist():
+def posts():
     return render_template('posts.html', posts=Post.select())
 
 @app.route('/posts/new', methods=['GET','POST'])
@@ -100,13 +100,13 @@ def post_new():
         p.content=json.dumps(post_types.receive(post_type, request.form))
 
         p.save()
-        return redirect(url_for('postlist'))
+        return redirect(url_for('posts'))
 
 @app.route('/posts/<int:postid>', methods=['GET','POST'])
 def postpage(postid):
     if not user_session.logged_in():
         flash("You're not logged in!")
-        return redirect(url_for(postlist))
+        return redirect(url_for(posts))
 
     try:
         post = Post.get(Post.id==postid)
@@ -115,7 +115,7 @@ def postpage(postid):
 
     except Post.DoesNotExist:
         flash('Sorry! Post id:{0} not found!'.format(postid))
-        return(redirect(url_for('postlist')))
+        return(redirect(url_for('posts')))
 
     if request.method == 'POST':
         if not post.feed and 'feedid' in request.form:

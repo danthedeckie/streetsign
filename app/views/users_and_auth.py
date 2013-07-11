@@ -39,7 +39,7 @@ def logout():
 # User Management:
 
 @app.route('/users')
-def userlist():
+def users():
     return render_template('users.html', users=User.select())
 
 @app.route('/users/<int:userid>')
@@ -47,7 +47,7 @@ def userpage(userid):
     return render_template('userpage.html', user=User.select(id=userid))
 
 @app.route('/groups')
-def grouplist():
+def groups():
     return render_template('groups.html', groups=Group.select())
 
 

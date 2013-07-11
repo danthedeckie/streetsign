@@ -9,7 +9,7 @@ from flask import render_template, url_for, request, session, redirect, \
 import app.views.users_and_auth
 import app.views.feeds_and_posts
 import app.views.user_files
-import app.views.simplescreens
+import app.views.screens
 
 # set up the app
 from app import app

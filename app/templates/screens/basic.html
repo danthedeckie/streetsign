@@ -4,7 +4,7 @@
 <html>
 <head>
   <title>Screen</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='simplescreens/main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='screens/main.css') }}" />
 </head>
 <body>
 <div id="zones" style="position:absolute;top:0;bottom:0;right:0;left:0;background-size:cover;"></div>
@@ -13,7 +13,7 @@
 {% block end_of_page_javascript %}
   {{ linkmacros.static_js('lib/jquery.js') }}
   {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
-  {{ linkmacros.static_js('simplescreens/main.js') }}
+  {{ linkmacros.static_js('screens/main.js') }}
   <script type="text/javascript">
 
   ZONES={{ screendata.zones|safe }};
@@ -23,7 +23,7 @@
       BG="black"
   {% endif %}
 
-  POSTS_URL = "{{ url_for('simplescreens_posts_from_feeds',json_feeds_list='-1') }}";
+  POSTS_URL = "{{ url_for('screens_posts_from_feeds',json_feeds_list='-1') }}";
   // TODO: load this from a screens json thingy.
   var screen_data = {
         background: BG,
@@ -34,7 +34,7 @@
                    'classes':'text_dropshadow',
                    'css':{}},
 
-        zones: ZONES 
+        zones: ZONES
                 };
 
 init_screen(screen_data, '#zones')
