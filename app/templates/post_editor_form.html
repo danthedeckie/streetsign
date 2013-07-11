@@ -1,12 +1,12 @@
 <input type="hidden" name="post_type" value="{{ post_type }}" />
-
 {{ form_content|safe }}
 
 {% if not feedlist %}
     You do NOT have permission to write to any feeds! Sorry!
 {% else %}
     <label>Feed to post to: 
-    <select name="post_feed" class="chosen" autocomplete="false" data-placeholder="Please select which feed this post should appear on">
+    <select name="post_feed" class="chosen" autocomplete="off"
+            data-placeholder="Please select which feed this post should appear on">
     {% for feed in feedlist %}
     <option value="{{ feed.id }}" {{ 'selected' if feed.id == current_feed }}>{{ feed.name }}</option>
     {% endfor %}

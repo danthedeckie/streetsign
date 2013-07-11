@@ -76,11 +76,10 @@ def post_new():
         return redirect(url_for('index'))
 
     if request.method == 'GET':
-        feeds = []
-        if 'initial_feed' in request.args:
-            feed = int(request.args.get('initial_feed'))
-        else:
-            feed = 0
+        #if 'initial_feed' in request.args:
+        feed = int(request.args.get('initial_feed',1))
+        #else:
+        #    feed = 0
         return render_template('postnew.html',
                 initial_feed=feed,
                 post_types=post_types.types())
@@ -160,6 +159,7 @@ def postpage(postid):
     return render_template('post_editor.html',
                             post = post,
                             post_type = post.type,
+                            current_feed = post.feed.id,
                             feedlist = writeable_feeds(user),
                             form_content = editor.form(json.loads(post.content)))
 
@@ -171,7 +171,7 @@ def postedit_type(typeid):
 
     return render_template('post_editor_loaded.html',
                            post_type = typeid,
-                           initial_feed=int(request.args.get('initial_feed')),
+                           current_feed=int(request.args.get('initial_feed',1)),
                            feedlist = writeable_feeds(user),
                            form_content = editor.form(request.form))
 

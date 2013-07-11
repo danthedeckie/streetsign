@@ -271,3 +271,27 @@ div.sizes_box {
     clear: left;
     float: left;
 }
+
+ul.optionrow {
+    display: inline;
+    margin: auto;
+    text-align: center;
+    list-style: none;
+}
+ul.optionrow > li {
+    display: inline;
+    background: #ccc;
+    padding: 0.5em;
+    margin: 0px;
+    list-style: none;
+}
+ul.optionrow > li:hover {
+    background: #aaa;
+}
+
+ul.optionrow > li:first-of-type {
+    border-radius: 10px 0 0 10px;
+}
+ul.optionrow > li:last-of-type {
+    border-radius: 0 10px 10px 0;
+}
