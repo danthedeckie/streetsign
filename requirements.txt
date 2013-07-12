@@ -6,3 +6,5 @@ flask-peewee
 # for passwords:
 py-bcrypt
 passlib
+
+gunicorn

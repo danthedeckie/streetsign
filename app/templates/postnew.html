@@ -11,7 +11,11 @@
 {%- endfor -%}
 </ul>
 </div>
-<div id="contentblock"></div>
+<form action="{{ form_action }}" method="POST" enctype="multipart/form-data">
+  <input type="hidden" name="action" value="new" />
+  {% include "post_editor_form.html" %}
+</form>
+
 {% endblock %}
 
 {% block end_of_page_javascript %}

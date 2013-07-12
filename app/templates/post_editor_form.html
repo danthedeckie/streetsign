@@ -1,5 +1,7 @@
+<div id="postcontentblock">
 <input type="hidden" name="post_type" value="{{ post_type }}" />
 {{ form_content|safe }}
+</div>
 
 {% if not feedlist %}
     You do NOT have permission to write to any feeds! Sorry!
@@ -13,12 +15,18 @@
     </select></label>
     <hr/>
 {% endif %}
-<h2>Display time restrictions <a href="#" data-bind="click: $root.addTime">New</a></h2>
 
-<style rel="css">
-input.third { max-width: 28%;};
-</style>
-<label>Active From: <input type="datetime" /></label>
+<h2>Post Lifetime:</h2>
+<label>Start:<input type="datetime-local" name="active_start" /></label>
+<label>End:<input type="datetime-local" name="active_end" /></label><br/>
+
+<h3>Time restrictions:</h3>
+<label>Do NOT show during the following times:
+            <input type="radio" name="times_mode" value="do_not_show" /></label><br/>
+<label>Only show during the following times:
+            <input type="radio" name="times_mode" value="only_show" /></label><br/>
+
+<a class="newbutton" href="#" data-bind="click: $root.addTime">New</a>
 
 <ul data-bind="foreach: times">
     <li><input class="third" type="time" data-bind="value: start" />
@@ -31,4 +39,6 @@ input.third { max-width: 28%;};
 
 {% if feedlist %}
     <input type="submit" value="Post!" />
+{% else %}
+    Sorry! You do NOT have permission to post on any feeds!
 {% endif %}

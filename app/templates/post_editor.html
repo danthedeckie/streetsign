@@ -3,7 +3,6 @@
 {% block body %}
   <h1> Edit Post </h1>
  
- 
  <form action="{{ form_action }}" method="POST" enctype="multipart/form-data">
   <input type="hidden" name="action" value="update" />
   {% include "post_editor_form.html" %}
@@ -14,4 +13,11 @@
 {{ super() }}
 {{ linkmacros.static_js('lib/knockout-2.2.1.js') }}
 {{ linkmacros.static_js('post_times_editor.js') }}
+<script type="text/javascript">
+var viewTimesModel = new TimesModel([
+    { start: "00:00", end: "23:00", note: "example"}
+]);
+
+ko.applyBindings(viewTimesModel);
+</script>
 {% endblock %}

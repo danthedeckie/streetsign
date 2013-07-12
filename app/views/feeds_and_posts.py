@@ -35,7 +35,7 @@ def feedpage(feedid):
         flash('invalid feed id! (' + feedid + ')')
         return redirect(url_for('feeds'))
 
-        
+
     if request.method == 'POST':
         action = request.form.get('action','none')
 
@@ -52,6 +52,8 @@ def feedpage(feedid):
             flash('Saved')
         elif action == 'delete':
             feed.delete_instance()
+            flash('Deleted')
+            return redirect(url_for('feeds'))
 
     return render_template('feed.html',
                      feed=feed,
@@ -75,14 +77,15 @@ def post_new():
         flash("You're not logged in!")
         return redirect(url_for('index'))
 
+    user = user_session.get_user()
+
     if request.method == 'GET':
-        #if 'initial_feed' in request.args:
         feed = int(request.args.get('initial_feed',1))
-        #else:
-        #    feed = 0
         return render_template('postnew.html',
-                initial_feed=feed,
+                current_feed=feed,
+                feedlist = writeable_feeds(user),
                 post_types=post_types.types())
+
     else: # POST. new post!
         post_type = request.form.get('post_type')
 
@@ -169,10 +172,8 @@ def postedit_type(typeid):
     editor = post_types.load(typeid)
     user = user_session.get_user()
 
-    return render_template('post_editor_loaded.html',
+    return render_template('post_type_container.html',
                            post_type = typeid,
-                           current_feed=int(request.args.get('initial_feed',1)),
-                           feedlist = writeable_feeds(user),
                            form_content = editor.form(request.form))
 
 
