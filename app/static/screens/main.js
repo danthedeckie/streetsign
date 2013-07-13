@@ -57,29 +57,49 @@ function zone(container, obj) {
               .prependTo(container)[0];
 
     $(obj.el).addClass(obj.classes);
-    $(obj.el).css(obj.css);
+    $(obj.el).attr('css',obj.css);
 
     //obj.el.innerHTML = '<div>'+obj.el.innerHTML + '<br/>(initialising)</div>';
 }
 
 function next_post(zone) {
+    // scroll through the posts loaded into a zone.
+
+    // TODO: time restrictions.
+
     // if it's not already scrolling, start!
     if (!('current_post' in zone))
         zone.current_post = -1;
     else
-        if ((zone.posts)&&(zone.posts.length > 1)) {
-            if (zone.current_post >= -1) {
-                $(zone.posts[zone.current_post]._el).fadeOut();
+        // let's first sort out the currently displayed post:
+
+        if ('posts' in zone) {
+            // there are some posts.
+            if (zone.current_post > -1) {
+                // we are actually currently displaying something.
+
                 if (zone.posts[zone.current_post].delete_me == true) {
+                    // if the post just faded out is marked for deletion,
+                    // then fade it out, and delete it.
+
+                    $(zone.posts[zone.current_post]._el).fadeOut();
+                    console.log('deleting current post:' + zone.current_post)
                     zone.posts.pop(zone.current_post);
+                } else {
+                    if (zone.posts.length > 1) {
+                        // it's not marked for deletion, and there are
+                        // other posts to display, so fade it out.
+                        $(zone.posts[zone.current_post]._el).fadeOut();
+                    }
                 }
             }
         }
 
-    // increment
+    // let's move on to the next post in the list.
     zone.current_post++;
     if ((!('posts' in zone)) || (zone.posts.length == 0)) {
         // there are no posts! I guess we'll sit around and wait for some.
+        zone.current_post = -1;
         setTimeout(function(){next_post(zone);}, zone.no_posts_wait);
         console.log('no posts!');
         return;
@@ -92,7 +112,7 @@ function next_post(zone) {
     //zone.el.innerHTML = zone.posts[zone.current_post].content.content;
     $(zone.posts[zone.current_post]._el).fadeIn();
     //zone.el.innerHTML = 'postid:' + zone.current_post;
-    setTimeout(function(){next_post(zone);}, zone.post_time);
+    zone.next_post_timer = setTimeout(function(){next_post(zone);}, zone.post_time);
 }
 
 function init_screen(screen_data, element) {
@@ -143,13 +163,23 @@ function make_updater(z){
             if ($.inArray(zone.posts[i].id, new_posts)!=-1) {
                 current_posts.push(zone.posts[i].id);
             } else {
-                console.log('deleting post:' + i);
-                // $(zone.posts(i)._el).fadeOut();
+                console.log('marking post for delete:' + i);
                 zone.posts[i].delete_me = true;
-                //zone.posts.pop(i);
+
+                // if we're currently displaying this post, then bring forward
+                // the timeout to 1 second from now (should be long enough to
+                // finish loading any other posts...)
+                if (zone.current_post == i) {
+                    console.log('bringing forward next post timer')
+                    clearTimeout(zone.next_post_timer);
+                    setTimeout(function(){next_post(zone);}, 1000);
+                } else {
+                    console.log('deleting post:' + i)
+                    zone.posts.pop(i);
+                }
             }
         }
-        
+
 
         // add new posts to the list!
         for (var i in data.posts) {
