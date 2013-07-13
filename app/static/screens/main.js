@@ -62,10 +62,55 @@ function zone(container, obj) {
     //obj.el.innerHTML = '<div>'+obj.el.innerHTML + '<br/>(initialising)</div>';
 }
 
-function next_post(zone) {
-    // scroll through the posts loaded into a zone.
+function get_posts_length(zone) {
+    try {
+        if (zone.posts.length > 0) {
+            return zone.posts.length;
+        } else {
+            return 0;
+        }
+    } catch (e) {
+        return 0;
+    }
+}
 
-    // TODO: time restrictions.
+function next_post(zone) {
+    /******************************
+     * start of new code for time restrictions... this whole function
+     * must be rewritten totally.  This gives the rough idea how to do it.
+     ******************************
+    var CURR_POST = -1;
+    var NEXT_POST = -1;
+    var TOTAL_POSTS = get_posts_length(zone);
+
+    if ('current_post' in zone) {
+        CURR_POST = zone.current_post;
+        NEXT_POST = CURR_POST + 1;
+    } else {
+        // current post not set up yet. so set it to -1...
+        zone.current_post = CURR_POST;
+    }
+
+    while ( NEXT_POST != CURR_POST ) {
+        // which means if current_post is -1, we don't bother with anything.
+
+        // wrap around:
+        if (NEXT_POST >= TOTAL_POSTS) { NEXT_POST = 0 };
+
+        // TODO: go through all time restrictions of post, compare to current time,
+        //       and if we're hit by them, either continue, or break.
+
+        // let's try the next one then...
+        NEXT_POST++;
+    }
+
+    // either we now have a next post, or else it is the same as the current post.
+    **************************************************
+    * end of new code. TODO TODO TODO.
+    **************************************************
+    */
+
+    // scroll through the posts loaded into a zone.
 
     // if it's not already scrolling, start!
     if (!('current_post' in zone))
@@ -112,7 +157,11 @@ function next_post(zone) {
     //zone.el.innerHTML = zone.posts[zone.current_post].content.content;
     $(zone.posts[zone.current_post]._el).fadeIn();
     //zone.el.innerHTML = 'postid:' + zone.current_post;
-    zone.next_post_timer = setTimeout(function(){next_post(zone);}, zone.post_time);
+    if ('display_time' in zone.posts[zone.current_post]) {
+        zone.next_post_timer = setTimeout(function(){next_post(zone);}, zone.posts[zone.current_post].display_time);
+    } else {
+        zone.next_post_timer = setTimeout(function(){next_post(zone);}, zone.post_time);
+    }
 }
 
 function init_screen(screen_data, element) {

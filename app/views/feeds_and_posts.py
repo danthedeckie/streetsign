@@ -3,6 +3,7 @@ from flask import render_template, url_for, request, session, redirect, \
 import app.user_session as user_session
 import app.post_types as post_types
 from werkzeug import secure_filename
+from datetime import datetime
 from app.views.utils import PleaseRedirect
 
 from app.logic.feeds_and_posts import try_to_set_feed, \
@@ -38,12 +39,20 @@ def feeds():
 def feedpage(feedid):
     try:
         feed = Feed.get(id=feedid)
+        user = user_session.get_user()
     except:
         flash('invalid feed id! (' + feedid + ')')
         return redirect(url_for('feeds'))
 
-
     if request.method == 'POST':
+        if not user_session.logged_in():
+            flash("You're not logged in!")
+            return redirect(url_for('feeds'))
+
+        if not user.is_admin:
+            flash('Sorry! Only Admins can change these details.')
+            return redirect(request.referrer)
+
         action = request.form.get('action','none')
 
         if action == 'edit':
@@ -64,6 +73,7 @@ def feedpage(feedid):
 
     return render_template('feed.html',
                      feed=feed,
+                     user=user,
                      allusers=User.select(),
                      allgroups=Group.select()
                 )
@@ -149,6 +159,35 @@ def postpage(postid):
         except PleaseRedirect as e:
             flash(e.msg)
             redirect(e.url)
+
+        # if it's a publish or delete request, handle that instead:
+        DO = request.form.get('action','edit')
+        if DO == 'delete':
+            post.delete_instance()
+            flash('Deleted')
+            return redirect(request.referrer)
+        elif DO == 'publish':
+            if post.feed.user_can_publish(user):
+                post.published = True
+                post.publisher = user
+                post.publish_date = datetime.now()
+                post.save()
+                flash ('Published')
+            else:
+                flash ('Sorry, You do NOT have publish' \
+                       ' permissions on this feed.')
+            return redirect(request.referrer)
+        elif DO == 'unpublish':
+            if post.feed.user_can_publish(user):
+                post.published = False
+                post.publisher = None
+                post.publish_date = None
+                post.save()
+                flash ('Unpublished!')
+            else:
+                flash ('Sorry, you do NOT have permission' \
+                       ' to unpublish on this feed.')
+            return redirect(request.referrer)
 
         # finally get around to editing the content of the post...
         try:

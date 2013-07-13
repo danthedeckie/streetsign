@@ -10,7 +10,7 @@
     <td>Post</td>
     <td>Author</td>
     <td>Date</td>
-    <td>Other Flags</td>
+    <td colspan=2></td>
   </tr>
 </thead>
 <tbody>
@@ -18,14 +18,25 @@
     <tr>
         <td>{{ linkmacros.post(post) }}</td>
         <td>{{ linkmacros.user(post.author) }}</td>
-        <td><form method="POST" action="" >
+        <td>{{ post.write_date }}</td>
+        <td>{{ 'Published' if post.published }}
+            {% if feed.user_can_publish(user) %}
+                <form method="POST" action="{{ url_for('postpage',postid=post.id) }}" >
+                    <input type="hidden" name="action" value="
+                        {{- 'unpublish' if post.published else 'publish' }}">
+                    <input type="submit" value="
+                        {{- 'Unpublish' if post.published else 'Publish' }}">
+                </form>
+            {% endif %}
+        </td>
+        <td><form method="POST" action="{{ url_for('postpage',postid=post.id) }}" >
             <input type="hidden" name="action" value="delete" />
-            <input type="submit" value="X"></form></td>
+            <input class="delbutton confirm_delete" type="submit" value="X" /></form></td>
     </tr>
 {% endfor %}
 </tbody>
 </table>
-<form method="POST">
+<form method="POST" id="users_and_groups">
 <input type="hidden" name="action" value="edit" />
 <div class="autowidth">
 <h2>Permissions for this feed.</h2>
@@ -51,4 +62,14 @@
 
 <div class="cf"></div>
 </div>
+{% endblock %}
+
+{% block end_of_page_javascript %}
+{{ super() }}
+{% if not user.is_admin %}
+<script type="text/javascript">
+$('users_and_groups input').attr('disabled','disabled');
+$('users_and_groups select').attr('disabled','disabled');
+</script>
+{% endif %}
 {% endblock %}

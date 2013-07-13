@@ -82,6 +82,7 @@ def screens_posts_from_feeds(json_feeds_list):
                    &(Post.status == 0)
                    &(Post.active_start < time_now)
                    &(Post.active_end > time_now)
+                   &(Post.published)
                    )]
     return json.dumps({'posts':posts})
 

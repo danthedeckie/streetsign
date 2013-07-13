@@ -208,6 +208,19 @@ div.free_blocks {
 	position:relative;
 	top:1px;
 }
+.delbutton {
+    background: red;
+    background: linear-gradient(#f22, #a22);
+    color: black;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+.delbutton:hover {
+    background: linear-gradient(#d22, #522);
+}
+
+/*************************************************************************/
+
 .error {
     font-width: bold;
     color: white;
