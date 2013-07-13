@@ -1,4 +1,5 @@
 // TODO: get these from somewhere?
+//'use strict';
 UPDATE_ZONES_TIMER = 6000; // how often to check for new posts?
 
 // These will eventually be loaded from their plugin files, rather than being
@@ -12,8 +13,8 @@ post_renderers = {
     },
     text: function(zone, data) {
         console.log('making text');
-        return ($('<div class="post post_text"><pre>'
-                  + data.content.content
+        return ($('<div class="post post_text"><pre>' 
+                  + data.content.content 
                   + '</pre></div>')
             .prependTo(zone));
     },
@@ -66,10 +67,14 @@ function next_post(zone) {
     if (!('current_post' in zone))
         zone.current_post = -1;
     else
-        if ((zone.posts)&&(zone.posts.length > 1))
-            $(zone.posts[zone.current_post]._el).fadeOut();
-            if (zone.posts[zone.current_post].delete_me == true)
-                zone.pop(zone.current_post);
+        if ((zone.posts)&&(zone.posts.length > 1)) {
+            if (zone.current_post >= -1) {
+                $(zone.posts[zone.current_post]._el).fadeOut();
+                if (zone.posts[zone.current_post].delete_me == true) {
+                    zone.posts.pop(zone.current_post);
+                }
+            }
+        }
 
     // increment
     zone.current_post++;
@@ -140,11 +145,11 @@ function make_updater(z){
             } else {
                 console.log('deleting post:' + i);
                 // $(zone.posts(i)._el).fadeOut();
-                zone.posts(i).delete_me = true;
+                zone.posts[i].delete_me = true;
                 //zone.posts.pop(i);
             }
-
         }
+        
 
         // add new posts to the list!
         for (var i in data.posts) {
