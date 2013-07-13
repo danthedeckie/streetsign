@@ -309,7 +309,12 @@ class Post(DBModel):
     publisher = ForeignKeyField(User, null=True)
 
     # Should it actually be displayed?
-    active = BooleanField(default=True)
+    status = IntegerField(default=0)
+    status_options = {
+        0: 'active',
+        1: 'finished',
+        2: 'archived'
+        }
 
     # When should the feed actually be shown:
     active_start = DateTimeField(null=True)
@@ -319,7 +324,7 @@ class Post(DBModel):
     # are easier just left in javascript/JSON land:
     # are these restrictions "Only show during these times" or
     #                        "Do not show during these times" ?
-    time_restrictions_exclude = BooleanField(default=True)
+    time_restrictions_show = BooleanField(default=True)
 
     # and the actual restrictions:
     time_restrictions = TextField(default='[]')

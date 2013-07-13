@@ -46,3 +46,7 @@ def make():
     app.models.Post(type='html', feed=news, author=User(id=1), content='{"content":"First Post"}').save()
 
     app.models.Screen(urlname='Default').save()
+
+if __name__ == '__main__':
+    print 'welcome to the database shell.'
+    print 'type:  make() to make default data'

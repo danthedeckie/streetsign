@@ -1,3 +1,6 @@
+{% macro enabled_if(condition) %}
+  {{- ' disabled ' if not condition -}}
+{% endmacro %}
 <div id="postcontentblock">
 <input type="hidden" name="post_type" value="{{ post_type }}" />
 {{ form_content|safe }}
@@ -10,35 +13,59 @@
     <select name="post_feed" class="chosen" autocomplete="off"
             data-placeholder="Please select which feed this post should appear on">
     {% for feed in feedlist %}
-    <option value="{{ feed.id }}" {{ 'selected' if feed.id == current_feed }}>{{ feed.name }}</option>
+        <option value="{{ feed.id }}"
+            {{- ' selected' if feed.id == current_feed }}>{{ feed.name }}</option>
     {% endfor %}
     </select></label>
+    <label>Published:<input disabled type="checkbox" {{ 'checked' if post.published }}/></label>
     <hr/>
 {% endif %}
 
 <h2>Post Lifetime:</h2>
-<label>Start:<input type="datetime-local" name="active_start" /></label>
-<label>End:<input type="datetime-local" name="active_end" /></label><br/>
+    <label>Start: <input type="datetime-local" name="active_start" id="active_start"
+                   {{ enabled_if(can_write) }} value="{{ post.active_start }}"></label>
+    <label>End:   <input type="datetime-local" name="active_end" id="active_end"
+                   {{ enabled_if(can_write) }} value="{{ post.active_end}}"/></label>
+    <br/>
 
 <h3>Time restrictions:</h3>
-<label>Do NOT show during the following times:
-            <input type="radio" name="times_mode" value="do_not_show" /></label><br/>
-<label>Only show during the following times:
-            <input type="radio" name="times_mode" value="only_show" /></label><br/>
 
-<a class="newbutton" href="#" data-bind="click: $root.addTime">New</a>
+<table style="min-width:80%">
+<thead>
+  <tr>
+    <td colspan=4 style="text-align: right">
+        <label>Do NOT show during the following times:
+            <input type="radio" name="times_mode" value="do_not_show"
+                   {{ 'checked' if not post.time_restrictions_show }} /></label><br/>
+        <label>Only show during the following times:
+            <input type="radio" name="times_mode" value="only_show"
+                   {{ 'checked' if post.time_restrictions_show }}/></label><br/>
 
-<ul data-bind="foreach: times">
-    <li><input class="third" type="time" data-bind="value: start" />
-        <input class="third" type="time" data-bind="value: end" />
-        <input class="third" data-bind="value: note" />
-        <a href="#" data-bind="click: $root.removeTime">X</a>
-    </li>
-</ul>
-
+    </td>
+  </tr>
+<tr>
+ <td>Start</td><td>End</td><td>Why? (optional)</td>
+ <td>{% if can_write %}<a class="newbutton" href="#" data-bind="click: $root.addTime">New</a>{% endif %}</td>
+</tr>
+</head>
+<tbody data-bind="foreach: times">
+  <tr>
+    <td><input type="time" data-bind="timeHandler: start" /></td>
+    <td><input type="time" data-bind="timeHandler: end" /></td>
+    <td><input data-bind="value: note" /></td>
+    <td>{% if can_write %}<a href="#" class="delbutton" data-bind="click: $root.removeTime">X</a>{% endif %}</td>
+  </tr>
+</tbody>
+</table>
+<input type="hidden" name="time_restrictions_json" data-bind="value: ko.toJSON($root)" />
+<!--<textarea style="width: 80%; height: 200px" data-bind="value: ko.toJSON($root, null, 2)"></textarea>-->
 
 {% if feedlist %}
-    <input type="submit" value="Post!" />
+    {% if can_write %}
+        <input type="submit" value="Post!" />
+    {% else %}
+        You cannot Post / Save.
+    {% endif %}
 {% else %}
-    Sorry! You do NOT have permission to post on any feeds!
+    You do NOT have permission to post on any feeds.
 {% endif %}

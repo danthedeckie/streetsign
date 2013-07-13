@@ -3,6 +3,12 @@ from flask import render_template, url_for, request, session, redirect, \
 import app.user_session as user_session
 import app.post_types as post_types
 from werkzeug import secure_filename
+from app.views.utils import PleaseRedirect
+
+from app.logic.feeds_and_posts import try_to_set_feed, \
+                                      if_i_cant_write_then_i_quit, \
+                                      can_user_write_and_publish
+
 from app import app
 from app.models import DB, User, Group, Feed, Post, Screen, \
                        writeable_feeds, by_id
@@ -83,6 +89,7 @@ def post_new():
         feed = int(request.args.get('initial_feed',1))
         return render_template('postnew.html',
                 current_feed=feed,
+                post=Post(),
                 feedlist = writeable_feeds(user),
                 post_types=post_types.types())
 
@@ -108,7 +115,7 @@ def post_new():
 def postpage(postid):
     if not user_session.logged_in():
         flash("You're not logged in!")
-        return redirect(url_for(posts))
+        return redirect(url_for('posts'))
 
     try:
         post = Post.get(Post.id==postid)
@@ -120,50 +127,45 @@ def postpage(postid):
         return(redirect(url_for('posts')))
 
     if request.method == 'POST':
-        if not post.feed and 'feedid' in request.form:
-            # new feed.
-            feed = Feed(id = request.form.get(feedid))
-            if feed.user_can_write(user):
-                post.feed = feed
-                flash('Posted to {0}'.format(feed.name))
-            else:
-                # This shouldn't happen very often - so don't worry about
-                # losing post data.  If it's an issue, refactor so it's stored
-                # but not written to the feed...
-                flash("Sorry, you don't have permission to write to {0}"
-                      .format(feed.name))
-                return redirect(url_for('index'))
+        # all of this logic is taken out to app/logic/feeds_and_posts.py
 
-        # if we don't have write permission, then this isn't our post!
-        if not post.feed.user_can_write(user):
-            flash("Sorry, this post is in feed '{0}', which"
-                  " you don't have permission to post to."
-                  " Edit cancelled.".format(post.feed.name))
-            return redirect(url_for('postpage', postid=postid))
+        try:
+            # if the user is allowed to set the feed to what they've
+            # requested, then do it.
 
-        # if this post is already published, be careful about editing it!
-        if post.published and not post.feed.user_can_publish(user):
-            flash('Sorry, this post is published, and you do not have'
-                  'permission to edit published posts in "{0}".'.format(f.name))
-            return redirect(url_for('postpage', postid=postid))
+            post.feed = try_to_set_feed(post, request.form, user)
 
+            # check for write permission, and if the post is
+            # already published, publish permission.
+
+            if_i_cant_write_then_i_quit(post, user)
+
+        except PleaseRedirect as e:
+            flash(e.msg)
+            redirect(e.url)
 
         # finally get around to editing the content of the post...
         try:
             content=json.dumps(editor.receive(request.form))
             post.content = content
+
+
             post.save()
             flash('Updated.')
         except:
             flash('invalid content for this data type!')
 
-    # TODO: figure out how to do post display times, etc...
+    # Should we bother displaying 'Post' button, and editable controls
+    # if the user can't write to this post anyway?
+
+    can_write, can_publish = can_user_write_and_publish(user, post)
 
     return render_template('post_editor.html',
                             post = post,
                             post_type = post.type,
                             current_feed = post.feed.id,
                             feedlist = writeable_feeds(user),
+                            can_write = can_write,
                             form_content = editor.form(json.loads(post.content)))
 
 @app.route('/posts/edittype/<typeid>')

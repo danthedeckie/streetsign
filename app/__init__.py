@@ -13,7 +13,6 @@ import config
 app = Flask(__name__)
 app.config.from_object('config')
 
-
 from app import models
 from app import views
 from app.models import DB, User, Group, Post, Feed, FeedPermission

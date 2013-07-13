@@ -20,7 +20,7 @@ def login():
     except:
         flash('Invalid username or password! Sorry!')
 
-    return redirect(url_for(return_to))
+    return redirect(request.referrer)
 
 @app.route('/logout', methods=['POST'])
 def logout():
@@ -33,7 +33,7 @@ def logout():
         flash('error logging out. That is odd')
 
     # return to where we were.
-    return redirect(url_for(return_to))
+    return redirect(request.referrer)
 
 ##################################################################
 # User Management:

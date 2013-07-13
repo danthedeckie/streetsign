@@ -279,8 +279,11 @@ ul.optionrow {
     list-style: none;
 }
 ul.optionrow > li {
+    border: 1px solid #999;
     display: inline;
-    background: #ccc;
+    background: #ddd;
+    background: linear-gradient( #fff,#ddd);
+    box-shadow: inset 2px 2px 2px #fff, inset -2px -2px -2px #777;
     padding: 0.5em;
     margin: 0px;
     list-style: none;
