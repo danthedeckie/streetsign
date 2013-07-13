@@ -1,13 +1,19 @@
-<label>Image (Upload):<br/>
-<input type="file" name="image_file" id="image_file" accept="image/*" />
-</label>
-<div id="img_preview"></div>
-<!-- TODO
-<script type="text/javascript">
-window.URL = window.URL || window.webkitURL;
+{% if not file_url %}
+    <input type="hidden" name="upload" value="true" />
+    <label>Image (Upload):<br/>
+    <input type="file" name="image_file" id="image_file" accept="image/*" />
+    </label>
+    <div id="img_preview"></div>
+    <!-- TODO
+    <script type="text/javascript">
+    window.URL = window.URL || window.webkitURL;
 
-    $('#image_file').change( function () {
-        alert ($(this).val());
-        $('#img_preview').attr('src',window.URL.createObjectURL($(this).val()));
-    });
-</script> -->
+        $('#image_file').change( function () {
+            alert ($(this).val());
+            $('#img_preview').attr('src',window.URL.createObjectURL($(this).val()));
+        });
+    </script> -->
+{% else %}
+    <img src="{{file_url}}" style="width:100%;height:auto" />
+    <input type="hidden" name="filename" value="{{filename}}" />
+{% endif %}

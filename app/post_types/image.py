@@ -8,20 +8,28 @@ def allow_filetype(filename):
     return splitext(filename)[-1].lower() in \
         ['.png','.jpg','.jpeg','.gif','.bmp','.svg']
 
-def form(data, **kwargs):
-    return render_template('post_types/image.html', **kwargs)
+def form(data):
+    return render_template('post_types/image.html', **data)
 
 def receive(data):
-    f = request.files['image_file']
-    if f and allow_filetype(f.filename):
-        filename = secure_filename(f.filename)
-        where = pathjoin(g.site_vars['user_dir'],'post_images')
-        if not isdir(where):
-            makedirs(where)
+    if 'upload' in data:
+        f = request.files['image_file']
+        if f and allow_filetype(f.filename):
+            filename = secure_filename(f.filename)
+            where = pathjoin(g.site_vars['user_dir'],'post_images')
+            if not isdir(where):
+                makedirs(where)
 
-        f.save(pathjoin(where, filename))
+            f.save(pathjoin(where, filename))
+        else:
+            raise IOError('Invalid file. Sorry')
     else:
-        raise IOError('Invalid file. Sorry')
+        filename = data.get('filename')
+        if filename and allow_filename(filename):
+            filename = secure_filename(filename)
+        else:
+            raise Exception('Tried to change the file, huh? Not happening')
+            # TODO
 
     return {'content': filename,
             'filename': filename,
