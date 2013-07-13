@@ -17,16 +17,20 @@
             {{- ' selected' if feed.id == current_feed }}>{{ feed.name }}</option>
     {% endfor %}
     </select></label>
-    <label>Published:<input disabled type="checkbox" {{ 'checked' if post.published }}/></label>
+    {% if post.id %}<p>{{ 'Not' if not post.published }} Published</p>{% endif %}
     <hr/>
 {% endif %}
 
 <h2>Post Lifetime:</h2>
+
     <label>Start: <input type="datetime-local" name="active_start" id="active_start"
                    {{ enabled_if(can_write) }} value="{{ post.active_start }}"></label>
     <label>End:   <input type="datetime-local" name="active_end" id="active_end"
                    {{ enabled_if(can_write) }} value="{{ post.active_end}}"/></label>
     <br/>
+    <label>How many seconds to show for at one time?
+                <input type="number" name="displaytime" data-min="1" data-max="500"
+                       value="{{ post.display_time }}" /></label>
 
 <h3>Time restrictions:</h3>
 
@@ -44,8 +48,12 @@
     </td>
   </tr>
 <tr>
- <td>Start</td><td>End</td><td>Why? (optional)</td>
- <td>{% if can_write %}<a class="newbutton" href="#" data-bind="click: $root.addTime">New</a>{% endif %}</td>
+ <td>Start</td>
+ <td>End</td>
+ <td>Why? (optional)</td>
+ <td>{% if can_write %}<a class="newbutton" href="#"
+                          data-bind="click: $root.addTime">New</a>
+     {% endif %}</td>
 </tr>
 </head>
 <tbody data-bind="foreach: times">
@@ -53,12 +61,14 @@
     <td><input type="time" data-bind="timeHandler: start" /></td>
     <td><input type="time" data-bind="timeHandler: end" /></td>
     <td><input data-bind="value: note" /></td>
-    <td>{% if can_write %}<a href="#" class="delbutton" data-bind="click: $root.removeTime">X</a>{% endif %}</td>
+    <td>{% if can_write %}<a href="#" class="delbutton"
+                             data-bind="click: $root.removeTime">X</a>
+        {% endif %}</td>
   </tr>
 </tbody>
 </table>
-<input type="hidden" name="time_restrictions_json" data-bind="value: ko.toJSON($root)" />
-<!--<textarea style="width: 80%; height: 200px" data-bind="value: ko.toJSON($root, null, 2)"></textarea>-->
+<input type="hidden" name="time_restrictions_json" data-bind="value: ko.toJSON($root.times)" />
+<input style="width: 80%; height: 90px" data-bind="value: ko.toJSON($root.times)"/>
 
 {% if feedlist %}
     {% if can_write %}
@@ -69,3 +79,13 @@
 {% else %}
     You do NOT have permission to post on any feeds.
 {% endif %}
+<pre>
+window.post={
+    "id":{{ post.id }},
+    "active_start":{{ post.active_start }},
+    "active_end":{{ post.active_end }},
+    "time_restrictions_show":{{ post.time_restrictions_show }},
+    "time_restrictions":{{ post.time_restrictions|safe }},
+    "display_time":{{ post.display_time }},
+    };
+</pre>

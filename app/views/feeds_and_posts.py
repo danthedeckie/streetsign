@@ -7,7 +7,8 @@ from app.views.utils import PleaseRedirect
 
 from app.logic.feeds_and_posts import try_to_set_feed, \
                                       if_i_cant_write_then_i_quit, \
-                                      can_user_write_and_publish
+                                      can_user_write_and_publish, \
+                                      post_form_intake
 
 from app import app
 from app.models import DB, User, Group, Feed, Post, Screen, \
@@ -86,30 +87,37 @@ def post_new():
     user = user_session.get_user()
 
     if request.method == 'GET':
+        # send a blank form for the user:
+
         feed = int(request.args.get('initial_feed',1))
         return render_template('postnew.html',
                 current_feed=feed,
                 post=Post(),
                 feedlist = writeable_feeds(user),
+                can_write = True,
                 post_types=post_types.types())
 
     else: # POST. new post!
         post_type = request.form.get('post_type')
+        editor = post_types.load(post_type)
 
-        u = user_session.get_user()
-        p = Post(type=post_type, author=u)
+        post = Post(type=post_type, author=user)
 
         try:
-            f = Feed(id=request.form.get('post_feed'))
-            if f.user_can_write(u):
-                p.feed = f
-        except Feed.DoesNotExist:
-            flash('Invalid Feed ID!')
+            post.feed = try_to_set_feed(post, request.form, user)
 
-        p.content=json.dumps(post_types.receive(post_type, request.form))
+            if_i_cant_write_then_i_quit(post, user)
 
-        p.save()
-        return redirect(url_for('posts'))
+            post_form_intake(post, request.form, editor)
+
+        except PleaseRedirect as e:
+            flash (e.msg)
+            redirect(e.url if e.url else request.url)
+
+        post.save()
+        flash('Saved!')
+
+        return redirect(request.referrer) #url_for('posts'))
 
 @app.route('/posts/<int:postid>', methods=['GET','POST'])
 def postpage(postid):
@@ -127,8 +135,6 @@ def postpage(postid):
         return(redirect(url_for('posts')))
 
     if request.method == 'POST':
-        # all of this logic is taken out to app/logic/feeds_and_posts.py
-
         try:
             # if the user is allowed to set the feed to what they've
             # requested, then do it.
@@ -146,9 +152,7 @@ def postpage(postid):
 
         # finally get around to editing the content of the post...
         try:
-            content=json.dumps(editor.receive(request.form))
-            post.content = content
-
+            post_form_intake(post, request.form, editor)
 
             post.save()
             flash('Updated.')

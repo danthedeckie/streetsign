@@ -23,7 +23,7 @@
 {{ linkmacros.static_js('lib/jquery.anytime/anytime.js') }}
 {{ linkmacros.static_js('post_times_editor.js') }}
 <script type="text/javascript">
-var viewTimesModel = new TimesModel( {{ post.time_restrictions }} );
+var viewTimesModel = new TimesModel({{ post.time_restrictions |safe }} );
 
 ko.applyBindings(viewTimesModel);
 </script>

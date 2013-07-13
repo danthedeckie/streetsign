@@ -2,6 +2,13 @@
 
 {% block title %} New Post {% endblock %}
 
+{% block htmlhead %}
+{{ super() }}
+{{ linkmacros.static_css('lib/jquery.timePicker/timePicker.css') }}
+{{ linkmacros.static_css('lib/jquery.anytime/anytime.css') }}
+{% endblock %}
+
+
 {% block body %}
 <h2>New Post</h2>
 <div style="text-align:center">
@@ -21,6 +28,11 @@
 {% block end_of_page_javascript %}
     {{ super() }}
     {{ linkmacros.static_js('post_editor.js') }}
+    {{ linkmacros.static_js('lib/jquery.timePicker/timePicker.js') }}
+    {{ linkmacros.static_js('lib/jquery-migrate-1.0.0.js') }}
+    {{ linkmacros.static_js('lib/jquery.anytime/anytime.js') }}
+    {{ linkmacros.static_js('post_times_editor.js') }}
+
     <script type="text/javascript">
     // As the static js is static, we need in inject URLs here.
     INITIAL_FEED="?initial_feed={{ initial_feed }}";
@@ -28,6 +40,10 @@
         var o="{{url_for('postedit_type', typeid='-1')}}";
         return o.replace(/-1/, id)+INITIAL_FEED;
     };
+    var viewTimesModel = new TimesModel([]);
+
+    ko.applyBindings(viewTimesModel);
+
 </script>
 
 {% endblock %}

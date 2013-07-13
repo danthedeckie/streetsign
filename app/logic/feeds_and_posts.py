@@ -3,7 +3,7 @@
 
 '''
 
-from flask import flash
+from flask import flash, url_for, json
 from app.views.utils import PleaseRedirect
 from app.models import Post, Feed
 
@@ -11,12 +11,20 @@ def try_to_set_feed(post, form, user):
     ''' Is this user actually allowed to set the feed of this post to what
         the form is saying they want to?  If so, cool. Return that feed. '''
 
-    if not post.feed and 'feedid' in form and form.get('feedid')!=post.feed.id:
+    try:
+        if post.feed:
+            oldfeedid = post.feed.id
+        else:
+            oldfeedid = False
+    except:
+        oldfeedid = False
+
+    if form.get('post_feed', oldfeedid) != oldfeedid:
         # new or changed feed.
         try:
-            feed = Feed.get(Feed.id==request.form.get('feedid'))
+            feed = Feed.get(Feed.id==form.get('post_feed'))
         except Feed.DoesNotExist:
-            raise PleaseRedirect(url_for('postpage',postid=postid),
+            raise PleaseRedirect(None,
                   "Odd. You somehow tried to post "
                   "to a non-existant feed. It didn't work.")
 
@@ -38,7 +46,7 @@ def if_i_cant_write_then_i_quit(post, user):
     # if we don't have write permission, then this isn't our post!
     if not post.feed.user_can_write(user):
 
-        raise PleaseRedirect(url_for('postpage', postid=postid),
+        raise PleaseRedirect(None,
             "Sorry, this post is in feed '{0}', which"
             " you don't have permission to post to."
             " Edit cancelled.".format(post.feed.name))
@@ -46,7 +54,7 @@ def if_i_cant_write_then_i_quit(post, user):
     # if this post is already published, be careful about editing it!
     if post.published and not post.feed.user_can_publish(user):
 
-        raise PleaseRedirect( url_for('postpage', postid=postid),
+        raise PleaseRedirect(None,
             'Sorry, this post is published, and you do not have'
             'permission to edit published posts in "{0}".'.format(f.name))
 
@@ -66,3 +74,18 @@ def can_user_write_and_publish(user, post):
 
     # default is secure:
     return False, False
+
+def post_form_intake(post, form, editor):
+
+    # note! this actually modifies the post it is sent!
+    content=json.dumps(editor.receive(form))
+    post.content = content
+
+    post.active_start = form.get("active_start")
+    post.active_end = form.get("active_end")
+
+    post.time_restrictions_show = (form.get('times_mode', \
+                'do_not_show') \
+            == 'only_show')
+    post.time_restrictions = form.get('time_restrictions_json','[]')
+
