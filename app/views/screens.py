@@ -5,6 +5,7 @@ import app.post_types as post_types
 from glob import glob
 from os.path import basename
 import urllib
+from datetime import datetime
 from app import app
 from app.models import Feed, Post, Screen, \
                        writeable_feeds, by_id
@@ -72,10 +73,16 @@ def screendisplay(template, screenname):
 @app.route('/screens/posts_from_feeds/<json_feeds_list>')
 def screens_posts_from_feeds(json_feeds_list):
     feeds_list = json.loads(json_feeds_list)
+
+    time_now = datetime.now()
+
     posts = [p.dict_repr() for p in \
              Post.select().join(Feed)
              .where((Feed.id << feeds_list)
-                   &(Post.active == True))]
+                   &(Post.status == 0)
+                   &(Post.active_start < time_now)
+                   &(Post.active_end > time_now)
+                   )]
     return json.dumps({'posts':posts})
 
 @app.route('/json/feed/<int:feedid>')

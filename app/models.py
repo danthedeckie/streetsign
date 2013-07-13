@@ -345,7 +345,6 @@ class Post(DBModel):
             { 'id': self.id,
               'type': self.type,
               'content': json.loads(self.content),
-              'active': self.active
             })
 
 

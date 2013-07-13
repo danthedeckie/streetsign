@@ -68,6 +68,9 @@ function next_post(zone) {
     else
         if ((zone.posts)&&(zone.posts.length > 1))
             $(zone.posts[zone.current_post]._el).fadeOut();
+            if (zone.posts[zone.current_post].delete_me == true)
+                zone.pop(zone.current_post);
+
     // increment
     zone.current_post++;
     if ((!('posts' in zone)) || (zone.posts.length == 0)) {
@@ -137,7 +140,8 @@ function make_updater(z){
             } else {
                 console.log('deleting post:' + i);
                 // $(zone.posts(i)._el).fadeOut();
-                zone.posts.pop(i);
+                zone.posts(i).delete_me = true;
+                //zone.posts.pop(i);
             }
 
         }
