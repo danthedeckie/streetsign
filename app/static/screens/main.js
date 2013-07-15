@@ -6,8 +6,21 @@ UPDATE_ZONES_TIMER = 6000; // how often to check for new posts?
 // hard-coded in here.
 
 function magic_vars(text) {
-    return (text.replace(/%%TIME%%/,'<span class="time"></span>')
-                .replace(/%%DATE%%/,'<span class="date"></span>'));
+    return (text.replace(/%%TIME%%/,'<span class="magic_time"></span>')
+                .replace(/%%DATE%%/,'<span class="magic_date"></span>'));
+}
+
+function magic_time() {
+    var d = new Date;
+    var timestr = ((d.getHours()<10?'0':'') + d.getHours() + ':'
+                  +(d.getMinutes()<10?'0':'') + d.getMinutes())
+    $('.magic_time').each(function(i){
+        this.innerHTML = timestr;
+    });
+    $('.magic_date').each(function(i){
+        this.innerHTML = Date().replace(/:[^:]*$/,'');
+    });
+    setTimeout(magic_time, 60000);
 }
 
 post_types = {
@@ -46,9 +59,11 @@ post_types = {
                    .prependTo(zone));
         },
         display: function(data) {
+            console.log('Trying to start local stream-player')
             $.post('http://localhost:7171/start');
         },
         hide: function(data) {
+            console.log('Trying to stop local stream-player')
             $.post('http://localhost:7171/stop');
         }
     }
@@ -154,8 +169,7 @@ function any_relevent_restrictions(post) {
 
 function next_post(zone) {
     /******************************
-     * start of new code for time restrictions... this whole function
-     * must be rewritten totally.  This gives the rough idea how to do it.
+     * start of new code for time restrictions...
      ******************************/
 
     var appendlist = [];
@@ -215,6 +229,12 @@ function next_post(zone) {
             // first post!
             zone.current_post = nextpost;
             $(zone.current_post._el).fadeIn(zone.fadetime);
+            // ugly:
+            try{post_types[nextpost.type].display(nextpost);}catch(i){};
+            /*if ('display' in post_types[nextpost.type]) {
+                post_types[nextpost.type].display(nextpost);
+            }*/
+
             setTimeout(function(){next_post(zone);}, nextpost.display_time);
             return;
 
@@ -227,8 +247,15 @@ function next_post(zone) {
         } else {
             // we have a new post to fade to. hurrah.
             $(zone.current_post._el).fadeOut(zone.fadetime, function() {
+                // ugly:
+                try{post_types[zone.current_post.type].render(zone.current_post)}catch(i){};
+
                 zone.current_post = nextpost;
                 $(zone.current_post._el).fadeIn(zone.fadetime);
+
+                // ugly:
+                try{post_types[nextpost.type].display(nextpost)}catch(i){};
+
                 setTimeout(function(){next_post(zone);}, nextpost.display_time);
             });
             return;
@@ -236,7 +263,11 @@ function next_post(zone) {
     } else {
         // no posts currently allowed!
         if (zone.current_post) {
-            $(zone.current_post._el).fadeOut(zone.fadetime);
+            $(zone.current_post._el).fadeOut(zone.fadetime, function() {
+                // ugly:
+                try{post_types[zone.current_post.type].render(zone.current_post)}catch(i){};
+            });
+
         }
         zone.current_post = false;
         setTimeout(function(){next_post(zone);}, zone.no_posts_wait);
@@ -251,63 +282,6 @@ function next_post(zone) {
     console.log('Somehow at the end of the next_post function. odd');
     setTimeout(function(){next_post(zone);}, zone.no_posts_wait);
 
-    /*************************************************
-    * end of new code. TODO TODO TODO.
-    **************************************************
-
-    // scroll through the posts loaded into a zone.
-
-    // if it's not already scrolling, start!
-    if (!('current_post' in zone))
-        zone.current_post = -1;
-    else
-        // let's first sort out the currently displayed post:
-
-        if ('posts' in zone) {
-            // there are some posts.
-            if (zone.current_post > -1) {
-                // we are actually currently displaying something.
-
-                if (zone.posts[zone.current_post].delete_me == true) {
-                    // if the post just faded out is marked for deletion,
-                    // then fade it out, and delete it.
-
-                    $(zone.posts[zone.current_post]._el).fadeOut();
-                    console.log('deleting current post:' + zone.current_post)
-                    zone.posts.pop(zone.current_post);
-                } else {
-                    if (zone.posts.length > 1) {
-                        // it's not marked for deletion, and there are
-                        // other posts to display, so fade it out.
-                        $(zone.posts[zone.current_post]._el).fadeOut();
-                    }
-                }
-            }
-        }
-
-    // let's move on to the next post in the list.
-    zone.current_post++;
-    if ((!('posts' in zone)) || (zone.posts.length == 0)) {
-        // there are no posts! I guess we'll sit around and wait for some.
-        zone.current_post = -1;
-        setTimeout(function(){next_post(zone);}, zone.no_posts_wait);
-        console.log('no posts!');
-        return;
-        }
-
-    // wrap around.
-    if (zone.posts.length <= zone.current_post) {
-        zone.current_post = 0;
-    }
-    //zone.el.innerHTML = zone.posts[zone.current_post].content.content;
-    $(zone.posts[zone.current_post]._el).fadeIn();
-    //zone.el.innerHTML = 'postid:' + zone.current_post;
-    if ('display_time' in zone.posts[zone.current_post]) {
-        zone.next_post_timer = setTimeout(function(){next_post(zone);}, zone.posts[zone.current_post].display_time);
-    } else {
-        zone.next_post_timer = setTimeout(function(){next_post(zone);}, zone.post_time);
-    }
-    */
 
 }
 
