@@ -22,6 +22,8 @@ function magic_time() {
     });
     setTimeout(magic_time, 60000);
 }
+setTimeout(magic_time, 2000);
+
 
 post_types = {
     html: {
@@ -229,11 +231,10 @@ function next_post(zone) {
             // first post!
             zone.current_post = nextpost;
             $(zone.current_post._el).fadeIn(zone.fadetime);
-            // ugly:
-            try{post_types[nextpost.type].display(nextpost);}catch(i){};
-            /*if ('display' in post_types[nextpost.type]) {
+
+            if ('display' in post_types[nextpost.type]) {
                 post_types[nextpost.type].display(nextpost);
-            }*/
+            }
 
             setTimeout(function(){next_post(zone);}, nextpost.display_time);
             return;
@@ -247,14 +248,17 @@ function next_post(zone) {
         } else {
             // we have a new post to fade to. hurrah.
             $(zone.current_post._el).fadeOut(zone.fadetime, function() {
-                // ugly:
-                try{post_types[zone.current_post.type].render(zone.current_post)}catch(i){};
+
+                if ('hide' in post_types[zone.current_post.type]) {
+                    post_types[zone.current_post.type].hide(zone.current_post);
+                }
 
                 zone.current_post = nextpost;
                 $(zone.current_post._el).fadeIn(zone.fadetime);
 
-                // ugly:
-                try{post_types[nextpost.type].display(nextpost)}catch(i){};
+                if ('display' in post_types[nextpost.type]) {
+                    post_types[nextpost.type].display(nextpost);
+                }
 
                 setTimeout(function(){next_post(zone);}, nextpost.display_time);
             });
@@ -264,8 +268,10 @@ function next_post(zone) {
         // no posts currently allowed!
         if (zone.current_post) {
             $(zone.current_post._el).fadeOut(zone.fadetime, function() {
-                // ugly:
-                try{post_types[zone.current_post.type].render(zone.current_post)}catch(i){};
+                if ('hide' in post_types[zone.current_post.type]) {
+                    post_types[zone.current_post.type].hide(zone.current_post);
+                }
+
             });
 
         }
@@ -329,9 +335,14 @@ function make_updater(z){
         // what posts are currently in the zone?
         var current_posts = [];
         for (var i in zone.posts){
+            var arrId = $.inArray(zone.posts[i].id, new_posts);
             // keep current posts, and delete no-longer needed posts:
-            if ($.inArray(zone.posts[i].id, new_posts)!=-1) {
+            if (arrId !=-1) {
                 current_posts.push(zone.posts[i].id);
+                zone.posts[i].time_restrictions_show = data.posts[arrId].time_restrictions_show;
+                zone.posts[i].time_restrictions = data.posts[arrId].time_restrictions;
+                // Maybe better not ?
+                zone.posts[i].time_restrictions = data.posts[arrId].time_restrictions;
             } else {
                 console.log('marking post for delete:' + i);
                 zone.posts[i].delete_me = true;
