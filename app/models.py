@@ -324,7 +324,7 @@ class Post(DBModel):
     # are easier just left in javascript/JSON land:
     # are these restrictions "Only show during these times" or
     #                        "Do not show during these times" ?
-    time_restrictions_show = BooleanField(default=True)
+    time_restrictions_show = BooleanField(default=False)
 
     # and the actual restrictions:
     time_restrictions = TextField(default='[]')

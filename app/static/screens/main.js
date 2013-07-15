@@ -5,26 +5,52 @@ UPDATE_ZONES_TIMER = 6000; // how often to check for new posts?
 // These will eventually be loaded from their plugin files, rather than being
 // hard-coded in here.
 
-post_renderers = {
-    html: function(zone, data) {
-        console.log('making html');
-        return $('<div class="post post_html">' + data.content.content + '</div>')
-            .prependTo(zone);
+function magic_vars(text) {
+    return (text.replace(/%%TIME%%/,'<span class="time"></span>')
+                .replace(/%%DATE%%/,'<span class="date"></span>'));
+}
+
+post_types = {
+    html: {
+        render: function(zone, data) {
+            console.log('making html');
+            return $('<div class="post post_html">'
+                    + magic_vars(data.content.content)
+                    + '</div>')
+                    .prependTo(zone);
+        }
     },
-    text: function(zone, data) {
-        console.log('making text');
-        return ($('<div class="post post_text"><pre>' 
-                  + data.content.content 
-                  + '</pre></div>')
-            .prependTo(zone));
+    text: {
+        render: function(zone, data) {
+            console.log('making text');
+            return ($('<div class="post post_text"><pre>' 
+                      + magic_vars(data.content.content)
+                      + '</pre></div>')
+                    .prependTo(zone));
+        }
     },
-    image: function(zone, data) {
-        console.log('making img');
-        console.log(data.content.file_url);
-        return ($('<div class="post post_image"><img src="'
-                 + data.content.file_url
-                 + '" style="width:100%;height:auto;" /></div>')
-            .prependTo(zone));
+    image: {
+        render: function(zone, data) {
+            console.log('making img');
+            console.log(data.content.file_url);
+            return ($('<div class="post post_image"><img src="'
+                     + data.content.file_url
+                     + '" style="width:100%;height:auto;" /></div>')
+                    .prependTo(zone));
+        }
+    },
+    videostream: {
+        render: function(zone, data) {
+            // honestly a bit pointless...
+            return($('<div class="post post_video">Playing Video</div>')
+                   .prependTo(zone));
+        },
+        display: function(data) {
+            $.post('http://localhost:7171/start');
+        },
+        hide: function(data) {
+            $.post('http://localhost:7171/stop');
+        }
     }
 };
 
@@ -55,14 +81,16 @@ function zone(container, obj) {
     var csspairs = [];
 
     window.zones.push(obj);
-    obj.el = $(zone_html(obj.name, obj.top, obj.left, obj.bottom, obj.right))
+    obj.el = $(zone_html(obj.name, obj.top, obj.left, obj.bottom, obj.right, obj.css))
               .prependTo(container)[0];
 
     $(obj.el).addClass(obj.classes);
 
-    csspairs = obj.css.split(/[\n;]+/).map(function (x) {
+    try {
+        csspairs = obj.css.split(/[\n;]+/).map(function (x) {
                                            var y = x.match(/^(.*):(.*)$/);
                                            return [y[1].trim(),y[2].trim()] } );
+    }catch(e){};
 
     for (var i in csspairs) {
         $(obj.el).css(csspairs[i][0], csspairs[i][1]);
@@ -133,7 +161,7 @@ function next_post(zone) {
     var appendlist = [];
     var nextpost = false;
 
-    if ((!('posts' in zone))&&(zone.posts.length==0)) {
+    if ((!('posts' in zone))||(zone.posts.length==0)) {
         // no posts!
         zone.current_post = false;
         setTimeout(function(){next_post(zone);}, zone.no_posts_wait);
@@ -355,7 +383,7 @@ function make_updater(z){
             if (!($.inArray(new_data.id, current_posts)!=-1)) {
                 var n = zone.posts.push(new_data) - 1;
                 var el =
-                    post_renderers[zone.posts[n].type](zone.el, zone.posts[n]);
+                    post_types[zone.posts[n].type].render(zone.el, zone.posts[n]);
                 var zone_height = $(zone.el).height();
                 var my_height = el.height();
                 if (my_height < zone_height) {
