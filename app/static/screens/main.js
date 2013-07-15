@@ -52,12 +52,21 @@ function zone(container, obj) {
     // adds an object into the window zones list,
     // and gives it an element within the container for filling with stuff.
 
+    var csspairs = [];
+
     window.zones.push(obj);
     obj.el = $(zone_html(obj.name, obj.top, obj.left, obj.bottom, obj.right))
               .prependTo(container)[0];
 
     $(obj.el).addClass(obj.classes);
-    $(obj.el).attr('css',obj.css);
+
+    csspairs = obj.css.split(/[\n;]+/).map(function (x) {
+                                           var y = x.match(/^(.*):(.*)$/);
+                                           return [y[1].trim(),y[2].trim()] } );
+
+    for (var i in csspairs) {
+        $(obj.el).css(csspairs[i][0], csspairs[i][1]);
+    };
 
     //obj.el.innerHTML = '<div>'+obj.el.innerHTML + '<br/>(initialising)</div>';
 }

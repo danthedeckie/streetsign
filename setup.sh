@@ -64,6 +64,14 @@ fi
 if [[ ! -e ".git/hooks/pre-commit" ]]; then
     cp .setup/hooks/pre-commit .git/hooks/pre-commit
 fi
+
+if [[ ! -f "database.db" ]]; then
+    echo "no database, so I'll make a default one"
+    echo "the main user is 'admin' and the password is 'password'."
+    echo "please change it!"
+    echo "make()" | ./db.py
+fi
+
 echo
 echo "--------------------------------------------------------"
 echo "Everything is done! You should be able to use ./run.sh to run the development server."

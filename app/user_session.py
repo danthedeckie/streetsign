@@ -21,7 +21,16 @@ class NotLoggedIn(Exception):
 def get_user():
     if not 'logged_in' in session:
         raise NotLoggedIn('Not logged in!')
-    return get_logged_in_user(session['username'], session['sessionid'])
+    try:
+        return get_logged_in_user(session['username'], session['sessionid'])
+    except:
+        session.pop('username', None)
+        session.pop('sessionid', None)
+        session.pop('display_admin_stuff', None)
+        session.pop('logged_in', None)
+        return None
+
+
 
 def logged_in():
     return 'logged_in' in session

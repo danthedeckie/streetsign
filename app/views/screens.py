@@ -55,7 +55,7 @@ def screenedit(screenid):
 
         screen.background = request.form.get('background')
         screen.urlname = urllib.quote(request.form.get('urlname'),'')
-        screen.settings = form_json('settings',{'css':[]})
+        screen.settings = request.form.get('settings',{'css':''})
         screen.zones = form_json('zones',{})
         screen.save()
         flash('saved.')
