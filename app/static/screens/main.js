@@ -2,8 +2,7 @@
 //'use strict';
 UPDATE_ZONES_TIMER = 6000; // how often to check for new posts?
 
-// These will eventually be loaded from their plugin files, rather than being
-// hard-coded in here.
+window.post_types = {};
 
 function magic_vars(text) {
     return (text.replace(/%%TIME%%/,'<span class="magic_time"></span>')
@@ -23,53 +22,6 @@ function magic_time() {
     setTimeout(magic_time, 60000);
 }
 setTimeout(magic_time, 2000);
-
-
-post_types = {
-    html: {
-        render: function(zone, data) {
-            console.log('making html');
-            return $('<div class="post post_html">'
-                    + magic_vars(data.content.content)
-                    + '</div>')
-                    .prependTo(zone);
-        }
-    },
-    text: {
-        render: function(zone, data) {
-            console.log('making text');
-            return ($('<div class="post post_text"><pre>' 
-                      + magic_vars(data.content.content)
-                      + '</pre></div>')
-                    .prependTo(zone));
-        }
-    },
-    image: {
-        render: function(zone, data) {
-            console.log('making img');
-            console.log(data.content.file_url);
-            return ($('<div class="post post_image"><img src="'
-                     + data.content.file_url
-                     + '" style="width:100%;height:auto;" /></div>')
-                    .prependTo(zone));
-        }
-    },
-    videostream: {
-        render: function(zone, data) {
-            // honestly a bit pointless...
-            return($('<div class="post post_video">Playing Video</div>')
-                   .prependTo(zone));
-        },
-        display: function(data) {
-            console.log('Trying to start local stream-player')
-            $.post('http://localhost:7171/start');
-        },
-        hide: function(data) {
-            console.log('Trying to stop local stream-player')
-            $.post('http://localhost:7171/stop');
-        }
-    }
-};
 
 function url_insert(url, data) {
     // Takes a url with a '-1' in it, and replaces the '-1' with
@@ -343,6 +295,7 @@ function make_updater(z){
                 zone.posts[i].time_restrictions = data.posts[arrId].time_restrictions;
                 // Maybe better not ?
                 zone.posts[i].time_restrictions = data.posts[arrId].time_restrictions;
+                zone.posts[i].display_time = data.posts[arrId].display_time;
             } else {
                 console.log('marking post for delete:' + i);
                 zone.posts[i].delete_me = true;

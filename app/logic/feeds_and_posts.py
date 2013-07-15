@@ -88,4 +88,5 @@ def post_form_intake(post, form, editor):
                 'do_not_show') \
             == 'only_show')
     post.time_restrictions = form.get('time_restrictions_json','[]')
+    post.display_time = min(100, max(2, int(form.get('displaytime'))))
 

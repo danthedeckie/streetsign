@@ -38,3 +38,6 @@ def receive(posttype, form):
 def renderer_js(posttype):
     editor = load(posttype)
     return(editor.renderer_js())
+
+def renderers():
+    return [(e, load(e).screen_js()) for e in modules()]

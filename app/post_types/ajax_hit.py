@@ -13,11 +13,12 @@ def form(data):
     return render_template_string(my('.form.html'), **data)
 
 def receive(data):
-    ''' turn the contents posted back to us from the form into
-        a dict which can be JSON'd by the system, and dumped as
-        text into the database. '''
-
-    return {'type':'html', 'content': data.get('content','')}
+    return {'type':'ajax_hit',
+            'render_url': data.get('render_url',''),
+            'display_url': data.get('display_url',''),
+            'hide_url': data.get('hide_url',''),
+            'content':'none'
+            }
 
 def display(data):
     return data['content']

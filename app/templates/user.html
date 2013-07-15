@@ -1,0 +1,16 @@
+{% extends "index.html" %}
+
+{% block body %}
+<h1> User Details </h1>
+<form method="POST">
+<label>login name:
+    <input name="loginname" locked value="{{user.loginname}}" /></label>
+<label>Displayed name:
+    <input name="displayname" value="{{user.displayname}}" /></label>
+<label>Email address:
+    <input name="emailaddress" value="{{user.emailaddress}}" /></label>
+<hr/>
+<h2> Change Password:</h2>
+<label>Your current Password:<input name="currpass" type="password" /></label>
+</form>
+{% endblock %}

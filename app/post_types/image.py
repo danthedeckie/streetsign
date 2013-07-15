@@ -1,15 +1,21 @@
-from flask import render_template, url_for, json, request, g
+from flask import render_template_string, url_for, json, request, g
 from werkzeug import secure_filename
-from os.path import splitext, join as pathjoin, isdir
+from os.path import splitext, join as pathjoin, isdir, abspath
 from os import makedirs
 
+def my(ending):
+    ''' given '.html', returns (if this is the foobar module)
+        the contents of: /where/this/file/is/foodbar.html '''
+
+    with open(splitext(abspath(__file__))[0] + ending,'r') as f:
+        return f.read()
 
 def allow_filetype(filename):
     return splitext(filename)[-1].lower() in \
         ['.png','.jpg','.jpeg','.gif','.bmp','.svg']
 
 def form(data):
-    return render_template('post_types/image.html', **data)
+    return render_template_string(my('.form.html'), **data)
 
 def receive(data):
     if 'upload' in data:
@@ -39,3 +45,5 @@ def display(data):
     return ('<img class="post_image" src="{0}"'
            ' style="width:100%;height:auto" />'.format(data['file_url']))
 
+def screen_js():
+    return my('.screen.js')
