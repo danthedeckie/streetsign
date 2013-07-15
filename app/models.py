@@ -345,6 +345,9 @@ class Post(DBModel):
             { 'id': self.id,
               'type': self.type,
               'content': json.loads(self.content),
+              'time_restrictions': json.loads(self.time_restrictions),
+              'time_restrictions_show': self.time_restrictions_show,
+              'display_time': self.display_time * 1000 # in milliseconds
             })
 
 

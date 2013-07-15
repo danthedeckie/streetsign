@@ -1,6 +1,14 @@
 {% macro enabled_if(condition) %}
   {{- ' disabled ' if not condition -}}
 {% endmacro %}
+{% if feedlist %}
+    {% if can_write %}
+        <input type="submit" value="Post!" style="float:right;"/>
+    {% else %}
+        You cannot Post / Save.
+    {% endif %}
+{% endif %}
+
 <div id="postcontentblock">
 <input type="hidden" name="post_type" value="{{ post_type }}" />
 {{ form_content|safe }}
@@ -68,7 +76,7 @@
 </tbody>
 </table>
 <input type="hidden" name="time_restrictions_json" data-bind="value: ko.toJSON($root.times)" />
-<input style="width: 80%; height: 90px" data-bind="value: ko.toJSON($root.times)"/>
+<!--<input style="width: 80%; height: 90px" data-bind="value: ko.toJSON($root.times)"/>-->
 
 {% if feedlist %}
     {% if can_write %}
@@ -79,13 +87,3 @@
 {% else %}
     You do NOT have permission to post on any feeds.
 {% endif %}
-<pre>
-window.post={
-    "id":{{ post.id }},
-    "active_start":{{ post.active_start }},
-    "active_end":{{ post.active_end }},
-    "time_restrictions_show":{{ post.time_restrictions_show }},
-    "time_restrictions":{{ post.time_restrictions|safe }},
-    "display_time":{{ post.display_time }},
-    };
-</pre>

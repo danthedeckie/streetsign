@@ -74,41 +74,149 @@ function get_posts_length(zone) {
     }
 }
 
+function faketime(timestring) {
+    'use strict';
+    // returns time in minutes, either of time NOW, if no argument,
+    // or of parsed HH:MM string.
+
+    if (timestring) {
+        var split = timestring.match(/(\d\d):(\d\d)/);
+        if (('length' in split)&&(split.length==3)) {
+            return (60*parseInt(split[1]))+parseInt(split[2]);
+        } else {
+            console.log ('invalid time: ' + JSON.stringify(timestring));
+            return 0;
+        }
+    } else {
+        var now = new Date();
+        return (60*now.getHours())+now.getMinutes();
+    }
+}
+
+function restriction_relevant(now, restriction) {
+    // returns True if we're curently within a time restriction's jurisdiction, else False;
+
+    var start = faketime(restriction.start);
+    var end = faketime(restriction.end);
+
+    return ((start<now)&&(now<end));
+}
+
+function any_relevent_restrictions(post) {
+    // returns True if *any* time restriction catches the current time.
+
+    var now = faketime();
+    for (var i in post.time_restrictions) {
+        if (restriction_relevant(now, post.time_restrictions[i])) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function next_post(zone) {
     /******************************
      * start of new code for time restrictions... this whole function
      * must be rewritten totally.  This gives the rough idea how to do it.
-     ******************************
-    var CURR_POST = -1;
-    var NEXT_POST = -1;
-    var TOTAL_POSTS = get_posts_length(zone);
+     ******************************/
 
-    if ('current_post' in zone) {
-        CURR_POST = zone.current_post;
-        NEXT_POST = CURR_POST + 1;
+    var appendlist = [];
+    var nextpost = false;
+
+    if ((!('posts' in zone))&&(zone.posts.length==0)) {
+        // no posts!
+        zone.current_post = false;
+        setTimeout(function(){next_post(zone);}, zone.no_posts_wait);
+        console.log('no posts!');
+        return;
+    }
+
+    console.log ( zone.posts.length + ' posts to check.');
+
+    while (zone.posts.length > 0) {
+        var thispost = zone.posts.shift();
+        console.log(':examining:' + thispost.id);
+
+        if ('delete_me' in thispost){
+            // it's popped!
+            // TODO: remove DOM element.
+            console.log('deleing element:'+ thispost.id);
+            continue;
+        }
+        if (thispost.time_restrictions_show) {
+            if (any_relevent_restrictions(thispost)) {
+                // we have a winner!
+                nextpost = thispost;
+                appendlist.push(thispost);
+                console.log('Going to show post:' + nextpost.id);
+                break;
+            } else {
+                console.log('not showing:' + thispost.id)
+                appendlist.push(thispost);
+                //continue;
+            }
+        } else {
+            if (any_relevent_restrictions(thispost)) {
+                console.log('not showing:' + thispost.id)
+                appendlist.push(thispost);
+                //continue;
+            } else {
+                // we have a winner!
+                nextpost = thispost;
+                appendlist.push(thispost);
+                console.log('going to show post:' + nextpost.id);
+                break;
+            }
+        }
+    }
+    // add delayed posts (including new 'thispost') on to the end of the queue.
+    zone.posts = zone.posts.concat(appendlist);
+
+    if (nextpost) {
+        if (!('current_post' in zone)||(zone.current_post == false)) {
+            // first post!
+            zone.current_post = nextpost;
+            $(zone.current_post._el).fadeIn(zone.fadetime);
+            setTimeout(function(){next_post(zone);}, nextpost.display_time);
+            return;
+
+        }
+        if (nextpost.id == zone.current_post.id) {
+            // this is the only valid post!
+            setTimeout(function(){next_post(zone);}, nextpost.display_time);
+            console.log('only this post is available');
+            return;
+        } else {
+            // we have a new post to fade to. hurrah.
+            $(zone.current_post._el).fadeOut(zone.fadetime, function() {
+                zone.current_post = nextpost;
+                $(zone.current_post._el).fadeIn(zone.fadetime);
+                setTimeout(function(){next_post(zone);}, nextpost.display_time);
+            });
+            return;
+        }
     } else {
-        // current post not set up yet. so set it to -1...
-        zone.current_post = CURR_POST;
+        // no posts currently allowed!
+        if (zone.current_post) {
+            $(zone.current_post._el).fadeOut(zone.fadetime);
+        }
+        zone.current_post = false;
+        setTimeout(function(){next_post(zone);}, zone.no_posts_wait);
+        console.log('no posts currently valid!');
+        console.log(JSON.stringify(zone.posts));
+        return;
     }
 
-    while ( NEXT_POST != CURR_POST ) {
-        // which means if current_post is -1, we don't bother with anything.
+    // I have no clue how we could have got here, but if we have, by some
+    // edgecase, then delay and call again.
 
-        // wrap around:
-        if (NEXT_POST >= TOTAL_POSTS) { NEXT_POST = 0 };
+    console.log('Somehow at the end of the next_post function. odd');
+    setTimeout(function(){next_post(zone);}, zone.no_posts_wait);
 
-        // TODO: go through all time restrictions of post, compare to current time,
-        //       and if we're hit by them, either continue, or break.
-
-        // let's try the next one then...
-        NEXT_POST++;
-    }
-
-    // either we now have a next post, or else it is the same as the current post.
-    **************************************************
+    /*************************************************
     * end of new code. TODO TODO TODO.
     **************************************************
-    */
 
     // scroll through the posts loaded into a zone.
 
@@ -162,6 +270,8 @@ function next_post(zone) {
     } else {
         zone.next_post_timer = setTimeout(function(){next_post(zone);}, zone.post_time);
     }
+    */
+
 }
 
 function init_screen(screen_data, element) {
@@ -238,10 +348,11 @@ function make_updater(z){
                 var el =
                     post_renderers[zone.posts[n].type](zone.el, zone.posts[n]);
                 var zone_height = $(zone.el).height();
-                var my_height =el.height();
+                var my_height = el.height();
                 if (my_height < zone_height) {
                     el.css('top', (zone_height/2)-(my_height/2));
                 }
+                //console.log('Adding new el:' + el[0]);
                 zone.posts[n]._el = el[0];
 
             }
