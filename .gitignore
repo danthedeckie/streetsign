@@ -5,3 +5,4 @@
 *.swp
 config.py
 database.db
+app/static/user_files

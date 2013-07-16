@@ -114,3 +114,9 @@ def screens_posts_from_feeds(json_feeds_list):
 @app.route('/json/feed/<int:feedid>')
 def api_feed(feedid):
     return '{"id":{0}, "posts":[]}'.format(feedid)
+
+@app.route('/screens/post_types.js')
+def post_types_js():
+    return (render_template('post_types.js',types=post_types.renderers()),
+            200,
+            {'Content-Type':'application/javascript'})

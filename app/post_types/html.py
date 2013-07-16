@@ -20,16 +20,29 @@
 
 """
 
+from os.path import abspath, splitext
+from flask import render_template_string
 
+def my(ending):
+    ''' given '.html', returns (if this is the foobar module)
+        the contents of: /where/this/file/is/foodbar.html '''
 
-from flask import render_template, url_for, json
+    with open(splitext(abspath(__file__))[0] + ending,'r') as f:
+        return f.read()
 
 def form(data):
-    return render_template('post_types/html.html', **data)
+    ''' the form for editing this type of post '''
+    return render_template_string(my('.form.html'), **data)
 
 def receive(data):
+    ''' turn the contents posted back to us from the form into
+        a dict which can be JSON'd by the system, and dumped as
+        text into the database. '''
+
     return {'type':'html', 'content': data.get('content','')}
 
 def display(data):
     return data['content']
 
+def screen_js():
+    return my('.screen.js')

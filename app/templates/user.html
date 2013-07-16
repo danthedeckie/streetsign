@@ -1,0 +1,40 @@
+{% extends "index.html" %}
+
+{% block body %}
+<h1> User Details: </h1>
+<form method="POST">
+<label>login name:
+    <input name="loginname" locked value="{{user.loginname}}" /></label>
+<label>Displayed name:
+    <input name="displayname" value="{{user.displayname}}" /></label>
+<label>Email address:
+    <input name="emailaddress" value="{{user.emailaddress}}" /></label>
+<hr/>
+<h2> Feeds: </h2>
+<ul>
+    {% for f in writable_feeds %}
+        <li>{{ linkmacros.feed(f) }}</li>
+    {% endfor %}
+</ul>
+<h2> Recent Posts: </h2>
+
+<hr/>
+{% if session.display_admin_stuff or session.userid == user.id %}
+    <h2> Change Password:</h2>
+    <label>Your current Password:<input name="currpass" type="password" /></label>
+    <label>New Password:<input name="currpass" type="password" /></label>
+    <label>Confirm new Password:<input name="currpass" type="password" /></label>
+{% endif %}
+<h2>Groups:</h2>
+{% if session.display_admin_stuff %}
+    {{ widgets.groupselect('groups', allgroups, user.groups) }}
+{% else %}
+    <ul>
+    {% for group in user.groups %}
+        <li>{{group.name}}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+<input type="submit" value="Save Changes." />
+</form>
+{% endblock %}
