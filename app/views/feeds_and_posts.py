@@ -22,11 +22,10 @@
 
 
 
-from flask import render_template, url_for, request, session, redirect, \
-                  flash, json, g
+from flask import render_template, url_for, request, redirect, \
+                  flash, json 
 import app.user_session as user_session
 import app.post_types as post_types
-from werkzeug import secure_filename
 from datetime import datetime
 from app.views.utils import PleaseRedirect
 
@@ -36,7 +35,7 @@ from app.logic.feeds_and_posts import try_to_set_feed, \
                                       post_form_intake
 
 from app import app
-from app.models import DB, User, Group, Feed, Post, Screen, \
+from app.models import User, Group, Feed, Post, \
                        writeable_feeds, by_id
 
 ####################################################################
@@ -151,7 +150,7 @@ def post_new():
         post.save()
         flash('Saved!')
 
-        return redirect(request.referrer) #url_for('posts'))
+        return redirect(url_for('feedpage', feedid=post.feed.id))
 
 @app.route('/posts/<int:postid>', methods=['GET','POST'])
 def postpage(postid):
@@ -239,7 +238,6 @@ def postpage(postid):
 def postedit_type(typeid):
     ''' returns an editor page, of type typeid '''
     editor = post_types.load(typeid)
-    user = user_session.get_user()
 
     return render_template('post_type_container.html',
                            post_type = typeid,
