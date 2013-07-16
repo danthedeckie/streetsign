@@ -23,7 +23,9 @@ for production deployment, look at the flask documentation.
 ## Requirements:
 
 Most packages will be installed by the ./setup.sh script into a folder called .virtualenv,
-but you will need Python 2.6/2.7 or so, and the Python headers package (python-dev on debian).
+but you will need Python 2.6/2.7 or so, and the Python headers package (python-dev on debian),
+probably also a functioning gcc is needed, for compiling the various requirements.  But
+python-dev should handle that (I hope!)
 
 ## More info:
 
@@ -39,3 +41,28 @@ There is the [pre-commit script by Sebastian Dahlgren](https://github.com/sebdah
 To run a git commit *without* using this, use:
 
     git commit --no-verify
+
+
+## Other notes
+
+_(to be part of full documentation, later on)_
+
+### Magic Vars in posts:
+
+You can use 2 magic variables in html or text posts:
+
+    %%TIME%%
+
+and
+
+    %%DATE%%
+
+these will be replaced by the current time, or date, respectively, and are kept
+up to date by the system.
+
+### Why isn't my post showing up?!
+
+- Does it have time restrictions which are in the way?
+- Is it published?
+- Does the output screen have the correct feeds selected?
+- Try refreshing the output screen...

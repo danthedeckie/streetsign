@@ -6,12 +6,15 @@
                .prependTo(zone));
     },
     display: function(data) {
-        console.log('Trying to start local stream-player')
-        $.post(data.content.display_url);
+        var url = (data.content.display_url.match(/.*:\/\/.*/) != -1 ? 'http://' : '') + data.content.display_url;
+        console.log('Trying to start local stream-player: ' + url);
+        $.post(url);
+        
     },
     hide: function(data) {
-        console.log('Trying to stop local stream-player')
-        $.post(data.content.hide_url);
+        var url = (data.content.display_url.match(/.*:\/\/.*/) != -1 ? 'http://' : '') + data.content.hide_url;
+        console.log('Trying to stop local stream-player: ' + url)
+        $.post(url);
     }
 }
 
