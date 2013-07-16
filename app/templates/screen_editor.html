@@ -78,7 +78,7 @@ CSS:<br/>
 BG="{{ screen.background }}";
 CSS=JSON.stringify({{ screen.css|safe if screen.css else '{}' }});
 SETTINGS=JSON.stringify({{ screen.settings|safe if screen.settings else '{}' }});
-ZONES={{ screen.zones|safe if screen.zones else '{}' }};
+ZONES={{ screen.zones|safe if screen.zones else '[]' }};
 AVAILABLE_FEEDS = [
     {%- for feed in feeds -%}
         {id: "{{ feed.id }}", name: "{{ feed.name}}"} {{- ',' if not loop.last -}}

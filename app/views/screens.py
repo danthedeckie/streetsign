@@ -55,6 +55,7 @@ def screens():
         screens=Screen.select())
 
 @app.route('/screens-edit/<screenid>', methods=['GET','POST'])
+@app.route('/screens-edit/<int:screenid>', methods=['GET','POST'])
 def screenedit(screenid):
     try:
         if screenid == '-1':
