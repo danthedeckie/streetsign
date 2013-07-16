@@ -16,7 +16,7 @@ Aspect Ratio:<select id="aspect">
 <option value=0.6>4:3</option>
 <option selected value=0.7>16:9</option>
 </select>
-<!--<textarea style="float: right;clear:right; max-width: 30%" data-bind="value: ko.mapping.toJSON($root, null, 2)"></textarea>-->
+<textarea style="float: right;clear:right; width: 100%; height: 100px" data-bind="value: ko.mapping.toJSON($root, null, 2)"></textarea>
 
 <h2>Screen ID:{{ screen.id }}</h2>
 
@@ -76,8 +76,8 @@ CSS:<br/>
 {{ linkmacros.static_js('model_zones.js') }}
 <script type="text/javascript">
 BG="{{ screen.background }}";
-CSS=JSON.stringify({{ screen.css|safe }});
-SETTINGS=JSON.stringify({{ screen.settings|safe if screen.settings else ''}});
+CSS=JSON.stringify({{ screen.css|safe if screen.css else '{}' }});
+SETTINGS=JSON.stringify({{ screen.settings|safe if screen.settings else '{}' }});
 ZONES={{ screen.zones|safe if screen.zones else '{}' }};
 AVAILABLE_FEEDS = [
     {%- for feed in feeds -%}

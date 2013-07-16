@@ -40,7 +40,9 @@ var ScreenModel = function(background, other_settings, css, zones) {
     self.background = ko.observable(background);
     self.css = ko.observable(css);
     self.zones = ko.observableArray();
-    ko.mapping.fromJS(zones, [], self.zones);
+    ko.mapping.fromJS(zones.map( function(x){
+        return $.extend({}, DEFAULT_ZONE,x);
+        }) , [], self.zones);
 
 
     // stupid knockout treats <select> options as strings.
@@ -48,7 +50,10 @@ var ScreenModel = function(background, other_settings, css, zones) {
     for (var zone in self.zones()){
         self.zones()[zone].feeds(
             self.zones()[zone].feeds().map(function(x){return ""+x}));
-        self.zones()[zone].css = JSON.stringify(self.zones().css);
+        if (! 'css' in self.zones()[zone]) {
+            self.zones()[zone].css = ko.observable('');
+            }
+        //self.zones()[zone].css = JSON.stringify(self.zones().css);
     }
 
     self.addZone = function() {

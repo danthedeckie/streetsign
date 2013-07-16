@@ -54,15 +54,16 @@ def screens():
     return render_template('screens.html',
         screens=Screen.select())
 
-@app.route('/screens/edit/<int:screenid>', methods=['GET','POST'])
+@app.route('/screens-edit/<screenid>', methods=['GET','POST'])
 def screenedit(screenid):
     try:
-        if screenid == -1:
+        if screenid == '-1':
             screen = Screen()
         else:
-            screen = Screen(id=screenid).get()
-            backgrounds = [basename(x) for x in \
-                           glob(app.config['SITE_VARS']['user_dir']+ '*')]
+            screen = Screen(id=int(screenid)).get()
+
+        backgrounds = [basename(x) for x in \
+                       glob(app.config['SITE_VARS']['user_dir']+ '*')]
 
     except Screen.DoesNotExist:
         flash('Invalid Screen ID! Screen does NOT exist!')
