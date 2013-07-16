@@ -28,8 +28,8 @@ UPDATE_ZONES_TIMER = 6000; // how often to check for new posts?
 window.post_types = {};
 
 function magic_vars(text) {
-    return (text.replace(/%%TIME%%/,'<span class="magic_time"></span>')
-                .replace(/%%DATE%%/,'<span class="magic_date"></span>'));
+    return (text.replace(/%%TIME%%/,'<span class="magic_time">&nbsp;</span>')
+                .replace(/%%DATE%%/,'<span class="magic_date">&nbsp;</span>'));
 }
 
 function magic_time() {
@@ -76,7 +76,8 @@ function zone(container, obj) {
     obj.el = $(zone_html(obj.name, obj.top, obj.left, obj.bottom, obj.right, obj.css))
               .prependTo(container)[0];
 
-    $(obj.el).addClass(obj.classes);
+    //obj.classes.map(function(x){ $(obj.el).addClass(x);});
+    //alert(obj.classes);
 
     try {
         csspairs = obj.css.split(/[\n;]+/).map(function (x) {
@@ -231,8 +232,14 @@ function next_post(zone) {
                 zone.current_post = nextpost;
                 $(zone.current_post._el).fadeIn(zone.fadetime);
 
+                try {
                 if ('display' in post_types[nextpost.type]) {
                     post_types[nextpost.type].display(nextpost);
+                }
+                } catch (e) {
+
+                    console.log('wrong type:' + nextpost.type);
+
                 }
 
                 setTimeout(function(){next_post(zone);}, nextpost.display_time);
@@ -347,7 +354,7 @@ function make_updater(z){
                     post_types[zone.posts[n].type].render(zone.el, zone.posts[n]);
                 var zone_height = $(zone.el).height();
                 var my_height = el.height();
-                if (my_height < zone_height) {
+                if ((my_height < zone_height)&&(my_height>1)) {
                     el.css('top', (zone_height/2)-(my_height/2));
                 }
                 //console.log('Adding new el:' + el[0]);
