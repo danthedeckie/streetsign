@@ -170,6 +170,7 @@ function next_post(zone) {
         if ('delete_me' in thispost){
             // it's popped!
             // TODO: remove DOM element.
+            $(thispost._el).fadeOut().remove();
             console.log('deleing element:'+ thispost.id);
             continue;
         }
@@ -324,7 +325,11 @@ function make_updater(z){
                 zone.posts[i].time_restrictions_show = data.posts[arrId].time_restrictions_show;
                 zone.posts[i].time_restrictions = data.posts[arrId].time_restrictions;
                 // Maybe better not ?
-                zone.posts[i].time_restrictions = data.posts[arrId].time_restrictions;
+                if (JSON.stringify(zone.posts[i].content) != JSON.stringify(data.posts[arrId].content)) {
+                    zone.posts[i].content = data.posts[arrId].content;
+                    $(zone.posts[i]._el).fadeOut().remove()
+                    zone.posts[i]._el = post_types[zone.posts[i].type].render(zone.el, zone.posts[i])[0];
+                }
                 zone.posts[i].display_time = data.posts[arrId].display_time;
             } else {
                 console.log('marking post for delete:' + i);
@@ -352,12 +357,6 @@ function make_updater(z){
                 var n = zone.posts.push(new_data) - 1;
                 var el =
                     post_types[zone.posts[n].type].render(zone.el, zone.posts[n]);
-                var zone_height = $(zone.el).height();
-                var my_height = el.height();
-                if ((my_height < zone_height)&&(my_height>1)) {
-                    el.css('top', (zone_height/2)-(my_height/2));
-                }
-                //console.log('Adding new el:' + el[0]);
                 zone.posts[n]._el = el[0];
 
             }

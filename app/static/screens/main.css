@@ -24,9 +24,16 @@ div.post {
     right:0;
     bottom:0;*/
     width: 100%;
-    height: auto;
+    height: 100%;
     margin: auto;
-    display: none;
+    display: table;
+}
+
+div.post_inner {
+    display: table-cell;
+    vertical-align: middle;
+    width: 100%;
+    bottom: 0px;
 }
 
 .text_dropshadow {

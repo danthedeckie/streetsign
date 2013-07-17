@@ -33,7 +33,7 @@ def my(ending):
         return f.read()
 
 def form(data):
-    return render_template_string(my('.html'), **data)
+    return render_template_string(my('.form.html'), **data)
 
 def receive(data):
     return {'type':'text', 'content': escape(data.get('content',''))}
