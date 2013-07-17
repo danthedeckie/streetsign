@@ -24,6 +24,7 @@
 // TODO: get these from somewhere?
 //'use strict';
 UPDATE_ZONES_TIMER = 6000; // how often to check for new posts?
+REFRESH_PAGE_TIMER = 3600000; // how often to reboot the page? this is every hour...
 
 window.post_types = {};
 
@@ -157,19 +158,15 @@ function next_post(zone) {
         // no posts!
         zone.current_post = false;
         setTimeout(function(){next_post(zone);}, zone.no_posts_wait);
-        console.log('no posts!');
+        console.log('no posts for '+ zone.name + '!');
         return;
     }
 
-    console.log ( zone.posts.length + ' posts to check.');
-
     while (zone.posts.length > 0) {
         var thispost = zone.posts.shift();
-        console.log(':examining:' + thispost.id);
 
         if ('delete_me' in thispost){
             // it's popped!
-            // TODO: remove DOM element.
             $(thispost._el).fadeOut().remove();
             console.log('deleing element:'+ thispost.id);
             continue;
@@ -182,20 +179,17 @@ function next_post(zone) {
                 console.log('Going to show post:' + nextpost.id);
                 break;
             } else {
-                console.log('not showing:' + thispost.id)
                 appendlist.push(thispost);
                 //continue;
             }
         } else {
             if (any_relevent_restrictions(thispost)) {
-                console.log('not showing:' + thispost.id)
                 appendlist.push(thispost);
                 //continue;
             } else {
                 // we have a winner!
                 nextpost = thispost;
                 appendlist.push(thispost);
-                console.log('going to show post:' + nextpost.id);
                 break;
             }
         }
@@ -239,7 +233,7 @@ function next_post(zone) {
                 }
                 } catch (e) {
 
-                    console.log('wrong type:' + nextpost.type);
+                    console.log('ERROR:wrong type:' + nextpost.type);
 
                 }
 
@@ -260,8 +254,7 @@ function next_post(zone) {
         }
         zone.current_post = false;
         setTimeout(function(){next_post(zone);}, zone.no_posts_wait);
-        console.log('no posts currently valid!');
-        console.log(JSON.stringify(zone.posts));
+        console.log('no posts currently valid in zone'+zone.name+'! : ' + JSON.stringify(zone.posts));
         return;
     }
 
@@ -285,7 +278,6 @@ function init_screen(screen_data, element) {
                 screen_data.zones[z][d] = screen_data.defaults[d];
             }
         }
-        console.log('adding zone:' + screen_data.zones[z].name);
         zone(element, screen_data.zones[z]);
     }
 
@@ -327,23 +319,28 @@ function make_updater(z){
                 // Maybe better not ?
                 if (JSON.stringify(zone.posts[i].content) != JSON.stringify(data.posts[arrId].content)) {
                     zone.posts[i].content = data.posts[arrId].content;
-                    $(zone.posts[i]._el).fadeOut().remove()
+                    if (zone.current_post == i) {
+                        $(zone.posts[i]._el).fadeOut().remove()
+                    }
                     zone.posts[i]._el = post_types[zone.posts[i].type].render(zone.el, zone.posts[i])[0];
+                    if (zone.current_post == i) {
+                        $(zone.posts[i]._el).fadeIn();
+                    }
                 }
                 zone.posts[i].display_time = data.posts[arrId].display_time;
             } else {
-                console.log('marking post for delete:' + i);
+                console.log('marking post for delete:' + zone.posts[i].id);
                 zone.posts[i].delete_me = true;
 
                 // if we're currently displaying this post, then bring forward
                 // the timeout to 1 second from now (should be long enough to
                 // finish loading any other posts...)
-                if (zone.current_post == i) {
+                if (zone.current_post == zone.posts[i]) {
                     console.log('bringing forward next post timer')
                     clearTimeout(zone.next_post_timer);
                     setTimeout(function(){next_post(zone);}, 1000);
                 } else {
-                    console.log('deleting post:' + i)
+                    console.log('deleting post:' + zone.posts[i].id)
                     zone.posts.pop(i);
                 }
             }
@@ -374,3 +371,10 @@ function update_zones_posts() {
     // TODO: get this value from somewhere:
     setTimeout(update_zones_posts, UPDATE_ZONES_TIMER);
 }
+
+function reload_page() {
+    $.get(document.URL, function() { window.location.reload(); });
+    // and if that doesn't work, we'll try again later:
+    setTimeout(reload_page, REFRESH_PAGE_TIMER);
+}
+setTimeout(reload_page, REFRESH_PAGE_TIMER);
