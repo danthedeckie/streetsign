@@ -21,7 +21,7 @@
 """
 
 from os.path import abspath, splitext
-from flask import render_template_string, Markup
+from flask import render_template_string
 import re
 
 def my(ending):
@@ -37,8 +37,8 @@ def form(data):
 
 def safehtml(text):
     S = re.compile(r'<(.*?)script(.*?)>', re.MULTILINE | re.IGNORECASE)
-    return re.sub(S, '', text.replace('\n',' ')).replace('<br/>','<br/>\n')
-
+    W = re.compile(r'\s+')
+    return re.sub(W, ' ', re.sub(S, '', text.replace('\n',' '))).replace('<br/> ','<br/>\n')
 def receive(data):
     ''' turn the contents posted back to us from the form into
         a dict which can be JSON'd by the system, and dumped as
