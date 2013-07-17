@@ -4,10 +4,7 @@
         var height = 0;
         var zone_height = $(zone).height()
         var newhtml = $('<div class="post post_text"><div class="post_inner">'
-                + magic_vars( data.content.content
-                              .replace(/&/g,'&amp;')
-                              .replace(/</g,'&lt;')
-                              .replace(/>/g,'&gt;'))
+                + magic_vars( data.content.content)
                 + '</div></div>')
                 .prependTo(zone);
 
