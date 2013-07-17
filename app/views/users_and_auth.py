@@ -65,9 +65,23 @@ def logout():
 def users():
     return render_template('users.html', users=User.select())
 
-@app.route('/users/<int:userid>')
-def userpage(userid):
-    return render_template('userpage.html', user=User.select(id=userid))
+@app.route('/users/<int:userid>', methods=['GET','POST'])
+def user(userid):
+    current_user = user_session.get_user()
+    user = User.get(id=userid)
+
+    if request.method == 'POST':
+        if current_user != user and not current_user.is_admin:
+            flash('Sorry! You cannot edit this user!')
+            return render_template('user.html',
+                    user=user)
+
+
+    return render_template('user.html',
+            posts=Post.select().where(Post.author==user)\
+                      .order_by(Post.write_date.desc()).limit(10),
+            user=user)
+
 
 @app.route('/groups')
 def groups():

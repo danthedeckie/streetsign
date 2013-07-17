@@ -70,6 +70,12 @@ class User(DBModel):
     def __repr__(self):
         return '<User:' + self.displayname + '>'
 
+    def writeable_feeds(self):
+        if self.is_admin:
+            return Feed.select()
+        return [f for f in Feed.select() if f.user_can_write(user)]
+
+
 ##########
 # login stuff:
 
@@ -282,7 +288,7 @@ class Feed(DBModel):
 
     def set_author_groups(self, authorlist):
         ''' set the complete author_groups list. deletes previous set '''
-        
+
         # delete old permissions first.
         FeedPermission.delete().where((FeedPermission.feed==self)
                                      &(FeedPermission.publish==True)
@@ -301,6 +307,7 @@ class Feed(DBModel):
         for p in publisherlist:
             assert(isinstance(p, Group))
             self.grant('Publish', group=p)
+
 
 def writeable_feeds(user):
     if user.is_admin:

@@ -80,7 +80,7 @@ def if_i_cant_write_then_i_quit(post, user):
 
 def can_user_write_and_publish(user, post):
     if not post.feed:
-        if user.writable_feeds():
+        if user.writeable_feeds():
             return True, False
 
     else: # there is a feed selected
