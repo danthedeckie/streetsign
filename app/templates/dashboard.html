@@ -7,7 +7,7 @@
     <h2> Unpublished Posts I can publish:</h2>
     <ul class="list">
     {% for post in posts_to_publish %}
-        <li><span class="{{ 'published' if post.published else 'unpublished' }}">{{ linkmacros.post(post) }}</span><form method="post" action="{{ url_for('postpage', postid=post.id) }}"><input type="hidden" name="action" value="publish" /><input type="submit" class="newbutton" value="Publish" /></form></li>
+        <li><span class="{{ 'published' if post.published else 'unpublished' }}">{{ linkmacros.post(post) }}</span><form method="post" action="{{ url_for('postpage', postid=post.id) }}"><input type="hidden" name="action" value="publish" /><input type="submit" class="newbutton" value="Publish" style="" /></form></li>
     {% endfor %}
     </ul>
     </div>
@@ -17,11 +17,7 @@
     <h2> Feeds I can publish to:</h2>
     <ul class="list">
     {% for feed in publishable_feeds %}
-        <li><a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a> -
-            {% if feed.user_can_write(user) %}
-                <a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}"
-                   class="newbutton">New</a>
-            {% endif %}
+        <li><a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a>
         </li>
     {% endfor %}
     </ul>
@@ -44,7 +40,7 @@
         <li><a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a> -
             {% if feed.user_can_write(user) %}
                 <a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}"
-                   class="newbutton">New</a>
+                   class="newbutton">New Post</a>
             {% endif %}
         </li>
     {% endfor %}
