@@ -62,11 +62,15 @@ def index():
         user = User()
 
     # TODO:
+    publishable_feeds = user.publishable_feeds()
+
     posts_to_publish = Post.select()\
-                           .where(Post.published==False)
+                           .where((Post.published==False) &
+                                  (Post.feed << publishable_feeds))
 
     return render_template('dashboard.html',
         feeds = Feed.select(),
+        publishable_feeds=publishable_feeds,
         posts = Post.select().where(Post.author == user)\
                     .order_by(Post.write_date)\
                     .limit(15),
