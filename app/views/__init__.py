@@ -30,10 +30,11 @@ import app.views.users_and_auth
 import app.views.feeds_and_posts
 import app.views.user_files
 import app.views.screens
+import app.user_session as user_session
 
 # set up the app
 from app import app
-from app.models import DB
+from app.models import DB, Post, Screen, Feed, User
 
 ######################################################################
 # Basic App stuff:
@@ -55,4 +56,24 @@ def end_of_request(exception):
 @app.route('/index.html')
 def index():
     ''' main front page / dashboard / index. '''
-    return render_template('index.html')
+    try:
+        user = user_session.get_user()
+    except user_session.NotLoggedIn as e:
+        user = User()
+
+    # TODO:
+    publishable_feeds = user.publishable_feeds()
+
+    posts_to_publish = Post.select()\
+                           .where((Post.published==False) &
+                                  (Post.feed << publishable_feeds))
+
+    return render_template('dashboard.html',
+        feeds = Feed.select(),
+        publishable_feeds=publishable_feeds,
+        posts = Post.select().where(Post.author == user)\
+                    .order_by(Post.write_date)\
+                    .limit(15),
+        posts_to_publish = posts_to_publish,
+        screens=Screen.select(),
+        user=user)

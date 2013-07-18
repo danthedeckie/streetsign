@@ -70,6 +70,20 @@ class User(DBModel):
     def __repr__(self):
         return '<User:' + self.displayname + '>'
 
+    def writeable_feeds(self):
+        if self.is_admin:
+            return Feed.select()
+        return [f for f in Feed.select() if f.user_can_write(self)]
+
+    def publishable_feeds(self):
+        if self.is_admin:
+            return Feed.select()
+        # TODO: make this a SQL select query, rather than this silly
+        #       slow way.
+        return [f for f in Feed.select() if f.user_can_publish(self)]
+
+
+
 ##########
 # login stuff:
 
@@ -181,15 +195,15 @@ class Feed(DBModel):
             return False
 
         # check for user-level read permission:
-        if self.permissions.where(FeedPermission.user==user,
-                                  FeedPermission.write==True).exists():
+        if self.permissions.where((FeedPermission.user==user) &
+                                  (FeedPermission.write==True)).exists():
             return True
 
         # check for group-level read permission:
         if (self.permissions.join(Group)
                             .join(UserGroup)
-                            .where(UserGroup.user == user,
-                                   FeedPermission.write == True).exists()):
+                            .where((UserGroup.user == user) &
+                                   (FeedPermission.write == True)).exists()):
             return True
 
         # oh well! no permission!
@@ -203,15 +217,15 @@ class Feed(DBModel):
             return False
 
         # check for user-level read permission:
-        if self.permissions.where(FeedPermission.user==user,
-                                  FeedPermission.publish==True).exists():
+        if self.permissions.where((FeedPermission.user==user) &
+                                  (FeedPermission.publish==True)).exists():
             return True
 
         # check for group-level read permission:
         if (self.permissions.join(Group)
                             .join(UserGroup)
-                            .where(UserGroup.user == user,
-                                   FeedPermission.publish == True).exists()):
+                            .where((UserGroup.user == user) &
+                                   (FeedPermission.publish == True)).exists()):
             return True
 
         # oh well! no permission!
@@ -282,7 +296,7 @@ class Feed(DBModel):
 
     def set_author_groups(self, authorlist):
         ''' set the complete author_groups list. deletes previous set '''
-        
+
         # delete old permissions first.
         FeedPermission.delete().where((FeedPermission.feed==self)
                                      &(FeedPermission.publish==True)
@@ -301,6 +315,7 @@ class Feed(DBModel):
         for p in publisherlist:
             assert(isinstance(p, Group))
             self.grant('Publish', group=p)
+
 
 def writeable_feeds(user):
     if user.is_admin:

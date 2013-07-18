@@ -1,0 +1,55 @@
+{% extends "index.html" %}
+{% block title %} Dashboard {% endblock %}
+
+{% block body %}
+{% if session.logged_in %}
+    <div class="leftside">
+    <h2> Unpublished Posts I can publish:</h2>
+    <ul class="list">
+    {% for post in posts_to_publish %}
+        <li class="{{ 'published' if post.published else 'unpublished' }}">{{ linkmacros.post(post) }}<form method="post" action="{{ url_for('postpage', postid=post.id) }}"><input type="hidden" name="action" value="publish" /><input type="submit" class="newbutton" value="Publish" /></form></li>
+    {% endfor %}
+    </ul>
+    </div>
+
+    {% if publishable_feeds %}
+    <div class="rightside">
+    <h2> Feeds I can publish to:</h2>
+    <ul class="list">
+    {% for feed in publishable_feeds %}
+        <li><a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a> -
+            {% if feed.user_can_write(user) %}
+                <a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}"
+                   class="newbutton">New</a>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+    </div>
+    {% endif %}
+
+    <div class="leftside">
+    <h2> My recent Posts:</h2>
+    <ul class="list">
+    {% for post in posts %}
+        <li class="{{ 'published' if post.published else 'unpublished' }}">{{ linkmacros.post(post) }} ( {{ 'published' if post.published else 'unpublished' }} ) </li>
+    {% endfor %}
+    </ul>
+    </div>
+
+    <div class="rightside">
+    <h2> Feeds I can write for:</h2>
+    <ul class="list">
+    {% for feed in feeds %}
+        <li><a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a> -
+            {% if feed.user_can_write(user) %}
+                <a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}"
+                   class="newbutton">New</a>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+    </div>
+{% endif %}
+<div class="cf"></div>
+{% endblock %}

@@ -11,7 +11,7 @@
   </head>
 <body>
 <header>
-  <h1>{{ g.site_vars.site_title }}:{{ display_title }}</h1>
+  <h1><a href="{{ url_for('index') }}">{{ g.site_vars.site_title }}:{{ display_title }}</a></h1>
   <nav>
     {% block nav %}
     <ul>

@@ -48,6 +48,20 @@ thead > tr {
     color: #eee;
     font-width: 400;
 }
+ul.list {
+    border: 1px solid #aaa;
+    padding:0;
+}
+.list li {
+    padding: 0.2em;
+    list-style-type: none;
+    margin: 0;
+    display: block;
+
+}
+.list li:nth-child(odd){
+    background: #ddd;
+}
 /*************************************************************************/
 /* Specific Areas (main stuff, common to all pages.) */
 header {
@@ -326,3 +340,12 @@ ul.optionrow > li:last-of-type {
 }
 input.half { max-width: 50%; }
 input.third { max-width: 28%;}
+
+.published {
+    font-width: bold;
+}
+.unpublished {
+    font-width: normal;
+    font-style: italic;
+    opacity: 0.6;
+}
