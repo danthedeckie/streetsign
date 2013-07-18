@@ -171,7 +171,21 @@ div.footerbox {
     border: 1px solid #123;
     padding: 1em;
 }
-
+footer {
+    position: static;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #ddd;
+    background: linear-gradient(#333,#222);
+    padding: 1em;
+    margin-top: 200px;
+    font-weight: thin;
+}
+footer a {
+   color: #fff;
+}
 div.free_blocks {
     display: block;
     padding: 1em;
@@ -287,16 +301,29 @@ div.sizes_box {
     color: white;
     text-align: center;
 }
+
+.rightside, .leftside {
+    width: 90%;
+    margin: auto;
+    float: none;
+    display: block;
+}
+
+@media only screen and (min-width: 500px) {
 .rightside {
     /* TODO: only on big enough media screen sizes */
     max-width: 48%;
+    min-width: 45%;
     clear: right;
     float: right;
 }
 .leftside {
     max-width: 48%;
+    min-width: 45%;
     clear: left;
     float: left;
+}
+
 }
 
 ul.optionrow {

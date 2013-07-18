@@ -40,7 +40,6 @@
   <li class="{{'err' if 'ERR' in msg }}">{{ msg }}</li>
 {% endfor %}
 </ul>
-<footer>
 <div id="login_box">
 {% if session.logged_in %}
     Logged in as {{ session.username }}.
@@ -58,6 +57,11 @@
     </form>
 {% endif %}
 </div>
+<footer>
+(C) 2013. an <a href="http://omnivision.om.org/">OMNIvision</a> Project.<br/>
+This project released under the <a href="https://www.gnu.org/licenses/gpl.html">GPL</a>.</br>
+<a href="https://bitbucket.org/dfairhead/concertino/overview">Currently still Alpha/TESTING!</a>
+
 </footer>
 {% block end_of_page_javascript %}
   <!-- jquery, ga, whatever goes here. -->

@@ -7,7 +7,7 @@
     <h2> Unpublished Posts I can publish:</h2>
     <ul class="list">
     {% for post in posts_to_publish %}
-        <li class="{{ 'published' if post.published else 'unpublished' }}">{{ linkmacros.post(post) }}<form method="post" action="{{ url_for('postpage', postid=post.id) }}"><input type="hidden" name="action" value="publish" /><input type="submit" class="newbutton" value="Publish" /></form></li>
+        <li><span class="{{ 'published' if post.published else 'unpublished' }}">{{ linkmacros.post(post) }}</span><form method="post" action="{{ url_for('postpage', postid=post.id) }}"><input type="hidden" name="action" value="publish" /><input type="submit" class="newbutton" value="Publish" /></form></li>
     {% endfor %}
     </ul>
     </div>
