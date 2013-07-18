@@ -10,7 +10,7 @@
     <td>Post</td>
     <td>Author</td>
     <td>Date</td>
-    <td colspan=2><a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}" class="newbutton">NEW</a></td>
+    <td colspan=2>{% if feed.user_can_write(user) %}<a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}" class="newbutton">NEW</a>{% endif %}</td>
   </tr>
 </thead>
 <tbody>
@@ -29,13 +29,17 @@
                 </form>
             {% endif %}
         </td>
-        <td><form method="POST" action="{{ url_for('postpage',postid=post.id) }}" >
+        <td>{% if (post.published and feed.user_can_publish(user)) or
+                  ((not post.published) and feed.user_can_write(user)) %}
+            <form method="POST" action="{{ url_for('postpage',postid=post.id) }}" >
             <input type="hidden" name="action" value="delete" />
-            <input class="delbutton confirm_delete" type="submit" value="X" /></form></td>
+            <input class="delbutton confirm_delete" type="submit" value="X" /></form>
+            {% endif %}</td>
     </tr>
 {% endfor %}
 </tbody>
 </table>
+{% if user.is_admin %}
 <form method="POST" id="users_and_groups">
 <input type="hidden" name="action" value="edit" />
 <div class="autowidth">
@@ -59,7 +63,23 @@
 </div>
 <input type="submit" value="Save">
 </form>
-
+{% else %}
+<div class="leftside">
+<h3>Authors who can post here:</h3>
+{% for u in feed.authors() %}
+<ul class="list">
+  <li>{{ linkmacros.user(u) }}</li>
+{% endfor %}
+</div>
+<div class="rightside">
+<h3>Publishers</h3>
+<ul class="list">
+{% for u in feed.publishers() %}
+  <li>{{ linkmacros.user(u) }}</li>
+{% endfor %}
+</ul>
+</div>
+{% endif %}
 <div class="cf"></div>
 </div>
 {% endblock %}

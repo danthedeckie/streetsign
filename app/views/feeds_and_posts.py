@@ -63,8 +63,10 @@ def feedpage(feedid):
     try:
         feed = Feed.get(id=feedid)
         user = user_session.get_user()
+    except user_session.NotLoggedIn as e:
+        user = User()
     except:
-        flash('invalid feed id! (' + feedid + ')')
+        flash('invalid feed id! (' + str(feedid) + ')')
         return redirect(url_for('feeds'))
 
     if request.method == 'POST':

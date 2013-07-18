@@ -67,7 +67,12 @@ def users():
 
 @app.route('/users/<int:userid>', methods=['GET','POST'])
 def user(userid):
-    current_user = user_session.get_user()
+    try:
+        current_user = user_session.get_user()
+    except user_session.NotLoggedIn as e:
+        flash("Sorry, you're not logged in!")
+        return redirect(url_for('index'))
+
     user = User.get(id=userid)
 
     if request.method == 'POST':

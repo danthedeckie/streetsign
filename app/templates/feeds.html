@@ -13,13 +13,14 @@
 {% for feed in feeds %}
     <tr>
         <td><a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a></td>
-        <td><form method="POST" action="{{ url_for('feedpage', feedid=feed.id) }}">
+        <td>{% if session.display_admin_stuff %}<form method="POST" action="{{ url_for('feedpage', feedid=feed.id) }}">
             <input type="hidden" name="action" value="delete" />
-            <input type="submit" value="X" class="confirm_delete"></form></td>
+            <input type="submit" value="X" class="confirm_delete"></form>{% endif %}</td>
     </tr>
 {% endfor %}
 </tbody>
 </table>
+{% if session.display_admin_stuff %}
 <div>
     <form action="{{ url_for('feeds') }}" method="POST">
     <h2> New Feed </h2>
@@ -27,4 +28,5 @@
     <input type="submit" value="Create!" />
     </form>
 </div>
+{% endif %}
 {% endblock %}
