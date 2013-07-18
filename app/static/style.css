@@ -273,16 +273,29 @@ div.sizes_box {
     color: white;
     text-align: center;
 }
+
+.rightside, .leftside {
+    width: 90%;
+    margin: auto;
+    float: none;
+    display: block;
+}
+
+@media only screen and (min-width: 500) {
 .rightside {
     /* TODO: only on big enough media screen sizes */
     max-width: 48%;
+    min-width: 45%;
     clear: right;
     float: right;
 }
 .leftside {
     max-width: 48%;
+    min-width: 45%;
     clear: left;
     float: left;
+}
+
 }
 
 ul.optionrow {
