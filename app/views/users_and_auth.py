@@ -29,6 +29,7 @@ from os import makedirs, remove, stat
 from app import app
 from app.models import DB, User, Group, Feed, Post, Screen, \
                        writeable_feeds, by_id
+import sqlite3
 
 
 @app.route('/login', methods=['POST'])
@@ -66,23 +67,75 @@ def users():
     return render_template('users.html', users=User.select())
 
 @app.route('/users/<int:userid>', methods=['GET','POST'])
-def user(userid):
+@app.route('/users/-1', methods=['GET','POST'])
+def user(userid=-1):
     try:
         current_user = user_session.get_user()
     except user_session.NotLoggedIn as e:
         flash("Sorry, you're not logged in!")
         return redirect(url_for('index'))
 
-    user = User.get(id=userid)
+    userid = int(userid)
 
+    if userid != -1:
+        user = User.get(id=userid)
+    else:
+        user = User()
+        user.loginname='new'
+        user.displayname='New User'
+        user.emailaddress='...'
     if request.method == 'POST':
-        if current_user != user and not current_user.is_admin:
-            flash('Sorry! You cannot edit this user!')
-            return render_template('user.html',
-                    user=user)
+        action = request.form.get('action','none')
+        if action == 'update':
+            if current_user != user and not current_user.is_admin:
+                flash('Sorry! You cannot edit this user!')
+                return render_template('user.html',
+                        user=user)
+            try:
+                oldname = user.loginname
+                user.loginname = request.form.get('loginname', user.loginname)
+                user.save()
+            except:
+                user.loginname = oldname if oldname else 'NEW'
+                flash('Sorry! You cannot have that loginname. Someone else does')
 
+            user.displayname = request.form.get('displayname', user.displayname)
+            user.emailaddress = request.form.get('emailaddress',user.emailaddress)
+
+            if not user.id == current_user.id:
+                user.is_admin = request.form.get('is_admin', False)
+
+            newpass = request.form.get('newpass','') if \
+                        request.form.get('newpass','') \
+                        == request.form.get('conf_newpass','2') else False
+
+            if newpass:
+                if current_user.confirm_password(request.form.get('currpass','')):
+                    user.set_password(request.form.get('newpass'))
+                    flash('password changed')
+                else:
+                    flash('Your password was wrong!')
+            else:
+                if not request.form.get('newpass','') == '':
+                    flash('invalid password!')
+
+            if current_user.is_admin:
+                user.set_groups(request.form.getlist('groups'))
+
+            user.save()
+            flash('Updated.')
+        elif action == 'delete':
+            if (not current_user.is_admin) \
+            or (user.id == current_user.id):
+               flash('Sorry! You cannot delete this user!')
+               return redirect(request.referrer)
+
+            user.delete_instance()
+            flash ('User:' + user.displayname + ' deleted.')
+            return redirect(request.referrer)
 
     return render_template('user.html',
+            allgroups=Group.select(),
             posts=Post.select().where(Post.author==user)\
                       .order_by(Post.write_date.desc()).limit(10),
             user=user)

@@ -34,6 +34,7 @@
 </header>
 <article>
 {% block body %}{% endblock %}
+<div class="cf"></div>
 </article>
 <ul id="flashed_notices">
 {% for msg in get_flashed_messages() %}
@@ -41,6 +42,7 @@
 {% endfor %}
 </ul>
 <div id="login_box">
+<a style="color:white;float:left"href="#" id="login_box_close">X</a>
 {% if session.logged_in %}
     Logged in as {{ session.username }}.
     <form action="{{ url_for('logout') }}" method="POST">

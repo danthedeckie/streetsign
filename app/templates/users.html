@@ -5,22 +5,31 @@
 <table>
 <thead>
 <tr>
-<td>Login Name</td>
 <td>Display Name</td>
+<td>login name</td>
 <td>Email</td>
-<td>Other Flags</td>
+<td></td>
 </tr>
 </thead>
 <tbody>
 {% for user in users %}
     <tr>
+    <td>{{ linkmacros.user(user) }}</td>
     <td>{{ user.loginname }}</td>
-    <td>{{ user.displayname }}</td>
     <td>{{ user.emailaddress }}</td>
     <td>{% if user.is_admin %}ADMIN {% endif %}
-        {% if user.is_locked_out %} Locked Out! {% endif %}</td>
+        {% if user.is_locked_out %} Locked Out! {% endif %}
+        {% if session.display_admin_stuff %}
+          {% if user.loginname != session.username %}
+          <form action="{{ url_for('user',userid=user.id) }}" method="POST">
+          <input type="hidden" name="action" value="delete" />
+          <input type="submit" class="delbutton confirm_delete" value="X"/>
+          </form>
+          {% endif %}
+        {% endif %}</td>
     </tr>
 {% endfor %}
 </tbody>
 </table>
+<a href="{{url_for('user',userid=-1)}}" class="newbutton">New</a>
 {% endblock %}

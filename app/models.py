@@ -67,6 +67,9 @@ class User(DBModel):
     def set_password(self, password):
         self.passwordhash = bcrypt.encrypt(password + SECRET_KEY)
 
+    def confirm_password(self, password):
+        return bcrypt.verify(password + SECRET_KEY, self.passwordhash)
+
     def __repr__(self):
         return '<User:' + self.displayname + '>'
 
@@ -82,7 +85,23 @@ class User(DBModel):
         #       slow way.
         return [f for f in Feed.select() if f.user_can_publish(self)]
 
+    def groups(self):
+        return [g for g in Group.select().join(UserGroup)
+                                .where(UserGroup.user==self)]
 
+    def set_groups(self, groupidlist):
+        # clear old groups:
+        UserGroup.delete().where(UserGroup.user==self).execute()
+
+        #set new ones:
+        for gid in groupidlist:
+            try:
+                g = Group.get(id=gid)
+                ug = UserGroup(user=self, group=g).save()
+            except:
+                return False, 'Invalid user, or groupid'
+
+        return True, self.groups()
 
 ##########
 # login stuff:
@@ -136,6 +155,25 @@ class Group(DBModel):
     def __repr__(self):
         return '<Group:' + self.name + \
             ('(hidden)>' if not self.display else '>')
+
+    def users(self):
+        return [u for u in User.select().join(UserGroup)
+                                .where(UserGroup.group==self)]
+
+    def set_users(self, useridlist):
+        # clear old groups:
+        UserGroup.delete().where(UserGroup.group==self).execute()
+
+        #set new ones:
+        for uid in useridlist:
+            try:
+                u = User.get(id=uid)
+                ug = UserGroup(group=self, user=u).save()
+            except:
+                return False, 'Invalid user'
+
+        return True, self.users()
+
 
 class UserGroup(DBModel):
     # XREF

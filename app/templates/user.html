@@ -4,26 +4,59 @@
 <div class="leftside">
     <h1> User Details: </h1>
     <form method="POST">
-    <label>login name:
-        <input name="loginname" locked value="{{user.loginname}}" /></label><br/>
-    <label>Displayed name:
-        <input name="displayname" value="{{user.displayname}}" /></label><br/>
-    <label>Email address:
-        <input name="emailaddress" value="{{user.emailaddress}}" /></label><br/>
+    <input type="hidden" name="action" value="update" />
+    <table>
+    <tbody>
+    <tr>
+      <td><label>login name:</label></td>
+      <td><input name="loginname" locked value="{{user.loginname}}" /></td>
+    </tr><tr>
+      <td><label>Displayed name:</label></td>
+      <td><input name="displayname" value="{{user.displayname}}" /></td>
+    </tr><tr>
+      <td><label>Email address:</lable></td>
+      <td><input name="emailaddress" value="{{user.emailaddress}}" /></td>
+    </tr><tr>
+      <td><label>Is admin?</lable></td>
+      <td>
+      {% if session.display_admin_stuff and session.username != user.loginname %}
+        <input type="checkbox" name="is_admin" {{'checked' if user.is_admin }}/>
+      {% else %}
+        {{ 'Yes' if user.is_admin else 'no' }}
+        {{ '(you!)' if session.username == user.loginname }}
+      {% endif %}
+      </td>
+    </tbody>
+    </table>
 </div>
 {% if session.display_admin_stuff or session.userid == user.id %}
 <div class="rightside">
     <h2> Change Password:</h2>
-    <label>Your current Password:<input name="currpass" type="password" /></label><br/>
-    <label>New Password:<input name="currpass" type="password" /></label><br/>
-    <label>Confirm new Password:<input name="currpass" type="password" /></label><br/>
+    <table>
+    </tbody>
+    <tr>
+      <td><label><b>Your</b> current Password:</label></td>
+      <td><input name="currpass" type="password" /></td>
+    </tr>
+    <tr>
+      <td><label>New Password:</label></td>
+      <td><input name="newpass" type="password" /></td>
+    </tr>
+    <tr>
+      <td><label>Confirm new Password:</label></td>
+      <td><input name="conf_newpass" type="password" /></td>
+    </tr>
+    </tbody>
+    </table>
 </div>
 {% endif %}
-<div class="cf"></div><hr/>
+<div class="cf">
+<input style="float:right" type="submit" value="Save" />
+</div><hr/>
 
 <div class="leftside">
 <h2> Feeds: </h2>
-<ul>
+<ul class="list">
     {% for f in user.writeable_feeds() %}
         <li>{{ linkmacros.feed(f) }}</li>
     {% endfor %}
@@ -31,19 +64,21 @@
 </div>
 <div class="rightside">
 <h2> Recent Posts: </h2>
-<ul>
+<ul class="list">
 {% for post in posts %}
     <li>{{ linkmacros.post(post) }}</li>
 {% endfor %}
 </ul>
 </div>
-<div class="cf"></div><hr/>
+<div class="cf"></div>
+<input style="float:right" type="submit" value="Save" />
+<hr/>
 <h2>Groups:</h2>
 {% if session.display_admin_stuff %}
-    {{ widgets.groupselect('groups', allgroups, user.groups) }}
+    {{ widgets.groupselect('groups', allgroups, user.groups()) }}
 {% else %}
     <ul>
-    {% for group in user.groups %}
+    {% for group in user.groups() %}
         <li>{{group.name}}</li>
     {% endfor %}
     </ul>
