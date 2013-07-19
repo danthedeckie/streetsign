@@ -142,8 +142,20 @@ def user(userid=-1):
             user=user)
 
 
-@app.route('/groups')
+@app.route('/groups', methods=['GET','POST'])
 def groups():
+
+    if request.method == 'POST':
+        if not user_session.is_admin():
+            flash('Only Admins can do this!')
+            return redirect(url_for('groups'))
+
+        action = request.form.get('action','create')
+
+        if action == 'create':
+            if not request.form.get('name','').strip():
+                flash("I'm not making you an un-named group!")
+                return redirect(url_for('groups'))
+            Group(name=request.form.get('name','blank').strip()).save()
+
     return render_template('groups.html', groups=Group.select())
-
-

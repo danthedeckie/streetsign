@@ -19,4 +19,14 @@
 {% endfor %}
 </tbody>
 </table>
+{% if session.display_admin_stuff %}
+<div>
+    <form action="{{ url_for('groups') }}" method="POST">
+    <h2> New Group </h2>
+    <label>Name:<input name="name" placeholder="new group name..."/></label>
+    <input type="submit" value="Create!" />
+    </form>
+</div>
+{% endif %}
+
 {% endblock %}
