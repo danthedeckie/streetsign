@@ -27,7 +27,7 @@ import app.user_session as user_session
 import app.post_types as post_types
 from os import makedirs, remove, stat
 from app import app
-from app.models import DB, User, Group, Feed, Post, Screen, \
+from app.models import DB, User, Group, Feed, Post, Screen, UserGroup,\
                        writeable_feeds, by_id
 import sqlite3
 
@@ -159,3 +159,32 @@ def groups():
             Group(name=request.form.get('name','blank').strip()).save()
 
     return render_template('groups.html', groups=Group.select())
+
+@app.route('/group/<int:groupid>', methods=['GET','POST'])
+def group(groupid):
+    try:
+        group = Group.get(id=groupid)
+    except:
+        flash('Invalid group ID')
+        return redirect(request.referrer)
+
+    if request.method == 'POST':
+        if not user_session.is_admin():
+            flash('Only Admins can do this!')
+            return redirect(url_for('groups'))
+
+        if request.form.get('action','none') == 'delete':
+            UserGroup.delete().where(UserGroup.group==group).execute()
+            group.delete_instance()
+            flash('group:'+ group.name +' deleted.')
+            return (redirect(url_for('groups')))
+
+        if request.form.get('action','none') == 'update':
+            group.name = request.form.get('groupname',group.name)
+            group.save()
+
+            users = request.form.getlist('groupusers')
+            group.set_users(users)
+            flash('saved')
+
+    return render_template('group.html', group=group, allusers=User.select())

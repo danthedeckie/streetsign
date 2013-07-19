@@ -6,15 +6,22 @@
 <thead>
 <tr>
 <td>Group Name</td>
-<td>Other Flags</td>
 <td>Members</td>
+<td></td>
 </tr>
 </thead>
 <tbody>
 {% for group in groups %}
     <tr>
-        <td>{{ group.name }}</td>
+        <td><a href="{{ url_for('group',groupid=group.id) }}">{{ group.name }}</a></td>
         <td>{% if not group.display %} HIDDEN {% endif %} </td>
+        <td>{% for u in group.users() %}{{ u.displayname }}{{ ',' if not loop.last }} {% endfor %}</td>
+        <td>{% if session.display_admin_stuff %}
+        <form action="{{ url_for('group',groupid=group.id) }}" method="POST">
+        <input type="hidden" name="action" value="delete" />
+        <input type="submit" class="delbutton confirm_delete" value="X" />
+        </form>
+        {% endif %}</td>
     </tr>
 {% endfor %}
 </tbody>
