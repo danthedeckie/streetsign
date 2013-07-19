@@ -94,7 +94,6 @@ def user(userid=-1):
             try:
                 oldname = user.loginname
                 user.loginname = request.form.get('loginname', user.loginname)
-                user.save()
             except:
                 user.loginname = oldname if oldname else 'NEW'
                 flash('Sorry! You cannot have that loginname. Someone else does')
@@ -124,6 +123,8 @@ def user(userid=-1):
 
             user.save()
             flash('Updated.')
+            if userid == -1:
+                return redirect(url_for('user', userid=user.id))
         elif action == 'delete':
             if (not current_user.is_admin) \
             or (user.id == current_user.id):
