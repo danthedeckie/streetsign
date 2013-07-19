@@ -6,37 +6,46 @@
 {% block title %}Edit Screen:{{ screen.id }}{% endblock %}
 {% block body %}
 
-<div class="rightside">
-<div id="my_fake_screen" class="fake_screen">
-<!-- ko foreach: zones -->
-<div class="fake_zone" data-bind="style: { top: top, left: left, right: right, bottom: bottom}, text: name"></div>
-<!-- /ko -->
-</div>
-Aspect Ratio:<select id="aspect">
-<option value=0.6>4:3</option>
-<option selected value=0.7>16:9</option>
-</select>
-<textarea style="float: right;clear:right; width: 100%; height: 100px" data-bind="value: ko.mapping.toJSON($root, null, 2)"></textarea>
-
-<h2>Screen ID:{{ screen.id }}</h2>
-
 <form id="screen_form" method="post">
-<label>Name<input type="text" name="urlname" value="{{ screen.urlname }}" /></label>
-<label style="display:block; width: 40%;">Background:
-    <select  name="background" id="background" autocomplete="off" class="chosen">
-      {% for bg in backgrounds %}
-        <option {{ 'selected' if bg == screen.background }} value="{{bg}}">{{bg}}</option>
-      {% endfor %}
+ <input type="submit" id="save_btn" value="Save" style="float: left;"/>
+  <div class="leftside">
+    <h2>Screen ID:{{ screen.id }}</h2>
+        <label>Name<input type="text" name="urlname" value="{{ screen.urlname }}" /></label>
+        <label style="display:block; width: 40%;">Background:
+            <select  name="background" id="background" autocomplete="off" class="chosen">
+              {% for bg in backgrounds %}
+                <option {{ 'selected' if bg == screen.background }} value="{{bg}}">{{bg}}</option>
+              {% endfor %}
+            </select>
+        </label>
+  </div>
+  <div class="rightside">
+      Other Settings:<br/>
+      <textarea name="settings" data-bind="value: other_settings" style="width: 100%"></textarea>
+      CSS:<br/>
+      <textarea name="css" data-bind="value: css" style="width: 100%"></textarea>
+      <!-- where the actual saved data happens -->
+      <input type="hidden" name="zones" data-bind="value: ko.mapping.toJSON(zones)"/>
+
+  </div>
+<div class="cf"></div>
+<hr/> 
+
+</form>
+<div class="rightside fake_screen_container">
+
+    <div id="my_fake_screen" class="fake_screen">
+    <!-- ko foreach: zones -->
+    <div class="fake_zone" data-bind="style: { top: top, left: left, right: right, bottom: bottom}, text: name"></div>
+    <!-- /ko -->
+    </div>
+    Aspect Ratio:<select id="aspect">
+    <option value=1.6>4:3</option>
+    <option selected value=1.77777>16:9</option>
+    <option value="0.5625">9:16</option>
     </select>
-</label>
-Other Settings:<br/>
-<textarea name="settings" data-bind="value: other_settings" style="width: 100%"></textarea>
-CSS:<br/>
-<textarea name="css" data-bind="value: css" style="width: 100%"></textarea>
-<!-- where the actual saved data happens -->
-    <input type="hidden" name="zones" data-bind="value: ko.mapping.toJSON(zones)"/>
-    <input type="submit" id="save_btn" value="Save" />
-  </form>
+    <!--<textarea style="float: right;clear:right; width: 100%; height: 100px" data-bind="value: ko.mapping.toJSON($root, null, 2)"></textarea>-->
+
 </div>
 
 <div id="zones_container">
@@ -97,6 +106,15 @@ $('#background').change(function(){
     var newbg="url(/static/user_files/" + $('#background').val() + ')';
     $('#my_fake_screen').css('background-image', newbg );
 }).change();
+
+$('#aspect').change( function(e) {
+    $('#my_fake_screen').height($('#my_fake_screen').width() / $(this).val());
+
+    while ($('#my_fake_screen').height() > $(window).height()) {
+        $('#my_fake_screen').width($('#my_fake_screen').width() - 10);
+        $('#my_fake_screen').height($('#my_fake_screen').width() / $(this).val());
+    }
+});
 
 </script>
 

@@ -285,7 +285,14 @@ div.sizes_box {
 .sizes_box input {
     max-width: 3em;
 }
-
+.fake_screen_container {
+     position: fixed;
+     bottom: 0px;
+     right: 0px;
+     background: #eee;
+     padding: 0.2em;
+     border: 2px solid #eee;
+}
 .fake_screen {
     display: block;
     position: relative;
@@ -293,6 +300,7 @@ div.sizes_box {
     width: 400px;
     height: 275px;
     background-size: cover;
+    margin: auto;
 }
 .fake_zone {
     display: block;

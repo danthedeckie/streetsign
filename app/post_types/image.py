@@ -22,9 +22,10 @@
 
 
 
-from flask import render_template_string, request, g
+from flask import render_template_string, request, g, flash
 from werkzeug import secure_filename
 from os.path import splitext, join as pathjoin, isdir, abspath
+from subprocess import check_call
 from os import makedirs
 
 def my(ending):
@@ -51,6 +52,14 @@ def receive(data):
                 makedirs(where)
 
             f.save(pathjoin(where, filename))
+            #try:
+            if True:
+                check_call([splitext(abspath(__file__))[0] +'.makesmall.sh',
+                        pathjoin(where, filename)])
+                flash ('image imported and resized')
+            if False:
+            #except:
+                flash('tried to resize... oh well.')
         else:
             raise IOError('Invalid file. Sorry')
     else:
