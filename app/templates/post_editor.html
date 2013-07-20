@@ -5,6 +5,7 @@
 {{ super() }}
 {{ linkmacros.static_css('lib/jquery.timePicker/timePicker.css') }}
 {{ linkmacros.static_css('lib/jquery.anytime/anytime.css') }}
+{{ linkmacros.static_css('/lib/colorpicker/bgrins-spectrum-2c2010c/spectrum.js') }}
 {% endblock %}
 
 {% block body %}
@@ -21,6 +22,7 @@
 {{ linkmacros.static_js('lib/jquery.timePicker/timePicker.js') }}
 {{ linkmacros.static_js('lib/jquery-migrate-1.0.0.js') }}
 {{ linkmacros.static_js('lib/jquery.anytime/anytime.js') }}
+{{ linkmacros.static_js('lib/colorpicker/bgrins-spectrum-2c2010c/spectrum.js') }}
 {{ linkmacros.static_js('post_times_editor.js') }}
 <script type="text/javascript">
 var viewTimesModel = new TimesModel({{ post.time_restrictions |safe }} );
