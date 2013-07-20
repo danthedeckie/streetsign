@@ -1,15 +1,10 @@
 # In progress
 
-- User management
-
 # Missing basic Features
 
 ## Urgent:
 
-- Screen dimensions on screen editor (easy)
-- Color & Font for screen zones (easy)
-- Color and Font for posts (easy)
-- Photo resizing on upload (easy-ish)
+- Font for screen zones (easy)
 - Post deactivation -> archive, and archive, future posts, etc view.
 
 ## Would be nice:
