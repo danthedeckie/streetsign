@@ -40,13 +40,14 @@ tbody > tr:nth-child(odd) {
 }
 
 td {
-    padding: 2px;
+    padding: 4px;
 }
 
 thead > tr {
     background: #333;
     color: #eee;
-    font-width: 400;
+    font-width: bold;
+    text-align: center;
 }
 ul.list {
     border: 1px solid #aaa;
@@ -377,9 +378,16 @@ input.third { max-width: 28%;}
 .time_future, .time_future a {
     color: #349;
 }
-.time_now, .time_now a {
-    color: #00f;
+
+.time_now {
+    background-color: #bcd;
+
 }
+
+tr.time_now:nth-child(odd) {
+    background-color: #abc;
+}
+
 .time_past, .time_past a  {
     color: #914;
     font-style: italic;

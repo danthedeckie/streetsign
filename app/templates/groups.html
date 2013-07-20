@@ -14,7 +14,6 @@
 {% for group in groups %}
     <tr>
         <td><a href="{{ url_for('group',groupid=group.id) }}">{{ group.name }}</a></td>
-        <td>{% if not group.display %} HIDDEN {% endif %} </td>
         <td>{% for u in group.users() %}{{ u.displayname }}{{ ',' if not loop.last }} {% endfor %}</td>
         <td>{% if session.display_admin_stuff %}
         <form action="{{ url_for('group',groupid=group.id) }}" method="POST">
