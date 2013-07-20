@@ -1,7 +1,9 @@
 <div class="cf"></div>
-<label>Contents: (rich text/HTML) </label></br>
-<label>Text Color:<input type="color" name="colorselect" /></label>
+<label>Contents: (rich text/HTML) </label><br/>
+<label>Text Color:<input type="color" name="color" value="{{color}}"/></label>
 <textarea name="content" rows="10" cols="80" style="width: 100%;">{{content}}</textarea>
-<script type="text/javascript">
-$('input[type=color]').spectrum();
+<script type="text/javascript" defer>
+$('input[type=color]').spectrum({
+   clickoutFiresChange: true
+});
 </script>

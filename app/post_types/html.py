@@ -21,7 +21,7 @@
 """
 
 from os.path import abspath, splitext
-from flask import render_template_string
+from flask import render_template_string, flash, json
 import re
 
 def my(ending):
@@ -33,6 +33,7 @@ def my(ending):
 
 def form(data):
     ''' the form for editing this type of post '''
+    flash(json.dumps(data))
     return render_template_string(my('.form.html'), **data)
 
 def safehtml(text):
@@ -43,8 +44,13 @@ def receive(data):
     ''' turn the contents posted back to us from the form into
         a dict which can be JSON'd by the system, and dumped as
         text into the database. '''
+    #############
+    # TODO: sanify color input.
 
-    return {'type':'html', 'content': safehtml(data.get('content',''))}
+    flash(json.dumps(data))
+    return {'type':'html',
+            'color': data.get('color','#abd'),
+            'content': safehtml(data.get('content',''))}
 
 def display(data):
     return data['content']

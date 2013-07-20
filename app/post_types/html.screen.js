@@ -21,6 +21,8 @@
                 newhtml.children('.post_inner').css('font-size', i + '%');
             }
         }
+        try{newhtml.css('color',data.content.color);}catch(e){};
+
         return newhtml.css('display','none');
     }
 }
