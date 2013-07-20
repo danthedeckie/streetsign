@@ -363,6 +363,8 @@ ul.optionrow > li:last-of-type {
 input.half { max-width: 50%; }
 input.third { max-width: 28%;}
 
+/***************************************/
+
 .published {
     font-width: bold;
 }
@@ -370,4 +372,15 @@ input.third { max-width: 28%;}
     font-width: normal;
     font-style: italic;
     opacity: 0.6;
+}
+
+.time_future, .time_future a {
+    color: #349;
+}
+.time_now, .time_now a {
+    color: #00f;
+}
+.time_past, .time_past a  {
+    color: #914;
+    font-style: italic;
 }

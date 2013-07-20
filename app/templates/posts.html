@@ -19,8 +19,8 @@
 </tr>
 </thead>
 <tbody>
-{% for post in posts %}
-    <tr>
+{% for post in posts|sort(attribute="active_end") %}
+    <tr class="time_{{- post.active_status() }}">
     <td>{{ post.type }}</td>
     <td>{{ linkmacros.post(post) }}</td>
     <td>{% if post.author %}

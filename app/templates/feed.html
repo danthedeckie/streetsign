@@ -14,11 +14,12 @@
   </tr>
 </thead>
 <tbody>
-{% for post in feed.posts %}
-    <tr>
+{% for post in feed.posts|sort(attribute="active_end") %}
+    <tr class="time_{{- post.active_status() }} {{ 'un' if not post.published}}published" >
         <td>{{ linkmacros.post(post) }}</td>
         <td>{{ linkmacros.user(post.author) }}</td>
-        <td>{{ post.write_date }}</td>
+        <td><b>Written:</b> {{ post.write_date.date() }}<br/>
+            <b>Lifetime:</b> {{ post.active_status() }}</td>
         <td>{{ 'Published' if post.published }}
             {% if feed.user_can_publish(user) %}
                 <form method="POST" action="{{ url_for('postpage',postid=post.id) }}" >

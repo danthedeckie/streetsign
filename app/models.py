@@ -427,6 +427,16 @@ class Post(DBModel):
               'time_restrictions_show': self.time_restrictions_show,
               'display_time': self.display_time * 1000 # in milliseconds
             })
+    def active_status(self):
+        time_now = datetime.now()
+        if (self.active_start > time_now):
+            return 'future'
+        elif (self.active_end < time_now):
+            return 'past'
+        else:
+            return 'now'
+
+
 
 
 
