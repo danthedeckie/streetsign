@@ -28,17 +28,19 @@ DEFAULT_ZONE = { name: "zone",
                  left: "30%",
                  right: "30%",
                  bottom: "30%",
+                 color: '#fff',
                  feeds: [],
                  css: '',
                  classes: '' };
 
 
-var ScreenModel = function(background, other_settings, css, zones) {
+var ScreenModel = function(background, other_settings, css, zones, color) {
     var self = this;
 
     self.other_settings = ko.observable(other_settings);
     self.background = ko.observable(background);
     self.css = ko.observable(css);
+    self.color = ko.observable(color);
     self.zones = ko.observableArray();
     ko.mapping.fromJS(zones.map( function(x){
         return $.extend({}, DEFAULT_ZONE,x);

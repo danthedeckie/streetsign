@@ -17,9 +17,9 @@
                 <option {{ 'selected' if bg == screen.background }} value="{{bg}}">{{bg}}</option>
               {% endfor %}
             </select>
-        </label>
-  </div>
-  <div class="rightside">
+        </label><!--
+      <label>Default Text color:
+      <input name="color" data-bind="value: color" type="color"></br>-->
       Other Settings:<br/>
       <textarea name="settings" data-bind="value: other_settings" style="width: 100%"></textarea>
       CSS:<br/>
@@ -29,14 +29,14 @@
 
   </div>
 <div class="cf"></div>
-<hr/> 
+<hr/>
 
 </form>
 <div class="rightside fake_screen_container">
 
     <div id="my_fake_screen" class="fake_screen">
     <!-- ko foreach: zones -->
-    <div class="fake_zone" data-bind="style: { top: top, left: left, right: right, bottom: bottom}, text: name"></div>
+    <div class="fake_zone" data-bind="style: { top: top, left: left, right: right, bottom: bottom, color: color}, text: name"></div>
     <!-- /ko -->
     </div>
     Aspect Ratio:<select id="aspect">
@@ -66,6 +66,7 @@
         </select>
     </label>
   <div>
+  <label>Default Text Color:<input type="color" data-bind="value: color" /><br/>
   <label>CSS:
       <textarea data-bind="value: css" ></textarea></label>
   </div>

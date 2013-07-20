@@ -79,8 +79,12 @@ function zone(container, obj) {
 
     //obj.classes.map(function(x){ $(obj.el).addClass(x);});
     //alert(obj.classes);
+    if ('color' in obj) {
+        $(obj.el).css('color', obj.color);
+    }
 
     try {
+        // this is 'tried' as we aren't sure if the data is valid CSS!
         csspairs = obj.css.split(/[\n;]+/).map(function (x) {
                                            var y = x.match(/^(.*):(.*)$/);
                                            return [y[1].trim(),y[2].trim()] } );
