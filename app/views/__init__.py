@@ -72,7 +72,7 @@ def index():
         feeds = Feed.select(),
         publishable_feeds=publishable_feeds,
         posts = Post.select().where(Post.author == user)\
-                    .order_by(Post.write_date)\
+                    .order_by(Post.write_date.desc())\
                     .limit(15),
         posts_to_publish = posts_to_publish,
         screens=Screen.select(),

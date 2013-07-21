@@ -239,10 +239,11 @@ div.free_blocks {
 }
 .delbutton {
     background: red;
-    background: linear-gradient(#f22, #a22);
+    background: linear-gradient(#faa, #c22);
     color: black;
     border-radius: 5px;
-    border: 1px solid black;
+    border: 1px solid #522;
+    box-shadow: inset 1px 1px 5px rgba(255,255,255,0.8);
 }
 .delbutton:hover {
     background: linear-gradient(#d22, #522);

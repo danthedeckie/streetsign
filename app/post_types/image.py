@@ -52,13 +52,11 @@ def receive(data):
                 makedirs(where)
 
             f.save(pathjoin(where, filename))
-            #try:
-            if True:
+            try:
                 check_call([splitext(abspath(__file__))[0] +'.makesmall.sh',
                         pathjoin(where, filename)])
                 flash ('image imported and resized')
-            if False:
-            #except:
+            except:
                 flash('tried to resize... oh well.')
         else:
             raise IOError('Invalid file. Sorry')
