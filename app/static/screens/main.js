@@ -21,16 +21,6 @@
 
 *************************************************************/
 
-// Returns the HTML for a zone area
-// TODO: This should really be templated out.
-function zone_html(id, top, left, bottom, right) {
-    return ('<div id="_zone_'+id+'" class="zone" style="'
-            +'left:' + left
-            +';right:' + right
-            +';bottom:' + bottom
-            +';top:' + top + '"></div>');
-}
-
 function zone(container, obj) {
     // adds an object into the window zones list,
     // and gives it an element within the container for filling with stuff.
@@ -94,8 +84,10 @@ function next_post(zone) {
 
         if ('delete_me' in thispost){
             // it's popped!
-            $(thispost._el).fadeOut().remove();
-            console.log('deleing element:'+ thispost.id);
+            post_fadeout(thispost, zone.fadetime, function() {
+                thispost._el.remove();
+                });
+            console.log('deleting element:'+ thispost.id);
             continue;
         }
         if (thispost.time_restrictions_show) {
@@ -128,7 +120,7 @@ function next_post(zone) {
         if (!('current_post' in zone)||(zone.current_post == false)) {
             // first post!
             zone.current_post = nextpost;
-            $(zone.current_post._el).fadeIn(zone.fadetime);
+            post_fadein(zone.current_post, zone.fadetime);
 
             if ('display' in post_types[nextpost.type]) {
                 post_types[nextpost.type].display(nextpost);
@@ -145,14 +137,14 @@ function next_post(zone) {
             return;
         } else {
             // we have a new post to fade to. hurrah.
-            $(zone.current_post._el).fadeOut(zone.fadetime, function() {
+            post_fadeout(zone.current_post, zone.fadetime, function() {
 
                 if ('hide' in post_types[zone.current_post.type]) {
                     post_types[zone.current_post.type].hide(zone.current_post);
                 }
 
                 zone.current_post = nextpost;
-                $(zone.current_post._el).fadeIn(zone.fadetime);
+                post_fadein(zone.current_post, zone.fadetime);
 
                 try {
                 if ('display' in post_types[nextpost.type]) {
@@ -171,7 +163,7 @@ function next_post(zone) {
     } else {
         // no posts currently allowed!
         if (zone.current_post) {
-            $(zone.current_post._el).fadeOut(zone.fadetime, function() {
+            post_fadeout(zone.current_post, zone.fadetime, function() {
                 if ('hide' in post_types[zone.current_post.type]) {
                     post_types[zone.current_post.type].hide(zone.current_post);
                 }
@@ -241,17 +233,20 @@ function make_updater(z){
             // keep current posts, and delete no-longer needed posts:
             if (arrId !=-1) {
                 current_posts.push(zone.posts[i].id);
+                // update post with all info from server, in case stuff has changed.
                 zone.posts[i].time_restrictions_show = data.posts[arrId].time_restrictions_show;
                 zone.posts[i].time_restrictions = data.posts[arrId].time_restrictions;
                 // Maybe better not ?
                 if (JSON.stringify(zone.posts[i].content) != JSON.stringify(data.posts[arrId].content)) {
                     zone.posts[i].content = data.posts[arrId].content;
                     if (zone.current_post == i) {
-                        $(zone.posts[i]._el).fadeOut().remove()
+                        post_fadeout(zone.posts[i], zone.fadetime, function() {
+                            zone.posts[i].remove();
+                            });
                     }
                     zone.posts[i]._el = post_types[zone.posts[i].type].render(zone.el, zone.posts[i])[0];
                     if (zone.current_post == i) {
-                        $(zone.posts[i]._el).fadeIn();
+                        post_fadein(zone.posts[i], zone.fadetime );
                     }
                 }
                 zone.posts[i].display_time = data.posts[arrId].display_time;
