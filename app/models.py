@@ -401,8 +401,8 @@ class Post(DBModel):
         }
 
     # When should the feed actually be shown:
-    active_start = DateTimeField(null=True)
-    active_end = DateTimeField(null=True)
+    active_start = DateTimeField(default=datetime.now)
+    active_end = DateTimeField(default=datetime.now)
 
     # Time restrictions don't need to be cross queried, and honestly
     # are easier just left in javascript/JSON land:

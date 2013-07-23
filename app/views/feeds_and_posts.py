@@ -134,7 +134,11 @@ def post_new():
 
     else: # POST. new post!
         post_type = request.form.get('post_type')
-        editor = post_types.load(post_type)
+        try:
+            editor = post_types.load(post_type)
+        except:
+            flash('Sorry! invalid post type.')
+            return redirect(request.referrer)
 
         post = Post(type=post_type, author=user)
 
@@ -147,7 +151,7 @@ def post_new():
 
         except PleaseRedirect as e:
             flash (e.msg)
-            redirect(e.url if e.url else request.url)
+            return(redirect(e.url if e.url else request.url))
 
         post.save()
         flash('Saved!')

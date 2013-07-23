@@ -24,6 +24,7 @@
 from flask import flash, url_for, json
 from app.views.utils import PleaseRedirect
 from app.models import Post, Feed
+from datetime import datetime
 
 def try_to_set_feed(post, form, user):
     ''' Is this user actually allowed to set the feed of this post to what
@@ -99,8 +100,11 @@ def post_form_intake(post, form, editor):
     content=json.dumps(editor.receive(form))
     post.content = content
 
-    post.active_start = form.get("active_start")
-    post.active_end = form.get("active_end")
+    try:
+        post.active_start = datetime.strptime(form.get("active_start"), '%Y-%m-%d %H:%M')
+        post.active_end = datetime.strptime(form.get("active_end"), '%Y-%m-%d %H:%M')
+    except:
+        flash('Problem with date.')
 
     post.time_restrictions_show = (form.get('times_mode', \
                 'do_not_show') \
