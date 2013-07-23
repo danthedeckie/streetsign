@@ -1,5 +1,12 @@
 {
     render: function(zone, data) {
+        if (('type' in data.zone ) && ( data.zone.type == 'scroll')) {
+            var newhtml = $('<div class="post post_html post_scrolling">'
+                           + magic_vars(data.content.content).replace('<br/>',' ')
+                           + '</div>').prependTo(zone);
+            return newhtml.css('display','none');
+        } else {
+
         console.log('making new html');
         var height = 0;
         var zone_height = $(zone).height()
@@ -24,5 +31,6 @@
         try{newhtml.css('color',data.content.color);}catch(e){};
 
         return newhtml.css('display','none');
+    }
     }
 }

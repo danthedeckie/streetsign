@@ -17,7 +17,7 @@
     along with Concertino.  If not, see <http://www.gnu.org/licenses/>.
 
     ---------------------------------
-    screens output, this theme (basic) specifics (zonehtml, post fadein/out)
+    screens output, this theme (overview) specifics (zonehtml, post fadein/out)
 
 *************************************************************/
 
@@ -31,14 +31,14 @@ function zone_html(id, top, left, bottom, right) {
 
 function post_fadeout(post, fadetime, andthen=function(){}) {
     /*$(post._el).fadeOut(fadetime, andthen);*/
-    $(post._el).css('border', '2px solid red');
-    andthen();
+    $(post._el).css({'border': '2px solid black', 'opacity':'80%'});
+    andthen()
 }
 
 function post_fadein(post, fadetime, andthen=function(){}) {
     $(post._el).fadeIn(fadetime, andthen);
     
-    $(post._el).css('border','2px solid black');
+    $(post._el).css({'border':'2px solid red', 'opacity':'100%'});
     andthen();
 }
 

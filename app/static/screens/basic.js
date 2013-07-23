@@ -23,8 +23,9 @@
 
 // Returns the HTML for a zone area
 // TODO: This should really be templated out.
-function zone_html(id, top, left, bottom, right) {
-    return ('<div id="_zone_'+id+'" class="zone" style="'
+function zone_html(id, top, left, bottom, right, css, type) {
+    console.log('TYPE: zone_' + type + '...');
+    return ('<div id="_zone_'+id+'" class="zone zone_'+type+'" style="'
             +'left:' + left
             +';right:' + right
             +';bottom:' + bottom
@@ -34,10 +35,25 @@ function zone_html(id, top, left, bottom, right) {
 /***************************************************************************/
 
 function post_fadeout(post, fadetime, andthen=function(){}) {
-    $(post._el).fadeOut(fadetime, andthen);
+    if (('type' in post.zone) && (post.zone.type == 'scroll')) {
+        // do scroll stuff.
+        andthen();
+    } else {
+        $(post._el).fadeOut(fadetime, andthen);
+    }
 }
 
 function post_fadein(post, fadetime, andthen=function(){}) {
-    $(post._el).fadeIn(fadetime, andthen);
+    if (('type' in post.zone) && (post.zone.type == 'scroll')) {
+        var distance = $(post._el).width() + $(post.zone.el).width() + 20;
+        $(post._el).fadeIn(0, andthen);
+        $(post._el).css('left', $(post.zone.el).width() + 10);
+        $(post._el).animate({'left': 0 - ($(post._el).width() + 10)}, distance * 10, 'linear'  );
+
+
+        // do scroll stuff.
+    } else {
+        $(post._el).fadeIn(fadetime, andthen);
+    }
 }
 

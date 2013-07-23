@@ -52,7 +52,8 @@
     <h3>Zones:<button data-bind="click: addZone">New Zone</button></h3>
 <ul data-bind="foreach: zones" class="itemlist">
   <li>
-    <label>Name:<input name="urlname" data-bind="value: name" /></label><br/>
+    <button style="float:right" data-bind="click:$root.removeZone ">X</button><br/>
+    <label>Name:<input name="urlname" data-bind="value: name" /></label>
     <label>Size:</label>
     <div class="sizes_box">
         <input data-bind="value: top" /><br/>
@@ -66,6 +67,7 @@
         </select>
     </label>
   <div>
+  <!--<select data-bind="options: ZONE_TYPES,  optionsText:'name', optionsValue:'id',selectedOptions: type"></select>-->
   <label>Default Text Color:<input type="color" data-bind="value: color" /><br/>
   <label>CSS:
       <textarea data-bind="value: css" ></textarea></label>
@@ -94,7 +96,9 @@ AVAILABLE_FEEDS = [
         {id: "{{ feed.id }}", name: "{{ feed.name}}"} {{- ',' if not loop.last -}}
     {%- endfor -%} ];
 
-
+ZONE_TYPES= [
+    {'id':'fade', 'name':'Fade In, Fade Out'},
+    {'id':'scroll', 'name':'Scrolling text'}];
 
 var viewScreenModel = new ScreenModel(BG, SETTINGS, CSS, ZONES);
 //ko.mapping.fromJS(ZONES, [], viewZonesModel.zones);

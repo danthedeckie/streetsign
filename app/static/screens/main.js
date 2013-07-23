@@ -28,7 +28,7 @@ function zone(container, obj) {
     var csspairs = [];
 
     window.zones.push(obj);
-    obj.el = $(zone_html(obj.name, obj.top, obj.left, obj.bottom, obj.right, obj.css))
+    obj.el = $(zone_html(obj.name, obj.top, obj.left, obj.bottom, obj.right, obj.css, obj.type))
               .prependTo(container)[0];
 
     //obj.classes.map(function(x){ $(obj.el).addClass(x);});
@@ -274,6 +274,7 @@ function make_updater(z){
             var new_data = data.posts[i];
             if (!($.inArray(new_data.id, current_posts)!=-1)) {
                 var n = zone.posts.push(new_data) - 1;
+                zone.posts[n].zone = zone;
                 var el =
                     post_types[zone.posts[n].type].render(zone.el, zone.posts[n]);
                 zone.posts[n]._el = el[0];

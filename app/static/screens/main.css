@@ -17,7 +17,7 @@ div.zone {
     background-size: cover;
 }
 
-div.post {
+.zone_ .post, .zone_fade .post {
     position: absolute;
     /*top:0;
     left:0;
@@ -29,7 +29,16 @@ div.post {
     display: table;
 }
 
-div.post_inner {
+.zone_scroll .post {
+    position: absolute;
+    overflow: hidden;
+    width: auto;
+    height: 100%;
+    /*display: inline;*/
+    border: 1px solid red;
+}
+
+.zone_ div.post_inner, .zone_fade div.post_inner {
     display: table-cell;
     vertical-align: middle;
     width: 100%;
