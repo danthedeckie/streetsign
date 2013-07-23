@@ -31,9 +31,9 @@
 
 <h2>Post Lifetime:</h2>
 
-    <label>Start: <input type="datetime-local" name="active_start" id="active_start"
+    <label>Start: <input type="text" name="active_start" id="active_start"
                    {{ enabled_if(can_write) }} value="{{ post.active_start }}"></label>
-    <label>End:   <input type="datetime-local" name="active_end" id="active_end"
+    <label>End:   <input type="text" name="active_end" id="active_end"
                    {{ enabled_if(can_write) }} value="{{ post.active_end}}"/></label>
     <br/>
     <label>How many seconds to show for at one time?

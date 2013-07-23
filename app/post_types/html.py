@@ -33,7 +33,6 @@ def my(ending):
 
 def form(data):
     ''' the form for editing this type of post '''
-    flash(json.dumps(data))
     return render_template_string(my('.form.html'), **data)
 
 def safehtml(text):
@@ -47,7 +46,6 @@ def receive(data):
     #############
     # TODO: sanify color input.
 
-    flash(json.dumps(data))
     return {'type':'html',
             'color': data.get('color','#abd'),
             'content': safehtml(data.get('content',''))}

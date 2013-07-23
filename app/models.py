@@ -226,6 +226,9 @@ class Feed(DBModel):
         return False
 
     def user_can_write(self, user):
+        if not user:
+            return False
+
         if user.is_admin:
             return True
 
@@ -248,6 +251,9 @@ class Feed(DBModel):
         return False
 
     def user_can_publish(self, user):
+        if not user:
+            return False
+
         if user.is_admin:
             return True
 
@@ -429,6 +435,8 @@ class Post(DBModel):
             })
     def active_status(self):
         time_now = datetime.now()
+        if not (self.active_start and self.active_end):
+            return 'future'
         if (self.active_start > time_now):
             return 'future'
         elif (self.active_end < time_now):
