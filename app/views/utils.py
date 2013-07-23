@@ -27,7 +27,7 @@ class PleaseRedirect(Exception):
                 try:
                     do_stuff()
                 except app.PleaseRedirect as e:
-                    flash(e.msg)
+                    flash(str(e.msg))
                     redirect(e.url)
     '''
     def __init__(self, url='index', msg='Something went wrong'):

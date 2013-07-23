@@ -38,7 +38,7 @@
 </article>
 <ul id="flashed_notices">
 {% for msg in get_flashed_messages() %}
-  <li class="{{'err' if 'ERR' in msg }}">{{ msg }}</li>
+  <li>{{ msg }}</li>
 {% endfor %}
 </ul>
 <div id="login_box">

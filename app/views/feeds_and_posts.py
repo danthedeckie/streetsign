@@ -150,7 +150,7 @@ def post_new():
             post_form_intake(post, request.form, editor)
 
         except PleaseRedirect as e:
-            flash (e.msg)
+            flash (str(e.msg))
             return(redirect(e.url if e.url else request.url))
 
         post.save()
@@ -186,7 +186,7 @@ def postpage(postid):
             if_i_cant_write_then_i_quit(post, user)
 
         except PleaseRedirect as e:
-            flash(e.msg)
+            flash(str(e.msg))
             redirect(e.url)
 
         # if it's a publish or delete request, handle that instead:

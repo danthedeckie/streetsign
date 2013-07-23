@@ -100,11 +100,18 @@ def post_form_intake(post, form, editor):
     content=json.dumps(editor.receive(form))
     post.content = content
 
+    '''
     try:
         post.active_start = datetime.strptime(form.get("active_start"), '%Y-%m-%d %H:%M')
+    except:
+        flash('Problem with start date.')
+    try:
         post.active_end = datetime.strptime(form.get("active_end"), '%Y-%m-%d %H:%M')
     except:
-        flash('Problem with date.')
+        flash('Problem with end date.')
+    '''
+    post.active_start = form.get('active_start')
+    post_active_end = form.get('active_end')
 
     post.time_restrictions_show = (form.get('times_mode', \
                 'do_not_show') \
