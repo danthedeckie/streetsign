@@ -61,8 +61,12 @@ def index():
     except user_session.NotLoggedIn as e:
         user = User()
 
-    # TODO:
+    if not user:
+        user = User()
+
+
     publishable_feeds = user.publishable_feeds()
+
 
     posts_to_publish = Post.select()\
                            .where((Post.published==False) &
