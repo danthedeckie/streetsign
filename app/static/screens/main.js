@@ -26,6 +26,11 @@ function zone(container, obj) {
     // and gives it an element within the container for filling with stuff.
 
     var csspairs = [];
+    // temporary!:
+
+    if (! 'type' in obj) {
+        obj.type='fade';
+    }
 
     window.zones.push(obj);
     obj.el = $(zone_html(obj.name, obj.top, obj.left, obj.bottom, obj.right, obj.css, obj.type))
