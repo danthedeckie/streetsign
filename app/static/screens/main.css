@@ -36,6 +36,7 @@ div.zone {
     height: 100%;
     /*display: inline;*/
     border: 1px solid red;
+    white-space: nowrap;
 }
 
 .zone_ div.post_inner, .zone_fade div.post_inner {

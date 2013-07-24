@@ -111,7 +111,7 @@ def post_form_intake(post, form, editor):
         flash('Problem with end date.')
     '''
     post.active_start = form.get('active_start')
-    post_active_end = form.get('active_end')
+    post.active_end = form.get('active_end')
 
     post.time_restrictions_show = (form.get('times_mode', \
                 'do_not_show') \

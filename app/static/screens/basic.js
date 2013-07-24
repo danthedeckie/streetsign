@@ -34,7 +34,9 @@ function zone_html(id, top, left, bottom, right, css, type) {
 
 /***************************************************************************/
 
-function post_fadeout(post, fadetime, andthen=function(){}) {
+function post_fadeout(post, fadetime, andthen) {
+    if (!andthen) { andthen = function() {}; }
+
     if (('type' in post.zone) && (post.zone.type == 'scroll')) {
         // do scroll stuff.
         andthen();
