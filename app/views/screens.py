@@ -58,10 +58,11 @@ def screens():
 @app.route('/screens-edit/<int:screenid>', methods=['GET','POST'])
 def screenedit(screenid):
     try:
-        if screenid == '-1':
+        if int(screenid) == -1:
+            flash('New Screen')
             screen = Screen()
         else:
-            screen = Screen(id=int(screenid)).get()
+            screen = Screen().get(Screen.id==int(screenid))
 
         backgrounds = [basename(x) for x in \
                        glob(app.config['SITE_VARS']['user_dir']+ '*')]
@@ -79,6 +80,11 @@ def screenedit(screenid):
         if not user.is_admin:
             flash('Sorry. You are NOT an admin!')
             redirect(url_for('index'))
+
+        if request.form.get('action','update') == 'delete':
+            screen.delete_instance()
+            flash('deleted')
+            return redirect(request.referrer)
 
         screen.background = request.form.get('background')
         screen.urlname = urllib.quote(request.form.get('urlname'),'')
