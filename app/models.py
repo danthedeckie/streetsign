@@ -465,9 +465,16 @@ class Screen(DBModel):
     urlname = CharField(unique=True, null=False)
     background = CharField(null=True)
     # JSON:
-    settings = TextField(default={})
-    defaults = TextField(default={})
-    zones = TextField(default={})
+    settings = TextField(default='{}')
+    defaults = TextField(default='{}')
+    zones = TextField(default='{}')
+
+    def json_all(self):
+        return ('{"id":' + str(self.id) + ', "urlname":"' + self.urlname + '",'\
+                 '"background":"' + self.background + '",' \
+                 '"settings":' + (self.settings if self.settings else '{}') + ',' \
+                 '"defaults":' + (self.defaults if self.defaults else '{}') + ',' \
+                 '"zones":' + (self.zones if self.zones else '{}') + '}')
 
 ##############################################################################
 

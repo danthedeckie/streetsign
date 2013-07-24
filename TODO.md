@@ -1,14 +1,16 @@
 # In progress
 
+- Screen info updating.
+
 # Missing basic Features
 
 ## Urgent:
 
 - Font for screen zones (easy)
-- Post deactivation -> archive, and archive, future posts, etc view.
 
 ## Would be nice:
 
+- Post deactivation -> archive, and archive, future posts, etc view.
 - WYSIWYG editor for HTML posts.
 - Group Editor, etc.
 - Better uploaded files editor.
@@ -27,3 +29,10 @@
 - Better client & serverside validation.
 
 # Random ideas:
+
+- Feed type options:
+  - Locally fed (as normal)
+  - From RSS feed
+  - From twitter?
+  etc
+  (rather than weird 'RSS' post type a la concerto)

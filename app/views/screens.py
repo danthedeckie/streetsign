@@ -32,6 +32,7 @@ from os.path import basename
 import urllib
 from datetime import datetime
 from app import app
+from md5 import md5
 from app.models import Feed, Post, Screen, \
                        writeable_feeds, by_id
 
@@ -122,6 +123,20 @@ def screens_posts_from_feeds(json_feeds_list):
 @app.route('/json/feed/<int:feedid>')
 def api_feed(feedid):
     return '{"id":{0}, "posts":[]}'.format(feedid)
+
+@app.route('/screens/json/<int:screenid>/<version>')
+def screen_version(screenid, version):
+    try:
+        screen = Screen.get(id=int(screenid))
+    except:
+        screen = Screen()
+
+    screenjson = screen.json_all()
+
+    return json.dumps({'screen': screenid, \
+                       'md5':  md5(screenjson).hexdigest(), \
+                       'screen': json.loads(screenjson)})
+
 
 @app.route('/screens/post_types.js')
 def post_types_js():
