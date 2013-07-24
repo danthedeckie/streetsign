@@ -130,7 +130,7 @@ function next_post(zone) {
             return;
 
         }
-        if (nextpost.id == zone.current_post.id) {
+        if ((nextpost.id == zone.current_post.id)&&(zone.type!='scroll')) {
             // this is the only valid post!
             setTimeout(function(){next_post(zone);}, nextpost.display_time);
             console.log('only this post is available');

@@ -35,7 +35,6 @@ div.zone {
     width: auto;
     height: 100%;
     /*display: inline;*/
-    border: 1px solid red;
     white-space: nowrap;
 }
 

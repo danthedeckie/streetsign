@@ -53,7 +53,8 @@ function post_fadein(post, fadetime, andthen) {
         $(post._el).fadeIn(0, andthen);
         $(post._el).css('left', $(post.zone.el).width() + 10);
         $(post._el).animate({'left': 0 - ($(post._el).width() + 10)}, distance * 10, 'linear'  );
-
+        post.display_time = distance * 10;
+        andthen();
 
         // do scroll stuff.
     } else {
