@@ -45,7 +45,9 @@ function post_fadeout(post, fadetime, andthen) {
     }
 }
 
-function post_fadein(post, fadetime, andthen=function(){}) {
+function post_fadein(post, fadetime, andthen) {
+    if (!andthen) { andthen = function() {}; }
+
     if (('type' in post.zone) && (post.zone.type == 'scroll')) {
         var distance = $(post._el).width() + $(post.zone.el).width() + 20;
         $(post._el).fadeIn(0, andthen);
