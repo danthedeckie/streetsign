@@ -136,10 +136,10 @@ def screen_version(screenid, version):
 
     screenjson = screen.json_all()
 
-    return json.dumps({'screen': screenid, \
+    data = json.dumps({'screen': screenid, \
                        'md5':  md5(screenjson).hexdigest(), \
                        'screen': json.loads(screenjson)})
-
+    return ( data, 200, {'Content-Type':'application/javascript'})
 
 @app.route('/screens/post_types.js')
 def post_types_js():

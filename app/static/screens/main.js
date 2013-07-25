@@ -197,10 +197,11 @@ function update_screen(screen_data, element) {
 
     var update = function(data) {
         if (data.md5 == screen_data.version) {
-            console.log('Screen the same! ' + data.md5);
-            setTimeout(function(){update_screen(screen_data, element);}, 4000);
+            setTimeout(function(){update_screen(screen_data, element);}, 12000);
         } else {
             // The md5 is different! we should do some updates!
+            // TODO: proper reloading, including pre-downloading background
+            //       images before displaying them, updating zone feeds, etc.
             reload_page();
         }
     };
