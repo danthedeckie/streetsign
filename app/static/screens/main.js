@@ -191,9 +191,37 @@ function next_post(zone) {
 
 }
 
+function update_screen(screen_data, element) {
+    'use strict';
+    console.log('getting screen updates...');
+
+    var update = function(data) {
+        if (data.md5 == screen_data.version) {
+            console.log('Screen the same! ' + data.md5);
+            setTimeout(function(){update_screen(screen_data, element);}, 4000);
+        } else {
+            // The md5 is different! we should do some updates!
+            reload_page();
+        }
+    };
+
+    $.getJSON('/screens/json/' +  screen_data.id + '/X' , update);
+}
+
+function background_from_value(text) {
+    'use strict';
+    if (text.indexOf('.') == -1) {
+        // not a filename.
+        return text;
+    } else {
+        // TODO: load this URL from somewhere!
+        return 'url(/static/user_files/' + text + ')';
+    }
+}
+
 function init_screen(screen_data, element) {
 
-    $(element).css('background-image',screen_data.background);
+    $(element).css('background-image', background_from_value(screen_data.background));
 
     for (var z in screen_data.zones) {
         // copy 'default' data in, if it needs it ONLY.
@@ -206,6 +234,7 @@ function init_screen(screen_data, element) {
     }
 
     update_zones_posts();
+    setTimeout(function(){update_screen(screen_data, element);}, 3000);
 }
 
 function start_zones_scrolling() {

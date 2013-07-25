@@ -21,7 +21,22 @@
 
   <script type="text/javascript">
 
-  ZONES={{ screendata.zones|safe }};
+  window.SCREEN={{screendata.json_all() | safe }};
+  window.SCREENMD5="{{screenmd5}}";
+  window.SCREEN.version = SCREENMD5;
+
+  window.DEFAULTSCREEN={
+        background: "black",
+        css:'',
+        defaults: {'no_posts_wait': 10000,
+                   'update_zones_timer': 96000,
+                   'post_time': 4000,
+                   'classes':'text_dropshadow',
+                   'css':{}},
+        zones: {},
+        version: '12345'
+                };
+
   {% if screendata.background %}
       BG="url({{url_for('static',filename='user_files/' + screendata.background)}})"
   {% else %}
@@ -29,18 +44,8 @@
   {% endif %}
 
   POSTS_URL = "{{ url_for('screens_posts_from_feeds',json_feeds_list='-1') }}";
-  // TODO: load this from a screens json thingy.
-  var screen_data = {
-        background: BG,
-        css:'',
-        defaults: {'no_posts_wait': 10000,
-                   'update_zones_timer': 96000,
-                   'post_time': 4000,
-                   'classes':'text_dropshadow',
-                   'css':{}},
 
-        zones: ZONES
-                };
+  var screen_data = $.extend({}, DEFAULTSCREEN, SCREEN);
 
 init_screen(screen_data, '#zones')
 setTimeout(start_zones_scrolling, 2000);

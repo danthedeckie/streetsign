@@ -101,8 +101,11 @@ def screenedit(screenid):
 
 @app.route('/screens/<template>/<screenname>')
 def screendisplay(template, screenname):
+    screen=Screen.get(urlname=screenname)
+
     return render_template('screens/' + template + '.html',
-                           screendata=Screen.get(urlname=screenname))
+                           screenmd5=md5(screen.json_all()).hexdigest(), \
+                           screendata=screen)
 
 @app.route('/screens/posts_from_feeds/<json_feeds_list>')
 def screens_posts_from_feeds(json_feeds_list):
