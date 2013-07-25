@@ -35,6 +35,8 @@ The setup.sh script is to allow you to get up an running on a new machine in sec
 
 There is also an initial gunicorn running shell script.
 
+Initial login credentials: `admin:password`
+
 ## pre-commit hook
 There is the [pre-commit script by Sebastian Dahlgren](https://github.com/sebdah/git-pylint-commit-hook) in the .setup/hooks/ folder, which will run pylint on python scripts to check they are valid before you commit them. The setup.sh script will copy this into your .git/hooks by default.
 
