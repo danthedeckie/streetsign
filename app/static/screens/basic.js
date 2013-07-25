@@ -37,6 +37,11 @@ function zone_html(id, top, left, bottom, right, css, type) {
 function post_fadeout(post, fadetime, andthen) {
     if (!andthen) { andthen = function() {}; }
 
+    fadetime = 1 * fadetime;
+
+    if ((fadetime === undefined)||(fadetime===NaN)) { fadetime = 0; }
+
+
     if (('type' in post.zone) && (post.zone.type == 'scroll')) {
         // do scroll stuff.
         andthen();
@@ -58,6 +63,9 @@ function post_fadein(post, fadetime, andthen) {
 
         // do scroll stuff.
     } else {
+        fadetime = 1 * fadetime;
+        if ((fadetime === undefined)||(fadetime===NaN)) { fadetime = 0; }
+
         $(post._el).fadeIn(fadetime, andthen);
     }
 }

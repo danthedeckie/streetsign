@@ -21,8 +21,6 @@
 
 *************************************************************/
 
-
-
 DEFAULT_ZONE = { name: "zone",
                  top: "30%",
                  left: "30%",
@@ -30,6 +28,7 @@ DEFAULT_ZONE = { name: "zone",
                  bottom: "30%",
                  type: 'fade',
                  color: '#fff',
+                 fadetime: 250,
                  feeds: [],
                  css: '',
                  classes: '' };

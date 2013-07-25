@@ -1,6 +1,6 @@
 # In progress
 
-- Screen info updating.
+- fade time turn off?
 
 # Missing basic Features
 
@@ -10,6 +10,7 @@
 
 ## Would be nice:
 
+- Smarter 'live' Screen info updating, w/o reloading the whole page.
 - Post deactivation -> archive, and archive, future posts, etc view.
 - WYSIWYG editor for HTML posts.
 - Group Editor, etc.
