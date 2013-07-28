@@ -29,6 +29,7 @@ import sqlite3 # for catching an integrity error
 from passlib.hash import bcrypt # for passwords
 from uuid import uuid4 # for unique session ids
 from datetime import datetime
+from HTMLParser import HTMLParser # for stripping html tags
 import app.post_types
 from app import app
 
@@ -421,7 +422,7 @@ class Post(DBModel):
         return '<Post:{0}:{1}>'.format(self.type, self.content[0:22])
 
     def repr(self):
-        return json.loads(self.content)['content'][0:12] + '...(' + self.type + ')'
+        return strip_tags(json.loads(self.content)['content'])[0:12] + '...(' + self.type + ')'
 
     def dict_repr(self):
         ''' must give all info, for use on screens, etc. '''
@@ -443,6 +444,29 @@ class Post(DBModel):
             return 'past'
         else:
             return 'now'
+
+# Class and function for stripping HTML tags
+class MLStripper(HTMLParser):
+    '''A class for stripping away html tags'''
+
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.reset()
+        self.fed = []
+
+    def handle_data(self, data):
+        '''Overriding handle_data'''
+        self.fed.append(data)
+
+    def get_data(self):
+        '''Get the html-stripped text'''
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    '''Strip a string of html data'''
+    mls = MLStripper()
+    mls.feed(html)
+    return mls.get_data()
 
 
 
