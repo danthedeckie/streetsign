@@ -74,4 +74,4 @@ fi
 
 echo
 echo "--------------------------------------------------------"
-echo "Everything is done! You should be able to use ./run.sh to run the development server."
+echo "Everything is done! You should be able to use ./run.py to run the development server."
