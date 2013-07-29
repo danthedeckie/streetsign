@@ -102,5 +102,27 @@ function reload_page() {
     setTimeout(reload_page, REFRESH_PAGE_TIMER);
 }
 
+function reduce_font_size_to_fit(inner, outer) {
+    'use strict';
+    // reduce fontsize until inner.height() < outer.height()...
+
+    var height = 0;
+    var zone_height = $(outer).height();
+
+    height = inner.height();
+
+    if ( height > zone_height ) {
+        for (var i=100; i>10;i-=3){
+
+            height = inner.height();
+            if (height <= zone_height) {
+                console.log ('reducing font size to ' + i + '%');
+                break;
+            }
+            inner.css('font-size', i + '%');
+        }
+    }
+}
+
 setTimeout(reload_page, REFRESH_PAGE_TIMER);
 setTimeout(magic_time, 2000);

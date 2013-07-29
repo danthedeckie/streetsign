@@ -467,14 +467,14 @@ class Screen(DBModel):
     # JSON:
     settings = TextField(default='{}')
     defaults = TextField(default='{}')
-    zones = TextField(default='{}')
+    zones = TextField(default='[]')
 
     def json_all(self):
         return ('{"id":' + str(self.id) + ', "urlname":"' + self.urlname + '",'\
                  '"background":"' + (self.background if self.background else '') + '",' \
                  '"settings":' + (self.settings if self.settings else '{}') + ',' \
                  '"defaults":' + (self.defaults if self.defaults else '{}') + ',' \
-                 '"zones":' + (self.zones if self.zones else '{}') + '}')
+                 '"zones":' + (self.zones if self.zones else '[]') + '}')
 
 ##############################################################################
 
