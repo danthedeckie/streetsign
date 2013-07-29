@@ -1,36 +1,32 @@
 {
     render: function(zone, data) {
-        if (('type' in data.zone ) && ( data.zone.type == 'scroll')) {
-            var newhtml = $('<div class="post post_html post_scrolling">'
-                           + magic_vars(data.content.content).replace('<br/>',' ')
-                           + '</div>').prependTo(zone);
-            return newhtml.css('display','none');
-        } else {
+        'use strict';
+        var newhtml = '';                   // html to append in to the zone.
 
         console.log('making new html');
-        var height = 0;
-        var zone_height = $(zone).height()
-        var newhtml = $('<div class="post post_html"><div class="post_inner">'
-                + magic_vars(data.content.content)
-                + '</div></div>')
-                .prependTo(zone);
 
-        height = newhtml.children('.post_inner').height();
-        if ( height > zone_height ) {
-            for (var i=100; i>10;i-=3){
+        if (('type' in data.zone ) && ( data.zone.type == 'scroll')) {
+            newhtml = $('<div class="post post_html post_scrolling"><div class="post_inner">'
+                           + magic_vars(data.content.content).replace('<br/>',' ')
+                           + '</div></div>').prependTo(zone);
+        } else {
 
-                height = newhtml.children('.post_inner').height();
-                //console.log ( zone_height + ':' + height);
-                if (height <= zone_height) {
-                    console.log ('setting size to ' + i + '%');
-                    break;
-                }
-                newhtml.children('.post_inner').css('font-size', i + '%');
-            }
+            newhtml = $('<div class="post post_html"><div class="post_inner">'
+                    + magic_vars(data.content.content)
+                    + '</div></div>')
+                    .prependTo(zone);
         }
+
+        // Reduce font size until it fits nicely:
+
+        reduce_font_size_to_fit(newhtml.children('.post_inner'), $(zone));
+
+        // Set font color:
+
         try{newhtml.css('color',data.content.color);}catch(e){};
 
+        // Return the HTML object, hiding it along the way.
+
         return newhtml.css('display','none');
-    }
     }
 }
