@@ -14,7 +14,7 @@
 <tbody>
 {% for f in file_list %}
     <tr>
-        <td><a href="{{ f.url }}" rel=new>{{f.name}}</a></td>
+        <td><a href="{{ f.url }}" rel=new>{{f.thumb|safe if f.thumb else f.name}}</a></td>
         <td>{{ f.size }}</td>
         <td><form method="POST">
             <input type="hidden" name="filename" value="{{f.name}}" />
