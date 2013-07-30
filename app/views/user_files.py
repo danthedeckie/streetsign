@@ -34,6 +34,13 @@ from app import app
 ##################################################################
 # user uploaded files:
 
+def human_size_str(filename):
+    s = stat(filename).st_size
+    if s > 1048576:
+        return str(s/1048576) + 'MB'
+    if s > 1024:
+        return str(s/1024) + 'kB'
+
 # TODO: move to file upload lib.
 def allow_filetype(filename):
     return splitext(filename)[-1].lower() in \
@@ -50,10 +57,11 @@ def make_dirlist(path):
                    'url': name + '/',
                   'size': "{0} items".format(len(glob(pathjoin(f,'*')))) })
         else:
+            
             return_list.append(
                 { 'name': name,
                    'url': pathjoin(g.site_vars['user_url'],path,name),
-                  'size': stat(f).st_size })
+                  'size': human_size_str(f) })
     return return_list
 
 @app.route('/user_files/', methods=['GET','POST'])
