@@ -50,25 +50,30 @@
 
 <div id="zones_container">
     <h3>Zones:<button data-bind="click: addZone" class="newbutton">New Zone</button></h3>
-<ul data-bind="foreach: zones" class="itemlist">
+<ul data-bind="foreach: zones" class="itemlist list_no_bullets">
   <li>
-    <button style="float:right" data-bind="click:$root.removeZone " class="delbutton">X</button><br/>
-    <label>Name:<input name="urlname" data-bind="value: name" /></label>
-    <label>Size:</label>
-    <div class="sizes_box">
-        <input data-bind="value: top" /><br/>
-        <input data-bind="value: left" />-<input data-bind="value:right" /><br/>
-        <input data-bind="value: bottom" /><br/>
-    </div>
+    <input name="urlname" data-bind="value: name" placeholder="zone name" style="width: 70%; float: left;"/>
+    <button style="float:right" data-bind="click:$root.removeZone " class="delbutton">X</button>
+    <div class="cf"></div>
     <label>Feeds:
         <select multiple autocomplete="off"
                 data-bind="options: AVAILABLE_FEEDS, optionsText:'name',
                            optionsValue: 'id', selectedOptions: feeds" >
         </select>
     </label>
+    <hr/>
+    <label>Size:</label>
+    <div class="sizes_box" style="margin:auto;background:#777;border-radius:90px">
+        <input data-bind="value: top" placeholder="top" /><br/>
+        <input data-bind="value: left" placeholder="left" />-<input data-bind="value:right" placeholder="right" /><br/>
+        <input data-bind="value: bottom" placeholder="bottom" /><br/>
+    </div>
+    <hr/>
+    <div class="cf"></div>
   <div>
-  <label>Fade time:<input type="number" data-bind="value: fadetime" /></label>
-  <select data-bind="options: ZONE_TYPES,  optionsText:'name', optionsValue:'id',selectedOptions: type"></select>
+<label>Zone type:</label><select data-bind="options: ZONE_TYPES,  optionsText:'name', optionsValue:'id',selectedOptions: type"></select></br>
+  <label>Fade time:<input type="number" data-bind="value: fadetime" style="width: 3em" /></label>
+  </br/>
   <label>Default Text Color:<input type="color" data-bind="value: color" /></label><br/>
   <label>CSS:
       <textarea name="css" data-bind="value: css" ></textarea></label>

@@ -285,14 +285,17 @@ div.free_blocks {
 
 .itemlist {
     display: block;
-    max-width: 17em;;
+    max-width: 17em;
+    list-style-type: none;
+    padding: 0;
 }
 ul.itemlist > li {
     background: #ddd;
     border-radius: 5px;
     margin: 0.2em;
-    border: 1px solid grey;
+    border: 1px solid #aaa;
     padding: 0.5em;
+    box-shadow: inset 5px 5px 12px #eee, inset -10px -10px 19px #ccc;
 }
 
 div.sizes_box {
