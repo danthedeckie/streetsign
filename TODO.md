@@ -33,8 +33,13 @@
 - basic password strength checking
 - login attempts counting/stopping
 - Better client & serverside validation.
-- try/catch enable-able blocks for screens, so that no matter what goes wrong with javascript,
-  it somehow notices and reloads the screen, or tells the admin, or something.
+- try/catch enable-able blocks for screens, so that no matter what goes wrong
+  with javascript, it somehow notices and reloads the screen, or tells the
+  admin, or something.
+- image thumbnails for 'uploaded files' & posts.
+  (possibly an auto-cache api, as part of the uploaded files section, which
+  then the images post_type (plugin) & the display reference?)
+  {{ url_for('thumbnail', filename=...) }} or something...
 
 # Random ideas:
 

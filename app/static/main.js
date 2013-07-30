@@ -15,7 +15,9 @@ $('select.chosen').chosen({'width':'100%'});
 // User login/details popup box thingy:
 
 $('#user_login_button').click( function () {
-    $('#login_box').fadeToggle();
+    $('#login_box').fadeToggle(200, function (e){
+        $('input[name=username]').focus();
+        });
 });
 
 $('#login_box_close').click(function (e) {

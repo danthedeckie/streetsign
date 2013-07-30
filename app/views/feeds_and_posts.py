@@ -92,7 +92,7 @@ def feedpage(feedid):
             feed.save()
             flash('Saved')
         elif action == 'delete':
-            feed.delete_instance()
+            feed.delete_instance(True,True) # cascade/recursive delete.
             flash('Deleted')
             return redirect(url_for('feeds'))
 
@@ -111,7 +111,15 @@ def feedpage(feedid):
 
 @app.route('/posts')
 def posts():
-    return render_template('posts.html', posts=Post.select())
+    try:
+        return render_template('posts.html', posts=Post.select())
+    except Feed.DoesNotExist as e:
+        # Ah. Database inconsistancy! Not good, lah.
+        ps = Post.raw('select post.id from post left join feed on feed.id = post.feed_id where feed.id is null;')
+        for p in ps:
+            p.delete_instance()
+        flash('Cleaned up old posts...')
+        return render_template('posts.html', posts=Post.select())
 
 @app.route('/posts/new', methods=['GET','POST'])
 def post_new():
