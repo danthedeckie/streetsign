@@ -76,6 +76,7 @@ header {
 }
 header h1 {
     color: white;
+    text-shadow: -1px -1px 0px #000;
     display: block;
     float: left;
     padding: 0px;
@@ -94,6 +95,9 @@ header > nav > ul {
 header > nav > ul > li {
     display: inline;
     background: rgba(255,255,255,0.1);
+    background: linear-gradient( rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+    text-shadow: -1px -1px 0px #000;
+    font-color: #222;
     padding: 0.3em;
     margin: 0px;
 }
@@ -173,6 +177,8 @@ div.footerbox {
     padding: 1em;
 }
 footer {
+
+    text-shadow: -1px -1px 0px #000;
     position: static;
     bottom: 0;
     left: 0;
