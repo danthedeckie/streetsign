@@ -189,6 +189,7 @@ article a:hover {
     text-align: center;
     padding: 1em;
     display: none;
+    box-shadow: 0 0 25px rgba(255,255,255,0.5);
 }
 #login_box > h2 {
     display: none;
