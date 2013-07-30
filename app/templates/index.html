@@ -10,6 +10,7 @@
     {% endblock %}
   </head>
 <body>
+<div id="allwrapper">
 <header>
   <h1><a href="{{ url_for('index') }}">{{ g.site_vars.site_title }}:{{ display_title }}</a></h1>
   <nav>
@@ -19,8 +20,8 @@
             <li><a href="{{ url_for(view) }}">{{text}}</a></li>
         {%- endmacro %}
         {% if session.display_admin_stuff %}
-            {{ navitem('users',  'User list') }}
-            {{ navitem('groups', 'Group list') }}
+            {{ navitem('users',  'Users') }}
+            {{ navitem('groups', 'Groups') }}
             {{ navitem('user_files_list', 'Uploaded Files') }}
         {% endif %}
         {{ navitem('feeds',  'Feeds') }}
@@ -42,7 +43,7 @@
 {% endfor %}
 </ul>
 <div id="login_box">
-<a style="color:white;float:left"href="#" id="login_box_close">X</a>
+<a style="padding:0.2em;color:white;float:left"href="#" id="login_box_close" class="delbutton">X</a>
 {% if session.logged_in %}
     Logged in as {{ session.username }}.
     <form action="{{ url_for('logout') }}" method="POST">
@@ -65,6 +66,7 @@ This project released under the <a href="https://www.gnu.org/licenses/gpl.html">
 <a href="https://bitbucket.org/dfairhead/concertino/overview">Currently still Alpha/TESTING!</a>
 
 </footer>
+</div>
 {% block end_of_page_javascript %}
   <!-- jquery, ga, whatever goes here. -->
   {{ linkmacros.static_js('lib/jquery.js') }}

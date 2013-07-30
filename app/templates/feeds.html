@@ -6,7 +6,7 @@
 <thead>
   <tr>
     <td>Feed Name</td>
-    <td>Other Flags</td>
+    <td></td>
   </tr>
 </thead>
 <tbody>
@@ -21,12 +21,13 @@
 </tbody>
 </table>
 {% if session.display_admin_stuff %}
-<div>
     <form action="{{ url_for('feeds') }}" method="POST">
     <h2> New Feed </h2>
+
+<span class="centerbox">
     <label>Title:<input name="title" placeholder="new feed name..."/></label>
-    <input type="submit" value="Create!" />
+    <input type="submit" value="Create!" class="newbutton" />
     </form>
-</div>
+</span>
 {% endif %}
 {% endblock %}

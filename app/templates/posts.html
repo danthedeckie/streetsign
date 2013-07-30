@@ -3,11 +3,6 @@
 
 {% block body %}
 <h2>All Posts</h2>
-{% if session.display_admin_stuff %}
-<div style="text-align:center;margin:auto;">
-    <a class="newbutton" href="{{ url_for('post_new') }}">New</a>
-</div>
-{% endif %}
 <table>
 <thead>
 <tr>
@@ -15,7 +10,7 @@
 <td>Content</td>
 <td>Author</td>
 <td>Feeds</td>
-<td>Other Flags</td>
+<td> {% if session.display_admin_stuff %}<a class="newbutton" href="{{ url_for('post_new') }}">New</a>{% endif %} </td>
 </tr>
 </thead>
 <tbody>

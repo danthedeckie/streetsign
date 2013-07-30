@@ -7,7 +7,7 @@
   <tr>
     <td>View URL</td>
     <td>Feed ID</td>
-    <td></td>
+    <td>{% if session.display_admin_stuff %}<a href="{{ url_for('screenedit', screenid=-1) }}" class="newbutton">New</a>{% endif %}</td>
   </tr>
 </thead>
 <tbody>
@@ -22,12 +22,4 @@
 {% endfor %}
 </tbody>
 </table>
-{% if session.display_admin_stuff %}
-<div>
-    <form action="{{ url_for('screenedit', screenid=-1) }}" method="GET">
-    <h2> New Screen </h2>
-    <input type="submit" value="Create!" />
-    </form>
-</div>
-{% endif %}
 {% endblock %}

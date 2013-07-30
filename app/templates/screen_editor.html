@@ -49,10 +49,10 @@
 </div>
 
 <div id="zones_container">
-    <h3>Zones:<button data-bind="click: addZone">New Zone</button></h3>
+    <h3>Zones:<button data-bind="click: addZone" class="newbutton">New Zone</button></h3>
 <ul data-bind="foreach: zones" class="itemlist">
   <li>
-    <button style="float:right" data-bind="click:$root.removeZone ">X</button><br/>
+    <button style="float:right" data-bind="click:$root.removeZone " class="delbutton">X</button><br/>
     <label>Name:<input name="urlname" data-bind="value: name" /></label>
     <label>Size:</label>
     <div class="sizes_box">

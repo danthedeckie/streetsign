@@ -24,12 +24,12 @@
 {% endfor %}
 </tbody>
 </table>
-<div>
+<div class="centerbox">
   <form method="POST" enctype="multipart/form-data">
     <input type="hidden" name="action" value="upload" />
     <h2>Upload new file</h2>
         <input type="file" name="image_file" id="image_file" accept="image/*" />
-    <input type="submit" value="Upload" />
+    <input type="submit" value="Upload" class="newbutton" />
   </form>
 </div>
 {% endblock %}

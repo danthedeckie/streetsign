@@ -26,11 +26,11 @@
 </tbody>
 </table>
 {% if session.display_admin_stuff %}
-<div>
+<div class="centerbox">
     <form action="{{ url_for('groups') }}" method="POST">
     <h2> New Group </h2>
     <label>Name:<input name="name" placeholder="new group name..."/></label>
-    <input type="submit" value="Create!" />
+    <input type="submit" value="Create!" class="newbutton"/>
     </form>
 </div>
 {% endif %}
