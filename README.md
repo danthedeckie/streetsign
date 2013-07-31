@@ -27,6 +27,8 @@ but you will need Python 2.6/2.7 or so, and the Python headers package (python-d
 probably also a functioning gcc is needed, for compiling the various requirements.  But
 python-dev should handle that (I hope!)
 
+For the thumbnail generation, and image-resizing, you'll need 'ImageMagick' installed (the 'convert' command).
+
 ## More info:
 
 The virtual env is kept in .virtualenv, and usually shouldn't need to be touched.  I don't like the entering and exiting a virtualenv business, so went with the 'virtualenv stuff happens transparently when you use run.py, you shouldn't have to care about it'.  If you want to run python for the virtualenv, use .virtualenv/bin/python
