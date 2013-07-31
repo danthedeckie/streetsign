@@ -23,7 +23,7 @@
 
 
 
-from flask import json
+from flask import json, url_for, Markup
 from peewee import *
 import sqlite3 # for catching an integrity error
 from passlib.hash import bcrypt # for passwords
@@ -422,7 +422,16 @@ class Post(DBModel):
         return '<Post:{0}:{1}>'.format(self.type, self.content[0:22])
 
     def repr(self):
-        return strip_tags(json.loads(self.content)['content'])[0:12] + '...(' + self.type + ')'
+        # TODO: split this out to the various post_type modules, and cache it.
+        content = json.loads(self.content)['content']
+        if (self.type=='html'):
+            return strip_tags(content[0:14]) + '...(' + self.type + ')'
+        elif (self.type=='text'):
+            return content[0:14]
+        elif (self.type=='image'):
+            return Markup('<img src="' + url_for('thumbnail',filename='post_images/'+content) +'"/>')
+        else:
+            return 'N/A'
 
     def dict_repr(self):
         ''' must give all info, for use on screens, etc. '''
