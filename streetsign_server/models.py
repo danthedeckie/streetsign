@@ -111,7 +111,7 @@ class UserSession(DBModel):
     id = CharField(primary_key=True)
     username = CharField()
 
-    user = ForeignKeyField(User)
+    user = ForeignKeyField(User, related_name='sessions')
     login_time = DateTimeField(default=datetime.now)
 
 
@@ -384,14 +384,14 @@ class Post(DBModel):
     content = TextField()
     feed = ForeignKeyField(Feed, related_name='posts')
 
-    author = ForeignKeyField(User)
+    author = ForeignKeyField(User, related_name='posts')
 
     write_date = DateTimeField(default=datetime.now)
 
     #publisher info:
     published = BooleanField(default=False)
     publish_date = DateTimeField(null=True)
-    publisher = ForeignKeyField(User, null=True)
+    publisher = ForeignKeyField(User, related_name='published_posts', null=True)
 
     # Should it actually be displayed?
     status = IntegerField(default=0)
