@@ -1,8 +1,7 @@
-# Concertino
+# StreetSign (Server)
 A digital signage system, inspired by Concerto, however written in Flask/Peewee/Python,
-with a simpler basis.  The name is subject to change, probably in the near future, to
-make it easier not to tread on the toes of the Concerto project.  Concertino is just
-my working title.
+with a simpler basis.  This project was originally written for Teenstreet 2013 in Germany
+(http://www.teenstreet.de).
 
 Work in Progress! Do not consider production ready yet!
 

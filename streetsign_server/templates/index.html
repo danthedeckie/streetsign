@@ -1,0 +1,78 @@
+{%- import "link-macros.html" as linkmacros -%}
+{%- import "common_widgets.html" as widgets -%}
+<!doctype html>
+<html>
+  <head>
+    <title>{% block title %}{{ g.site_vars.site_title }}{% endblock %}</title>
+    {% block htmlhead %}
+        {{ linkmacros.static_css('lib/chosen/chosen.min.css') }}
+        {{ linkmacros.static_css('style.css') }}
+    {% endblock %}
+  </head>
+<body>
+<div id="allwrapper">
+<header>
+  <h1><a href="{{ url_for('index') }}">{{ g.site_vars.site_title }}:{{ display_title }}</a></h1>
+  <nav>
+    {% block nav %}
+    <ul>
+        {% macro navitem(view, text) -%}
+            <li><a href="{{ url_for(view) }}">{{text}}</a></li>
+        {%- endmacro %}
+        {% if session.display_admin_stuff %}
+            {{ navitem('users',  'Users') }}
+            {{ navitem('groups', 'Groups') }}
+            {{ navitem('user_files_list', 'Uploaded Files') }}
+        {% endif %}
+        {{ navitem('feeds',  'Feeds') }}
+        {{ navitem('posts',  'All Posts') }}
+        {{ navitem('screens', 'Screens') }}
+    </ul>
+    {% endblock %}
+  </nav>
+  <a href="#" id="user_login_button">{{ session.username if session.logged_in else 'Login' }}</a>
+  <div class="cf"></div>
+</header>
+<article>
+{% block body %}{% endblock %}
+<div class="cf"></div>
+</article>
+<ul id="flashed_notices">
+{% for msg in get_flashed_messages() %}
+  <li>{{ msg }}</li>
+{% endfor %}
+</ul>
+<div id="login_box">
+<a style="padding:0.2em;color:white;float:left"href="#" id="login_box_close" class="delbutton">X</a>
+{% if session.logged_in %}
+    Logged in as {{ session.username }}.
+    <form action="{{ url_for('logout') }}" method="POST">
+        <input type="hidden" name="from" value="{{ request.endpoint }}" />
+        <input type="submit" value="Log out">
+    </form>
+{% else %}
+    <h2>Log in</h2>
+    <form action="{{ url_for('login') }}" method="POST">
+        <input name="username" placeholder="Your user name..." /><br />
+        <input name="password" type="password" placeholder="password" /><br />
+        <input type="hidden" name="from" value="{{ request.endpoint }}" />
+        <input type="submit" value="Log in" />
+    </form>
+{% endif %}
+</div>
+<footer>
+(C) 2013. an <a href="http://omnivision.om.org/">OMNIvision</a> Project.<br/>
+This project released under the <a href="https://www.gnu.org/licenses/gpl.html">GPL</a>.</br>
+<a href="https://bitbucket.org/dfairhead/streetsign-server/overview">Currently still Alpha/TESTING!</a>
+
+</footer>
+</div>
+{% block end_of_page_javascript %}
+  <!-- jquery, ga, whatever goes here. -->
+  {{ linkmacros.static_js('lib/jquery.js') }}
+  {{ linkmacros.static_js('lib/knockout-2.2.1.js') }}
+  {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
+  {{ linkmacros.static_js('main.js') }}
+{% endblock %}
+</body>
+</html>
