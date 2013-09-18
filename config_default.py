@@ -6,6 +6,6 @@ MAX_CONTENT_LENGTH = 16 * 1024 * 1024 # 16 megabytes. reasonable.
 SITE_VARS = {
     'site_title': 'StreetSign',
     'site_dir': dirname(__file__),
-    'user_dir': dirname(__file__)+'/app/static/user_files/',
+    'user_dir': dirname(__file__)+'streetsign_server/static/user_files/',
     'user_url': '/static/user_files'
     }

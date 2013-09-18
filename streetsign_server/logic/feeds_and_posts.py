@@ -62,6 +62,13 @@ def try_to_set_feed(post, form, user):
     return post.feed
 
 def if_i_cant_write_then_i_quit(post, user):
+    ''' checks if a post is editable by a user. If it isn't, for
+        whatever reason, then raise an appropriate 'PleaseRedirect'
+        exception. (reasons could be that it's in a feed we don't
+        have write access to, or it's been published, and we don't
+        have publish permission to that feed, so the post is now
+        'locked' to us.) '''
+
     # if we don't have write permission, then this isn't our post!
     if not post.feed.user_can_write(user):
 
@@ -74,12 +81,16 @@ def if_i_cant_write_then_i_quit(post, user):
     if post.published and not post.feed.user_can_publish(user):
 
         raise PleaseRedirect(None,
-            'Sorry, this post is published, and you do not have'
-            'permission to edit published posts in "{0}".'.format(post.feed.name))
+            'Sorry, this post is published,'
+            ' and you do not have permission to'
+            ' edit published posts in "{0}".'.format(post.feed.name))
 
     return True
 
 def can_user_write_and_publish(user, post):
+    ''' returns a tuple, expressing if 'user' has permission to
+        write and publish a post. '''
+
     if not post.feed:
         if user.writeable_feeds():
             return True, False
@@ -95,18 +106,27 @@ def can_user_write_and_publish(user, post):
     return False, False
 
 def post_form_intake(post, form, editor):
+    ''' takes the values from 'form', passes the post contents to
+        the editor 'receive' function, and adds all the values into
+        the 'post' object.
 
-    # note! this actually modifies the post it is sent!
-    content=json.dumps(editor.receive(form))
+        NOTE: this actually modifies the post it is sent!
+    '''
+
+    content = json.dumps(editor.receive(form))
     post.content = content
 
     '''
+    TODO:
+
     try:
-        post.active_start = datetime.strptime(form.get("active_start"), '%Y-%m-%d %H:%M')
+        post.active_start = datetime.strptime(form.get("active_start"),
+                                              '%Y-%m-%d %H:%M')
     except:
         flash('Problem with start date.')
     try:
-        post.active_end = datetime.strptime(form.get("active_end"), '%Y-%m-%d %H:%M')
+        post.active_end = datetime.strptime(form.get("active_end"),
+                                            '%Y-%m-%d %H:%M')
     except:
         flash('Problem with end date.')
     '''

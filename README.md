@@ -3,7 +3,8 @@ A digital signage system, inspired by Concerto, however written in Flask/Peewee/
 with a simpler basis.  This project was originally written for Teenstreet 2013 in Germany
 (http://www.teenstreet.de).
 
-Work in Progress! Do not consider production ready yet!
+Although this has been used at a large conference, it's still very much work in progress,
+so if you do use it, expect changes in the future, and some features missing.
 
 ## Usage:
 
