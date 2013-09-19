@@ -1,2 +1,6 @@
 [TYPECHECK]
-generated-members=id,DoesNotExist
+generated-members=id,DoesNotExist, permissions, setdefaultencoding
+[FORMAT]
+max-line-length=90
+[BASIC]
+good-names=i,j,p,ps,k,u,e,f,s,_

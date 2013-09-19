@@ -23,8 +23,8 @@
 
 from flask import flash, url_for, json
 from streetsign_server.views.utils import PleaseRedirect
-from streetsign_server.models import Post, Feed
-from datetime import datetime
+from streetsign_server.models import Feed
+#from datetime import datetime
 
 def try_to_set_feed(post, form, user):
     ''' Is this user actually allowed to set the feed of this post to what
@@ -113,8 +113,7 @@ def post_form_intake(post, form, editor):
         NOTE: this actually modifies the post it is sent!
     '''
 
-    content = json.dumps(editor.receive(form))
-    post.content = content
+    post.content = json.dumps(editor.receive(form))
 
     '''
     TODO:
@@ -130,6 +129,7 @@ def post_form_intake(post, form, editor):
     except:
         flash('Problem with end date.')
     '''
+
     post.active_start = form.get('active_start')
     post.active_end = form.get('active_end')
 

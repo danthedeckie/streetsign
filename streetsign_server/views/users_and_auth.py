@@ -27,8 +27,8 @@ import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
 from os import makedirs, remove, stat
 from streetsign_server import app
-from streetsign_server.models import DB, User, Group, Feed, Post, Screen, UserGroup,\
-                       writeable_feeds, by_id
+from streetsign_server.models import DB, User, Group, Feed, Post, Screen, \
+                                     UserGroup, by_id
 import sqlite3
 
 

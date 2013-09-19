@@ -35,8 +35,7 @@ from streetsign_server.logic.feeds_and_posts import try_to_set_feed, \
                                       post_form_intake
 
 from streetsign_server import app
-from streetsign_server.models import User, Group, Feed, Post, \
-                       writeable_feeds, by_id
+from streetsign_server.models import User, Group, Feed, Post, by_id
 
 ####################################################################
 # Feeds & Posts:
@@ -136,7 +135,7 @@ def post_new():
         return render_template('postnew.html',
                 current_feed=feed,
                 post=Post(),
-                feedlist = writeable_feeds(user),
+                feedlist = user.writeable_feeds(),
                 can_write = True,
                 post_types=post_types.types())
 
@@ -244,7 +243,7 @@ def postpage(postid):
                             post = post,
                             post_type = post.type,
                             current_feed = post.feed.id,
-                            feedlist = writeable_feeds(user),
+                            feedlist = user.writeable_feeds(),
                             can_write = can_write,
                             form_content = editor.form(json.loads(post.content)))
 

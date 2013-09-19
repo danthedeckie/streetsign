@@ -23,7 +23,7 @@
 
 
 from flask import render_template_string, request, g, flash
-from werkzeug import secure_filename
+from werkzeug import secure_filename # pylint: disable=no-name-in-module
 from os.path import splitext, join as pathjoin, isdir, abspath
 from subprocess import check_call
 from os import makedirs

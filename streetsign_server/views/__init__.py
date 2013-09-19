@@ -47,7 +47,7 @@ def before_the_action():
     DB.connect()
 
 @app.teardown_request
-def end_of_request(exception):
+def end_of_request(exception): # pylint: disable=unused-argument
     ''' close the database '''
     DB.close()
 

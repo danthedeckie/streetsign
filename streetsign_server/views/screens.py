@@ -33,8 +33,7 @@ import urllib
 from datetime import datetime
 from streetsign_server import app
 from md5 import md5
-from streetsign_server.models import Feed, Post, Screen, \
-                       writeable_feeds, by_id
+from streetsign_server.models import Feed, Post, Screen, by_id
 
 
 ###########################################

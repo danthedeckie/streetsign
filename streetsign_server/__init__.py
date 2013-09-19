@@ -27,7 +27,7 @@ import flask
 #from flask_peewee.auth import Auth
 import config
 
-app = Flask(__name__)
+app = Flask(__name__) # pylint: disable=invalid-name
 app.config.from_object('config')
 
 from streetsign_server import models

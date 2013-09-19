@@ -26,7 +26,7 @@ from flask import render_template, request, session, redirect, \
 import streetsign_server.user_session as user_session
 from glob import glob
 from os.path import basename, dirname, join as pathjoin, splitext, isdir, isfile
-from werkzeug import secure_filename
+from werkzeug import secure_filename # pylint: disable=no-name-in-module
 from os import makedirs, remove, stat
 from streetsign_server import app
 from subprocess import check_call # for making thumbnails
@@ -35,6 +35,7 @@ from subprocess import check_call # for making thumbnails
 # user uploaded files:
 
 def human_size_str(filename):
+    ''' returns a human-readable size (string) of a file-name '''
     s = stat(filename).st_size
     if s > 1048576:
         return str(s/1048576) + 'MB'
@@ -43,10 +44,14 @@ def human_size_str(filename):
 
 # TODO: move to file upload lib.
 def allow_filetype(filename):
+    ''' is this file-type allowed to be uploaded? '''
     return splitext(filename)[-1].lower() in \
         ['.png','.jpg','.jpeg','.gif','.bmp','.svg']
 
 def make_dirlist(path):
+    ''' returns a list of the files and sub-dirs in a directory, ready to be
+        JSON encoded, and sent to a client, or rendererd server-side. '''
+
     return_list = []
     things = glob(pathjoin(g.site_vars['user_dir'],path,'*'))
     for f in things:
