@@ -5,6 +5,8 @@
 ## Urgent:
 
 - More polished GUI.
+- make sure user uploaded files have the right place to go etc for new projects,
+- make lack of thumbnail generator not an exception, but fall back happily.
 
 ## Needed, but copable for alpha version.
 
@@ -18,7 +20,6 @@
 
 # Good things for the future:
 
-- New name
 - Full Documentation
 - Output screens status, tracking which addresses are requesting info, alert when one goes down, etc.
 - Local machine mini-proxy which gets the latest info from the master server, but otherwise caches everything

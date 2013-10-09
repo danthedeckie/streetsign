@@ -471,9 +471,9 @@ class Post(DBModel):
         elif (self.type=='text'):
             return content[0:14]
         elif (self.type=='image'):
-            return Markup('<img src="'
-                          + url_for('thumbnail',
-                                    filename='post_images/'+content) +'"/>')
+            return Markup('<img src="{0}" alt="{1}" />'.format(
+                        url_for('thumbnail', filename='post_images/'+content),
+                        content))
         else:
             return 'N/A'
 

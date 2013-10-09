@@ -63,8 +63,9 @@ def make_dirlist(path):
                   'size': "{0} items".format(len(glob(pathjoin(f,'*')))) })
         else:
             if allow_filetype(name):
-                thumb = '<img src="{0}"/>'.format(url_for('thumbnail',
-                                                          filename=path + name))
+                thumb = '<img src="{0}" alt="{1}" />'.format(
+                    url_for('thumbnail', filename=path + name),
+                    name)
             else:
                 thumb=''
             return_list.append(
