@@ -53,7 +53,7 @@ def make_dirlist(path):
         JSON encoded, and sent to a client, or rendererd server-side. '''
 
     return_list = []
-    things = glob(pathjoin(g.site_vars['user_dir'],path,'*'))
+    things = glob(pathjoin(g.site_vars['user_dir'], path, '*'))
     for f in things:
         name = basename(f)
         if isdir(f):
@@ -63,7 +63,8 @@ def make_dirlist(path):
                   'size': "{0} items".format(len(glob(pathjoin(f,'*')))) })
         else:
             if allow_filetype(name):
-                thumb='<img src="' + url_for('thumbnail', filename=path + name) + '"/>'
+                thumb = '<img src="{0}"/>'.format(url_for('thumbnail',
+                                                          filename=path + name))
             else:
                 thumb=''
             return_list.append(
@@ -108,23 +109,27 @@ def user_files_list(dirname=""):
 
 @app.route('/thumbnail/<path:filename>')
 def thumbnail(filename):
-    full_path = pathjoin(g.site_vars['user_dir'],filename)
-    thumb_path = pathjoin(g.site_vars['user_dir'],'.thumbnails',filename)
+    full_path = pathjoin(g.site_vars['user_dir'], filename)
+    thumb_path = pathjoin(g.site_vars['user_dir'], '.thumbnails', filename)
 
     if isfile(full_path):
         if not isfile(thumb_path):
             # we need to make a thumbnail!
-            where = pathjoin(g.site_vars['user_dir'],'.thumbnails',dirname(filename))
+            where = pathjoin(g.site_vars['user_dir'],
+                             '.thumbnails',
+                             dirname(filename))
             if not isdir(where):
                 makedirs(where)
 
             try:
-                check_call([pathjoin(g.site_vars['site_dir'],'scripts','makethumbnail.sh'),
+                check_call([pathjoin(g.site_vars['site_dir'],
+                                     'scripts',
+                                     'makethumbnail.sh'),
                         full_path, thumb_path])
             except:
                 return 'Sorry!'
         # either there is a thumbnail, or we just made one.
-        return redirect(g.site_vars['user_url']+'/.thumbnails/' + filename)
+        return redirect(g.site_vars['user_url'] + '/.thumbnails/' + filename)
     else:
         return 'Sorry! not a valid original file!'
 
