@@ -20,6 +20,8 @@
 
 # Good things for the future:
 
+- non-session auth as well for API, makes scripting easier.
+- 'create feeds from twitter/RSS/etc' importers? scripts, with cron???
 - Full Documentation
 - Output screens status, tracking which addresses are requesting info, alert when one goes down, etc.
 - Local machine mini-proxy which gets the latest info from the master server, but otherwise caches everything

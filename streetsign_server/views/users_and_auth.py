@@ -16,7 +16,7 @@
     along with StreetSign.  If not, see <http://www.gnu.org/licenses/>.
 
     ---------------------------------
-    Views for Working with users and passwords.
+    Views for Working with users and passwords, and user-groups.
 
 """
 
@@ -25,15 +25,15 @@ from flask import render_template, url_for, request, session, redirect, \
                   flash, json, g
 import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
-from os import makedirs, remove, stat
 from streetsign_server import app
-from streetsign_server.models import DB, User, Group, Feed, Post, Screen, \
-                                     UserGroup, by_id
-import sqlite3
+from streetsign_server.models import User, Group, Post, UserGroup
 
 
 @app.route('/login', methods=['POST'])
 def login():
+    ''' log a user into the system, set session cookies, set up database
+        session row, or not, if wrong password. '''
+
     # TODO: is using the request.endpoint the best way to do this?
     #       would it be better to use an absolute URL?  I dunno if this
     #       is better against XSS?
@@ -48,6 +48,8 @@ def login():
 
 @app.route('/logout', methods=['POST'])
 def logout():
+    ''' log out, remove session cookies, etc. '''
+
     return_to = request.form.get('from','index')
 
     # delete the session from the database:
@@ -64,11 +66,15 @@ def logout():
 
 @app.route('/users')
 def users():
+    ''' list of all users (HTML page). '''
     return render_template('users.html', users=User.select())
 
 @app.route('/users/<int:userid>', methods=['GET','POST'])
 @app.route('/users/-1', methods=['GET','POST'])
 def user(userid=-1):
+    ''' edit one user.  Admins can edit any user, but other users
+        can only edit themselves. if userid is -1, create a new user. '''
+
     try:
         current_user = user_session.get_user()
     except user_session.NotLoggedIn as e:
@@ -80,33 +86,41 @@ def user(userid=-1):
     if userid != -1:
         user = User.get(id=userid)
     else:
+        if not current_user.is_admin:
+            flash('Sorry! Only admins can create new users!')
+            return redirect(url_for('users'))
+
         user = User()
-        user.loginname='new'
-        user.displayname='New User'
-        user.emailaddress='...'
+        user.loginname = 'new'
+        user.displayname = 'New User'
+        user.emailaddress = '...'
+
+
     if request.method == 'POST':
-        action = request.form.get('action','none')
+        action = request.form.get('action', 'none')
         if action == 'update':
             if current_user != user and not current_user.is_admin:
                 flash('Sorry! You cannot edit this user!')
-                return render_template('user.html',
-                        user=user)
+                return render_template('user.html', user=user)
             try:
                 oldname = user.loginname
                 user.loginname = request.form.get('loginname', user.loginname)
             except:
                 user.loginname = oldname if oldname else 'NEW'
-                flash('Sorry! You cannot have that loginname. Someone else does')
+                flash('Sorry! You cannot have that loginname.' \
+                      ' Someone else does')
 
-            user.displayname = request.form.get('displayname', user.displayname)
-            user.emailaddress = request.form.get('emailaddress',user.emailaddress)
+            user.displayname = request.form.get('displayname',
+                                                user.displayname)
+            user.emailaddress = request.form.get('emailaddress',
+                                                 user.emailaddress)
 
             if not user.id == current_user.id:
                 user.is_admin = request.form.get('is_admin', False)
 
-            newpass = request.form.get('newpass','') if \
-                        request.form.get('newpass','') \
-                        == request.form.get('conf_newpass','2') else False
+            newpass = request.form.get('newpass', '') if \
+                        request.form.get('newpass', '') \
+                        == request.form.get('conf_newpass', '2') else False
 
             if newpass:
                 if current_user.confirm_password(request.form.get('currpass','')):
@@ -115,7 +129,7 @@ def user(userid=-1):
                 else:
                     flash('Your password was wrong!')
             else:
-                if not request.form.get('newpass','') == '':
+                if not request.form.get('newpass', '') == '':
                     flash('invalid password!')
 
             if current_user.is_admin:
@@ -126,24 +140,30 @@ def user(userid=-1):
             if userid == -1:
                 return redirect(url_for('user', userid=user.id))
         elif action == 'delete':
-            if (not current_user.is_admin) \
-            or (user.id == current_user.id):
-               flash('Sorry! You cannot delete this user!')
-               return redirect(request.referrer)
+            if (not current_user.is_admin):
+                flash('Sorry! Only admins can delete users!')
+                return redirect(request.referrer)
+
+            if (user.id == current_user.id):
+                flash('Sorry! You cannot delete yourself!')
+                return redirect(request.referrer)
 
             user.delete_instance()
             flash ('User:' + user.displayname + ' deleted.')
             return redirect(request.referrer)
 
+    users_posts = Post.select().where(Post.author==user) \
+                               .order_by(Post.write_date.desc()) \
+                               .limit(10)
+
     return render_template('user.html',
-            allgroups=Group.select(),
-            posts=Post.select().where(Post.author==user)\
-                      .order_by(Post.write_date.desc()).limit(10),
-            user=user)
+                            allgroups=Group.select(),
+                            posts=users_posts, user=user)
 
 
 @app.route('/groups', methods=['GET','POST'])
 def groups():
+    ''' (HTML) user-groups list, and creation of new ones. '''
 
     if request.method == 'POST':
         if not user_session.is_admin():
@@ -162,6 +182,8 @@ def groups():
 
 @app.route('/group/<int:groupid>', methods=['GET','POST'])
 def group(groupid):
+    ''' edit one user group. '''
+
     try:
         group = Group.get(id=groupid)
     except:
@@ -180,7 +202,7 @@ def group(groupid):
             return (redirect(url_for('groups')))
 
         if request.form.get('action','none') == 'update':
-            group.name = request.form.get('groupname',group.name)
+            group.name = request.form.get('groupname', group.name)
             group.save()
 
             users = request.form.getlist('groupusers')

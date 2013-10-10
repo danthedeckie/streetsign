@@ -91,7 +91,7 @@ def feedpage(feedid):
             feed.save()
             flash('Saved')
         elif action == 'delete':
-            feed.delete_instance(True,True) # cascade/recursive delete.
+            feed.delete_instance(True, True) # cascade/recursive delete.
             flash('Deleted')
             return redirect(url_for('feeds'))
 
@@ -110,6 +110,8 @@ def feedpage(feedid):
 
 @app.route('/posts')
 def posts():
+    ''' (HTML) list of ALL posts. (also deletes broken posts, if error) '''
+
     try:
         return render_template('posts.html', posts=Post.select())
     except Feed.DoesNotExist as e:
@@ -122,6 +124,8 @@ def posts():
 
 @app.route('/posts/new', methods=['GET','POST'])
 def post_new():
+    ''' create a new post! '''
+
     if not user_session.logged_in():
         flash("You're not logged in!")
         return redirect(url_for('index'))
@@ -131,7 +135,7 @@ def post_new():
     if request.method == 'GET':
         # send a blank form for the user:
 
-        feed = int(request.args.get('initial_feed',1))
+        feed = int(request.args.get('initial_feed', 1))
         return render_template('postnew.html',
                 current_feed=feed,
                 post=Post(),
@@ -167,6 +171,8 @@ def post_new():
 
 @app.route('/posts/<int:postid>', methods=['GET','POST'])
 def postpage(postid):
+    ''' Edit a post. '''
+
     if not user_session.logged_in():
         flash("You're not logged in!")
         return redirect(url_for('posts'))
@@ -250,6 +256,7 @@ def postpage(postid):
 @app.route('/posts/edittype/<typeid>')
 def postedit_type(typeid):
     ''' returns an editor page, of type typeid '''
+
     editor = post_types.load(typeid)
 
     return render_template('post_type_container.html',

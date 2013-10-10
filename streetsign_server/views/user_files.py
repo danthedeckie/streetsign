@@ -67,7 +67,8 @@ def make_dirlist(path):
                     url_for('thumbnail', filename=path + name),
                     name)
             else:
-                thumb=''
+                thumb = ''
+
             return_list.append(
                 { 'name': name,
                  'thumb': thumb,
@@ -78,9 +79,11 @@ def make_dirlist(path):
 @app.route('/user_files/', methods=['GET','POST'])
 @app.route('/user_files/<path:dirname>', methods=['GET','POST'])
 def user_files_list(dirname=""):
+    ''' HTML list of user-uploaded files. '''
+
     user = user_session.get_user()
 
-    full_path = pathjoin(g.site_vars['user_dir'],dirname)
+    full_path = pathjoin(g.site_vars['user_dir'], dirname)
 
     if not isdir(full_path):
         makedirs(full_path)
@@ -110,6 +113,9 @@ def user_files_list(dirname=""):
 
 @app.route('/thumbnail/<path:filename>')
 def thumbnail(filename):
+    ''' return a thumbnail of an (image) file.  if one doesn't exist,
+        create one (with imagemagick(convert)) '''
+
     full_path = pathjoin(g.site_vars['user_dir'], filename)
     thumb_path = pathjoin(g.site_vars['user_dir'], '.thumbnails', filename)
 
