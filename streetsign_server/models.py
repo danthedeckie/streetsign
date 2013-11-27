@@ -41,6 +41,13 @@ __all__ = [ 'DB', 'user_login', 'user_logout', 'get_logged_in_user',
             'ConfigVar', 'Screen',
             'create_all', 'by_id' ]
 
+def safe_json_load(text, default):
+    ''' either parse a string from JSON into python or else return default. '''
+    try:
+        return json.loads(text)
+    except:
+        return default
+
 
 class DBModel(Model):
     ''' base class '''
@@ -465,7 +472,7 @@ class Post(DBModel):
             then wrap it in Markup(), so jinja2 doesn't escape it. '''
 
         # TODO: split this out to the various post_type modules, and cache it.
-        content = json.loads(self.content)['content']
+        content = safe_json_load((self.content)['content'], {})
         if (self.type=='html'):
             return strip_tags(content[0:14]) + '...(' + self.type + ')'
         elif (self.type=='text'):
@@ -482,8 +489,8 @@ class Post(DBModel):
         return (
             { 'id': self.id,
               'type': self.type,
-              'content': json.loads(self.content),
-              'time_restrictions': json.loads(self.time_restrictions),
+              'content': safe_json_load(self.content, {}),
+              'time_restrictions': safe_json_load(self.time_restrictions, []),
               'time_restrictions_show': self.time_restrictions_show,
               'display_time': self.display_time * 1000 # in milliseconds
             })

@@ -23,6 +23,8 @@
 {{ linkmacros.static_js('lib/jquery-migrate-1.0.0.js') }}
 {{ linkmacros.static_js('lib/jquery.anytime/anytime.js') }}
 {{ linkmacros.static_js('lib/colorpicker/bgrins-spectrum-2c2010c/spectrum.js') }}
+{{ linkmacros.static_js('lib/wysihtml5/parser_rules/advanced.js') }}
+{{ linkmacros.static_js('lib/wysihtml5/dist/wysihtml5-0.3.0.js') }}
 {{ linkmacros.static_js('post_times_editor.js') }}
 <script type="text/javascript">
 var viewTimesModel = new TimesModel({{ post.time_restrictions |safe }} );

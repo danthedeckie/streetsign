@@ -7,6 +7,7 @@
     {% block htmlhead %}
         {{ linkmacros.static_css('lib/chosen/chosen.min.css') }}
         {{ linkmacros.static_css('style.css') }}
+        {{ linkmacros.static_js('lib/jquery.js') }}
     {% endblock %}
   </head>
 <body>
@@ -69,7 +70,6 @@ This project released under the <a href="https://www.gnu.org/licenses/gpl.html">
 </div>
 {% block end_of_page_javascript %}
   <!-- jquery, ga, whatever goes here. -->
-  {{ linkmacros.static_js('lib/jquery.js') }}
   {{ linkmacros.static_js('lib/knockout-2.2.1.js') }}
   {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
   {{ linkmacros.static_js('main.js') }}

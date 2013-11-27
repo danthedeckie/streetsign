@@ -1,9 +1,20 @@
 <div class="cf"></div>
 <label>Contents: (rich text/HTML) </label><br/>
-<label>Text Color:<input type="color" name="color" value="{{color}}"/></label>
-<textarea name="content" rows="10" cols="80" style="width: 100%;">{{content}}</textarea>
+<label>Default Color:<input type="color" name="color" value="{{color}}"/></label>
+<div id="content-toolbar" style="display:none;">
+  <a data-wysihtml5-command="bold"><b>B</b></a>
+  <a data-wysihtml5-command="italic"><i>i</i></a>
+</div>
+
+<textarea id="contenttextarea" name="content" rows="10" cols="80" style="width: 100%;">{{content}}</textarea>
 <script type="text/javascript" defer>
-$('input[type=color]').spectrum({
-   clickoutFiresChange: true
+$( function() {
+    $('input[type=color]').spectrum({
+       clickoutFiresChange: true
+    });
+    var editor = new wysihtml5.Editor("contenttextarea",
+        { toolbar: "content-toolbar",
+        parserRules: wysihtml5ParserRules
+        });
 });
 </script>
