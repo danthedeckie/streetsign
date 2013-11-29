@@ -37,19 +37,19 @@
   <div class="collapse navbar-collapse">
     {% block nav %}
     <ul class="nav navbar-nav">
-        {% macro navitem(view, text) -%}
-            <li><a href="{{ url_for(view) }}">{{text}}</a></li>
+        {% macro navitem(view, text, icon) -%}
+            <li><a href="{{ url_for(view) }}"><span class="glyphicon glyphicon-{{icon}}"></span> {{text}}</a></li>
         {%- endmacro %}
 
         {% if session.display_admin_stuff %}
-            {{ navitem('users',  'Users') }}
-            {{ navitem('groups', 'Groups') }}
-            {{ navitem('user_files_list', 'Uploaded Files') }}
+            {{ navitem('users',  'Users', 'user') }}
+            {{ navitem('groups', 'Groups', 'tower') }}
+            {{ navitem('user_files_list', 'Uploaded Files', 'picture') }}
         {% endif %}
 
-        {{ navitem('feeds',  'Feeds') }}
-        {{ navitem('posts',  'All Posts') }}
-        {{ navitem('screens', 'Screens') }}
+        {{ navitem('feeds',  'Feeds', 'list') }}
+        {{ navitem('posts',  'All Posts', 'list-alt') }}
+        {{ navitem('screens', 'Screens', 'credit-card') }}
     </ul>
     {% endblock %}
 
@@ -64,7 +64,7 @@
           <li>
             <form action="{{ url_for('logout') }}" method="POST" class="form-inline">
                 <input type="hidden" name="from" value="{{ request.endpoint }}" />
-                <input class="menuitem btn" type="submit" value="Log out">
+                <input class="menuitem btn btn-block" type="submit" value="Log out">
             </form>
           </li>
         </ul>
