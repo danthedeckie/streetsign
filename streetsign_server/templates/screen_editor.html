@@ -62,13 +62,14 @@
     <h3 class="panel-title">Zones:</h3> <button data-bind="click: addZone" class="btn btn-primary">New Zone</button>
 </div>
 <div class="panel-body">
-<ul data-bind="foreach: zones" class="itemlist list_no_bullets">
-  <li class="well">
-    <input name="urlname" data-bind="value: name"
-           placeholder="zone name" style="width: 70%; float: left;"
-           class="form-control" />
-    <button style="float:right" data-bind="click:$root.removeZone " class="delbutton">X</button>
-    <div class="cf"></div>
+<!-- ko foreach: zones -->
+  <div class="panel panel-default">
+    <div class="panel-heading">
+    <input name="urlname" data-bind="value: name" style="width: 80%"
+           placeholder="zone name" class="form-control" />
+    <button data-bind="click:$root.removeZone " class="delbutton pull-right">X</button>
+    </div>
+    <div class="panel-body">
     <label>Feeds:
         <select multiple autocomplete="off" class="form-control"
                 data-bind="options: AVAILABLE_FEEDS, optionsText:'name',
@@ -92,8 +93,8 @@
   <label>CSS:
       <textarea name="css" data-bind="value: css" class="form-control"></textarea></label>
   </div>
-  </li>
-</ul>
+  </div>
+  <!-- /ko -->
 <br/>
 </div>
 </div>
