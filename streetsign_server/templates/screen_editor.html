@@ -65,38 +65,46 @@
 <!-- ko foreach: zones -->
   <div class="panel panel-default">
     <div class="panel-heading">
-    <input name="urlname" data-bind="value: name" style="width: 80%"
+      <input name="urlname" data-bind="value: name" style="width: 80%"
            placeholder="zone name" class="form-control" />
-    <button data-bind="click:$root.removeZone " class="delbutton pull-right">X</button>
+      <button data-bind="click:$root.removeZone " class="delbutton pull-right">X</button>
     </div>
     <div class="panel-body">
-    <label>Feeds:
+      <label>Feeds:
         <select multiple autocomplete="off" class="form-control"
                 data-bind="options: AVAILABLE_FEEDS, optionsText:'name',
                            optionsValue: 'id', selectedOptions: feeds" >
         </select>
-    </label>
-    <hr/>
-    <label>Size:</label>
-    <div class="sizes_box" style="margin:auto;background:#777;border-radius:90px">
-        <input data-bind="value: top" placeholder="top" /><br/>
-        <input data-bind="value: left" placeholder="left" />-<input data-bind="value:right" placeholder="right" /><br/>
-        <input data-bind="value: bottom" placeholder="bottom" /><br/>
+      </label>
+      <hr/>
+      <label>Size:</label>
+      <div class="sizes_box" style="margin:auto;background:#777;border-radius:90px">
+          <input data-bind="value: top" placeholder="top" /><br/>
+          <input data-bind="value: left" placeholder="left" />-<input data-bind="value:right" placeholder="right" /><br/>
+          <input data-bind="value: bottom" placeholder="bottom" /><br/>
+      </div>
+      <hr/>
+      <div class="cf"></div>
+    <div>
+      <label>Zone type:</label>
+        <select class="form-control" data-bind="options: ZONE_TYPES, 
+                optionsText:'name', optionsValue:'id',selectedOptions: type"></select>
+      <br/>
+      <label>Fade time:</label>
+        <input type="number" data-bind="value: fadetime"
+               style="width: 3em" class="form-control" />
+      <br/>
+      <label>Default Text Color:
+        <input type="color" data-bind="value: color" class="form-control" />
+      </label>
+      <br/>
+      <label>CSS:
+        <textarea name="css" data-bind="value: css" class="form-control"></textarea>
+      </label>
     </div>
-    <hr/>
-    <div class="cf"></div>
-  <div>
-<label>Zone type:</label><select class="form-control" data-bind="options: ZONE_TYPES,  optionsText:'name', optionsValue:'id',selectedOptions: type"></select></br>
-  <label>Fade time:<input type="number" data-bind="value: fadetime" style="width: 3em" class="form-control" /></label>
-  </br/>
-  <label>Default Text Color:<input type="color" data-bind="value: color" class="form-control" /></label><br/>
-  <label>CSS:
-      <textarea name="css" data-bind="value: css" class="form-control"></textarea></label>
   </div>
-  </div>
-  <!-- /ko -->
-<br/>
 </div>
+<!-- /ko -->
 </div>
 </div>
 <div class="cf"></div>
