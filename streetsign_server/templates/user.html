@@ -1,79 +1,121 @@
 {% extends "index.html" %}
 
 {% block body %}
-<div class="leftside">
-    <h1> User Details: </h1>
-    <form method="POST">
-    <input type="hidden" name="action" value="update" />
-    <table>
-    <tbody>
-    <tr>
-      <td><label>login name:</label></td>
-      <td><input name="loginname" locked value="{{user.loginname}}" /></td>
-    </tr><tr>
-      <td><label>Displayed name:</label></td>
-      <td><input name="displayname" value="{{user.displayname}}" /></td>
-    </tr><tr>
-      <td><label>Email address:</lable></td>
-      <td><input name="emailaddress" value="{{user.emailaddress}}" /></td>
-    </tr><tr>
-      <td><label>Is admin?</lable></td>
-      <td>
+<form method="POST" role="form">
+<input class="form-control" type="hidden" name="action" value="update" />
+
+<div class="col-md-8">
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h2 class="panel-title"> User Details: </h2>
+  </div>
+  <div class="panel-body form-horizontal">
+    <div class="form-group">
+      <label class="col-sm-2 control-label">login name:</label>
+      <div class="col-sm-10">
+        <input class="form-control" name="loginname" value="{{user.loginname}}" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Displayed name:</label>
+      <div class="col-sm-10">
+        <input class="form-control" name="displayname" value="{{user.displayname}}" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Email address:</label>
+      <div class="col-sm-10">
+        <input class="form-control" name="emailaddress" value="{{user.emailaddress}}" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Is admin?</label>
+
+      <div class="col-sm-10">
       {% if session.display_admin_stuff and session.username != user.loginname %}
-        <input type="checkbox" name="is_admin" {{'checked' if user.is_admin }}/>
+        <input class="form-control" type="checkbox" name="is_admin" {{'checked' if user.is_admin }}/>
       {% else %}
+        <p class="form-control-static">
         {{ 'Yes' if user.is_admin else 'no' }}
         {{ '(you!)' if session.username == user.loginname }}
+        </p>
       {% endif %}
-      </td>
-    </tbody>
-    </table>
+      </div>
+    </div>
+  </div>
 </div>
+</div>
+
 {% if session.display_admin_stuff or session.userid == user.id %}
-<div class="rightside">
-    <h2> Change Password:</h2>
-    <table>
-    </tbody>
-    <tr>
-      <td><label><b>Your</b> current Password:</label></td>
-      <td><input name="currpass" type="password" /></td>
-    </tr>
-    <tr>
-      <td><label>New Password:</label></td>
-      <td><input name="newpass" type="password" /></td>
-    </tr>
-    <tr>
-      <td><label>Confirm new Password:</label></td>
-      <td><input name="conf_newpass" type="password" /></td>
-    </tr>
-    </tbody>
-    </table>
+<div class="col-md-4"><div class="panel panel-default">
+  <div class="panel-heading">
+    <h2 class="panel-title"> Change Password:</h2>
+  </div>
+  <div class="panel-body form">
+    <div class="form-group">
+      <label class="control-label"><b>Your</b> current Password:</label>
+      <div class="col-sm-10">
+<input class="form-control" name="currpass" type="password" />
 </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label">New Password:</label>
+      <div class="col-sm-10">
+<input class="form-control" name="newpass" type="password" />
+</div>
+    </div>
+    <div class="form-group">
+      <label class="control-label">Confirm new Password:</label>
+      <div class="col-sm-10">
+<input class="form-control" name="conf_newpass" type="password" />
+</div>
+    </div>
+  </div>
+</div></div>
 {% endif %}
+
 <div class="cf">
-<input style="float:right" type="submit" value="Save" />
+<input class="btn btn-primary" style="float:right" type="submit" value="Save" />
 </div><hr/>
 
-<div class="leftside">
-<h2> Feeds: </h2>
-<ul class="list">
-    {% for f in user.writeable_feeds() %}
-        <li>{{ linkmacros.feed(f) }}</li>
+<div class="col-md-6">
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h2 class="panel-title"> Feeds: </h2>
+  </div>
+  <div class="panel-body">
+    <ul class="list">
+        {% for f in user.writeable_feeds() %}
+            <li>{{ linkmacros.feed(f) }}</li>
+        {% endfor %}
+    </ul>
+  </div>
+</div></div>
+
+<div class="col-md-6">
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title"> Recent Posts: </h2>
+    </div>
+    <div class="panel-body">
+    <ul class="list">
+    {% for post in posts %}
+        <li>{{ linkmacros.post(post) }}</li>
     {% endfor %}
-</ul>
-</div>
-<div class="rightside">
-<h2> Recent Posts: </h2>
-<ul class="list">
-{% for post in posts %}
-    <li>{{ linkmacros.post(post) }}</li>
-{% endfor %}
-</ul>
-</div>
+    </ul>
+    </div>
+</div></div>
+
 <div class="cf"></div>
-<input style="float:right" type="submit" value="Save" />
+<input class="btn btn-primary" style="float:right" type="submit" value="Save" />
 <hr/>
-<h2>Groups:</h2>
+<div class="panel panel-default">
+<div class="panel-heading">
+<h2 class="panel-title">Groups:</h2>
+</div>
+<div class="panel-body">
 {% if session.display_admin_stuff %}
     {{ widgets.groupselect('groups', allgroups, user.groups()) }}
 {% else %}
@@ -83,6 +125,10 @@
     {% endfor %}
     </ul>
 {% endif %}
-<input type="submit" value="Save Changes." />
+</div>
+<div class="panel-footer">
+<input class="btn btn-primary" type="submit" value="Save Changes." />
+</div>
+</div>
 </form>
 {% endblock %}

@@ -2,15 +2,16 @@
 {% block title %} Users {% endblock %}
 
 {% block body %}
-<table>
+
+<table class="table table-striped">
 <thead>
 <tr>
-<td>Display Name</td>
-<td>login name</td>
-<td>Email</td>
-<td>
-<a href="{{url_for('user',userid=-1)}}" class="newbutton">New</a>
-</td>
+<th>Display Name</th>
+<th>login name</th>
+<th>Email</th>
+<th>
+<a href="{{url_for('user',userid=-1)}}" class="btn btn-primary">New</a>
+</th>
 </tr>
 </thead>
 <tbody>
@@ -25,7 +26,7 @@
           {% if user.loginname != session.username %}
           <form action="{{ url_for('user',userid=user.id) }}" method="POST">
           <input type="hidden" name="action" value="delete" />
-          <input type="submit" class="delbutton confirm_delete" value="X"/>
+          <input type="submit" class="btn btn-danger btn-sm confirm_delete" value="&times;"/>
           </form>
           {% endif %}
         {% endif %}</td>

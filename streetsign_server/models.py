@@ -472,7 +472,7 @@ class Post(DBModel):
             then wrap it in Markup(), so jinja2 doesn't escape it. '''
 
         # TODO: split this out to the various post_type modules, and cache it.
-        content = safe_json_load((self.content)['content'], {})
+        content = safe_json_load(self.content, {'content':'None'})['content']
         if (self.type=='html'):
             return strip_tags(content[0:14]) + '...(' + self.type + ')'
         elif (self.type=='text'):

@@ -29,7 +29,11 @@
     <hr/>
 {% endif %}
 
-<h2>Post Lifetime:</h2>
+<div class="panel panel-default">
+    <div class="panel-heading"
+        <h2 class="panel-title">Post Lifetime:</h2>
+    </div>
+    <div class="panel-body">
 
     <label>Start: <input type="text" name="active_start" id="active_start"
                    {{ enabled_if(can_write) }} value="{{ post.active_start }}"></label>
@@ -39,13 +43,18 @@
     <label>How many seconds to show for at one time?
                 <input type="number" name="displaytime" data-min="1" data-max="500"
                        value="{{ post.display_time }}" /></label>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading"
+        <h3 class="panel-title">Time restrictions:</h3>
+    </div>
+    <div class="panel-body">
 
-<h3>Time restrictions:</h3>
-
-<table style="min-width:80%">
+<table style="min-width:80%" class="table table-striped">
 <thead>
   <tr>
-    <td colspan=4 style="text-align: right">
+    <th colspan=4 style="text-align: right">
         <label>Do NOT show during the following times:
             <input type="radio" name="times_mode" value="do_not_show"
                    {{ 'checked' if not post.time_restrictions_show }} /></label><br/>
@@ -53,15 +62,15 @@
             <input type="radio" name="times_mode" value="only_show"
                    {{ 'checked' if post.time_restrictions_show }}/></label><br/>
 
-    </td>
+    </th>
   </tr>
 <tr>
- <td>Start</td>
- <td>End</td>
- <td>Why? (optional)</td>
- <td>{% if can_write %}<a class="newbutton" href="#"
+ <th>Start</th>
+ <th>End</th>
+ <th>Why? (optional)</th>
+ <th>{% if can_write %}<a class="btn btn-primary" href="#"
                           data-bind="click: $root.addTime">New</a>
-     {% endif %}</td>
+     {% endif %}</th>
 </tr>
 </head>
 <tbody data-bind="foreach: times">
@@ -77,6 +86,9 @@
 </table>
 <input type="hidden" name="time_restrictions_json" data-bind="value: ko.toJSON($root.times)" />
 <!--<input style="width: 80%; height: 90px" data-bind="value: ko.toJSON($root.times)"/>-->
+</div>
+</div>
+
 
 {% if feedlist %}
     {% if can_write %}

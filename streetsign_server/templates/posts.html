@@ -3,14 +3,14 @@
 
 {% block body %}
 <h2>All Posts</h2>
-<table>
+<table class="table table-striped">
 <thead>
 <tr>
-<td>Type</td>
-<td>Content</td>
-<td>Author</td>
-<td>Feeds</td>
-<td> {% if session.display_admin_stuff %}<a class="newbutton" href="{{ url_for('post_new') }}">New</a>{% endif %} </td>
+<th>Type</th>
+<th>Content</th>
+<th>Author</th>
+<th>Feeds</th>
+<th> {% if session.display_admin_stuff %}<a class="btn btn-primary" href="{{ url_for('post_new') }}">New</a>{% endif %} </th>
 </tr>
 </thead>
 <tbody>

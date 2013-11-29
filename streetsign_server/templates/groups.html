@@ -2,12 +2,12 @@
 {% block title %} User Group list {% endblock %}
 
 {% block body %}
-<table>
+<table class="table table-striped">
 <thead>
 <tr>
-<td>Group Name</td>
-<td>Members</td>
-<td></td>
+<th>Group Name</th>
+<th>Members</th>
+<th></th>
 </tr>
 </thead>
 <tbody>
@@ -18,20 +18,28 @@
         <td>{% if session.display_admin_stuff %}
         <form action="{{ url_for('group',groupid=group.id) }}" method="POST">
         <input type="hidden" name="action" value="delete" />
-        <input type="submit" class="delbutton confirm_delete" value="X" />
+        <input type="submit" class="btn btn-sm btn-danger confirm_delete" value="&times;" />
         </form>
         {% endif %}</td>
     </tr>
 {% endfor %}
 </tbody>
 </table>
+
 {% if session.display_admin_stuff %}
-<div class="centerbox">
-    <form action="{{ url_for('groups') }}" method="POST">
-    <h2> New Group </h2>
-    <label>Name:<input name="name" placeholder="new group name..."/></label>
-    <input type="submit" value="Create!" class="newbutton"/>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h2 class="panel-title"> New Group </h2>
+  </div>
+  <div class="panel-body">
+    <form action="{{ url_for('groups') }}" method="POST" class="form-inline" role="form">
+    <div class="form-group">
+        <label class="form-label sr-only">Name:</label>
+        <input name="name" placeholder="new group name..." class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Create!</button>
     </form>
+  </div>
 </div>
 {% endif %}
 

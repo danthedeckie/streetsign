@@ -32,6 +32,7 @@ def login(username, password):
 
     user, sessionid = user_login(username, password)
     session['username'] = user.loginname
+    session['userid'] = user.id
     # note: this is *potentially* less secure. Always confirm against
     #       real user data before accepting any values:
     session['display_admin_stuff'] = user.is_admin

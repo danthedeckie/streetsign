@@ -7,9 +7,14 @@
 {% block body %}
 
 <form id="screen_form" method="post">
- <input type="submit" id="save_btn" value="Save" style="float: left;"/>
-  <div class="leftside">
-    <h2>Screen ID:{{ screen.id }}</h2>
+ <input type="submit" id="save_btn" value="Save" style="float: right;"/>
+
+<div class="col-md-6">
+  <div class="panel panel-default">
+  <div class="panel-heading">
+    <h2 class="panel-title">Screen ID:{{ screen.id }}</h2>
+  </div>
+  <div class="panel-body">
         <label>Name<input type="text" name="urlname" value="{{ screen.urlname }}" /></label>
         <label style="display:block; width: 40%;">Background:
             <select  name="background" id="background" autocomplete="off" class="chosen">
@@ -26,13 +31,16 @@
       <textarea name="css" data-bind="value: css" style="width: 100%"></textarea>
       <!-- where the actual saved data happens -->
       <input type="hidden" name="zones" data-bind="value: ko.mapping.toJSON(zones)"/>
-
   </div>
+  </div>
+</div>
+</div>
+
 <div class="cf"></div>
 <hr/>
-
 </form>
-<div class="rightside fake_screen_container">
+
+<div class="col-md-5 fake_screen_container">
 
     <div id="my_fake_screen" class="fake_screen">
     <!-- ko foreach: zones -->
@@ -48,15 +56,21 @@
 
 </div>
 
-<div id="zones_container">
-    <h3>Zones:<button data-bind="click: addZone" class="newbutton">New Zone</button></h3>
+<div class="col-md-6">
+<div id="zones_container" class="panel panel-default">
+<div class="panel-heading">
+    <h3 class="panel-title">Zones:</h3> <button data-bind="click: addZone" class="btn btn-primary">New Zone</button>
+</div>
+<div class="panel-body">
 <ul data-bind="foreach: zones" class="itemlist list_no_bullets">
-  <li>
-    <input name="urlname" data-bind="value: name" placeholder="zone name" style="width: 70%; float: left;"/>
+  <li class="well">
+    <input name="urlname" data-bind="value: name"
+           placeholder="zone name" style="width: 70%; float: left;"
+           class="form-control" />
     <button style="float:right" data-bind="click:$root.removeZone " class="delbutton">X</button>
     <div class="cf"></div>
     <label>Feeds:
-        <select multiple autocomplete="off"
+        <select multiple autocomplete="off" class="form-control"
                 data-bind="options: AVAILABLE_FEEDS, optionsText:'name',
                            optionsValue: 'id', selectedOptions: feeds" >
         </select>
@@ -71,17 +85,18 @@
     <hr/>
     <div class="cf"></div>
   <div>
-<label>Zone type:</label><select data-bind="options: ZONE_TYPES,  optionsText:'name', optionsValue:'id',selectedOptions: type"></select></br>
-  <label>Fade time:<input type="number" data-bind="value: fadetime" style="width: 3em" /></label>
+<label>Zone type:</label><select class="form-control" data-bind="options: ZONE_TYPES,  optionsText:'name', optionsValue:'id',selectedOptions: type"></select></br>
+  <label>Fade time:<input type="number" data-bind="value: fadetime" style="width: 3em" class="form-control" /></label>
   </br/>
-  <label>Default Text Color:<input type="color" data-bind="value: color" /></label><br/>
+  <label>Default Text Color:<input type="color" data-bind="value: color" class="form-control" /></label><br/>
   <label>CSS:
-      <textarea name="css" data-bind="value: css" ></textarea></label>
+      <textarea name="css" data-bind="value: css" class="form-control"></textarea></label>
   </div>
   </li>
 </ul>
 <br/>
-
+</div>
+</div>
 </div>
 <div class="cf"></div>
 

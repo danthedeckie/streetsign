@@ -3,12 +3,12 @@
 
 {% block body %}
 <pre>{{ dirname }}</pre>
-<table>
+<table class="table table-striped">
 <thead>
   <tr>
-    <td>Filename</td>
-    <td>Size</td>
-    <td></td>
+    <th>Filename</th>
+    <th>Size</th>
+    <th></th>
   </tr>
 </thead>
 <tbody>
@@ -24,12 +24,16 @@
 {% endfor %}
 </tbody>
 </table>
-<div class="centerbox">
-  <form method="POST" enctype="multipart/form-data">
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h2 class="panel-title">Upload new file</h2>
+  </div>
+  <div class="panel-body">
+  <form method="POST" enctype="multipart/form-data" class="form-inline" role="form">
     <input type="hidden" name="action" value="upload" />
-    <h2>Upload new file</h2>
-        <input type="file" name="image_file" id="image_file" accept="image/*" />
-    <input type="submit" value="Upload" class="newbutton" />
+    <input type="file" name="image_file" id="image_file" accept="image/*" class="btn btn-default" />
+    <input type="submit" value="Upload" class="btn btn-primary" />
   </form>
+  </div>
 </div>
 {% endblock %}

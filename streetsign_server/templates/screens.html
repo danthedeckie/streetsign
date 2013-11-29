@@ -2,12 +2,12 @@
 {% block title %} Screens {% endblock %}
 
 {% block body %}
-<table>
+<table class="table table-striped">
 <thead>
   <tr>
-    <td>View URL</td>
-    <td>Feed ID</td>
-    <td>{% if session.display_admin_stuff %}<a href="{{ url_for('screenedit', screenid=-1) }}" class="newbutton">New</a>{% endif %}</td>
+    <th>View URL</th>
+    <th>Feed ID</th>
+    <th>{% if session.display_admin_stuff %}<a href="{{ url_for('screenedit', screenid=-1) }}" class="btn btn-primary">New</a>{% endif %}</th>
   </tr>
 </thead>
 <tbody>

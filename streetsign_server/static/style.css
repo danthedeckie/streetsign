@@ -1,140 +1,7 @@
 /**********************************************************************/
-/* Generic bits and pieces */
-html,body {
-    height: 100%;
-}
 body {
-    font-family: "Deja-Vu Sans",Sans-Serif;
-    /*background-color: #9a9;*/
-    /*background: url('resources/tweed/tweed.png');*/
-    margin: 0;
-    padding: 0;
-    font-weight: 300;
-    /*background: #689;*/
+    padding-top: 70px;
 }
-#allwrapper {
-    min-height: 100%;
-    position: relative;
-}
-h1, h2 {
-    text-align: center;
-    font-weight: 100;
-    color: #333;
-}
-a {
-    color: #fff;
-    font-weight: bold;
-    text-decoration: none;
-}
-a:hover {
-    color: #66e275;
-    text-decoration: underline;
-}
-a:active {
-    color: red;
-}
-
-table {
-    border: 1px solid #aaa;
-    border-radius: 5px;
-    margin: auto;
-}
-tr {
-    background: #eee;
-    color: black;
-}
-tbody > tr:nth-child(odd) {
-    background: #ddd;
-}
-
-td {
-    padding: 4px;
-}
-thead > tr {
-    background: #04346C;
-    color: #eff;
-    font-weight: 600;
-    text-align: center;
-}
-thead > tr > td {
-    padding: 0.5em;
-}
-
-ul.list {
-    border: 1px solid #aaa;
-    padding:0;
-}
-.list li {
-    padding: 0.2em;
-    list-style-type: none;
-    margin: 0;
-    display: block;
-
-}
-.list li:nth-child(odd){
-    background: #ddd;
-}
-/*************************************************************************/
-/* Specific Areas (main stuff, common to all pages.) */
-header {
-    /*width: 100%;*/
-    margin: none;
-    /*background: rgba(10,10,20,0.5);*/
-    background: #04346C;
-    color: #eff;
-    text-align: center;
-    padding: 0.4em;
-    min-height: 50px;
-}
-header h1 {
-    color: #6899D3;
-    display: block;
-    float: left;
-    padding: 0px;
-    margin: 0px;
-}
-
-header a {
-    color: #ddd;
-    font-weight: 100;
-}
-header > nav {
-    display: block;
-    float: left;
-    }
-header > nav > ul {
-    display: block;
-}
-header > nav > ul > li {
-    display: inline;
-    background: rgba(255,255,255,0.1);
-    background: linear-gradient( rgba(255,255,255,0.3), rgba(255,255,255,0.1));
-    font-color: #222;
-    padding: 0.7em;
-    margin: 0px;
-    float: left;
-    border-right: 1px dashed black;
-}
-header > nav > ul > li:hover {
-    background: rgba(255,255,255,0.3);
-}
-
-header > nav > ul > li:first-of-type {
-    border-radius: 10px 0 0 10px;
-}
-header > nav > ul > li:last-of-type {
-    border-radius: 0 10px 10px 0;
-    border-right: none;
-}
-#user_login_button {
-    display: block;
-    float: right;
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 1em;
-}
-
 #flashed_notices {
     position: absolute;
     top: 2em;
@@ -155,6 +22,7 @@ header > nav > ul > li:last-of-type {
 #flashed_notices > li .err {
     background: rgba(8,2,2,0.7);
 }
+
 option.admin {
     font-weight: bold;
     color: #224;
@@ -162,49 +30,15 @@ option.admin {
 option:checked {
     background: #222;
 }
-article {
-    background: #eee;
-    margin: auto;
-    width: 90%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    padding-bottom: 10em;
-}
-article a {
-    color: #333;
-}
-article a:hover {
-    color: #000;
-}
 
-#login_box {
-    display: block;
-    position: absolute;
-    top: 2em;
-    right: 0;
-    border: 2px solid black;
-    background: rgba(0,0,0,0.5);
-    color: white;
-    border-radius: 15px;
-    text-align: center;
-    padding: 1em;
-    display: none;
-    box-shadow: 0 0 25px rgba(255,255,255,0.5);
-}
-#login_box > h2 {
-    display: none;
-}
-input {
-    margin: 0.2em;
-}
 div.footerbox {
     width: 25%;
     border: 1px solid #123;
     padding: 1em;
 }
+
 footer {
     text-shadow: -1px -1px 0px #000;
-    position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
@@ -219,6 +53,7 @@ footer {
 footer a {
    color: #fff;
 }
+
 div.free_blocks {
     display: block;
     padding: 1em;
@@ -230,74 +65,6 @@ div.free_blocks {
 .cf {
     clear:both;
     }
-.autowidth {
-    border: 2px solid #ddd;
-    border-radius: 15px;
-    display: block;
-    margin: auto;
-    width: auto;
-    margin-top: 10px;
-}
-.newbutton {
-    background: linear-gradient(#2e2,#0c0);
-    padding: 0.2em 0.7em;
-    margin: 0.5em;
-    border-radius: 3px;
-    border: 1px solid #0db50d;
-    color: #fff;
-    font-weight: 400;
-    text-shadow: -1px -1px 0px #0db50d;
-}
-.newbutton:hover {
-    background: linear-gradient(#0d0,#0b0);
-    color: #fff;
-}
-.delbutton {
-    background: red;
-    background: linear-gradient(#e22,#c00);
-    color: #faa;
-    font-weight: 800;
-    border-radius: 5px;
-    border: 1px solid #b50d0d;
-    text-shadow: -1px -1px 0px #b50d0d, 1px 1px 0px #e22;
-    /*box-shadow: inset 1px 1px 5px rgba(255,255,255,0.8);*/
-
-}
-.delbutton:hover {
-    background: linear-gradient(#d22, #522);
-}
-
-/*************************************************************************/
-
-.error {
-    font-width: bold;
-    color: white;
-    background-color: red;
-    text-shadow: red 10;
-}
-
-.warning {
-    font-width: bold;
-    color: orange;
-    background-color: black;
-    text-shadow: black 10;
-    padding: 0.2em;
-}
-
-.itemlist {
-    display: block;
-    max-width: 17em;
-    list-style-type: none;
-    padding: 0;
-}
-ul.itemlist > li {
-    background: #ddd;
-    border-radius: 5px;
-    margin: 0.2em;
-    border: 1px solid #aaa;
-    padding: 0.5em;
-    box-shadow: inset 5px 5px 12px #eee, inset -10px -10px 19px #ccc;
-}
 
 div.sizes_box {
     display: block;
@@ -333,62 +100,6 @@ div.sizes_box {
     color: white;
     text-align: center;
 }
-
-.rightside, .leftside {
-    width: 90%;
-    margin: auto;
-    float: none;
-    display: block;
-}
-
-.centerbox {
-    margin: auto;
-    text-align: center;
-    display: block;
-}
-
-@media only screen and (min-width: 500px) {
-    .rightside {
-        /* TODO: only on big enough media screen sizes */
-        max-width: 48%;
-        min-width: 45%;
-        clear: right;
-        float: right;
-    }
-    .leftside {
-        max-width: 48%;
-        min-width: 45%;
-        clear: left;
-        float: left;
-    }
-}
-
-ul.optionrow {
-    display: inline;
-    margin: auto;
-    text-align: center;
-    list-style: none;
-}
-ul.optionrow > li {
-    border: 1px solid #999;
-    display: inline;
-    background: #ddd;
-    background: linear-gradient( #fff,#ddd);
-    box-shadow: inset 2px 2px 2px #fff, inset -2px -2px -2px #777;
-    padding: 0.5em;
-    margin: 0px;
-    list-style: none;
-}
-ul.optionrow > li:hover {
-    background: #aaa;
-}
-
-ul.optionrow > li:first-of-type {
-    border-radius: 10px 0 0 10px;
-}
-ul.optionrow > li:last-of-type {
-    border-radius: 0 10px 10px 0;
-}
 input.half { max-width: 50%; }
 input.third { max-width: 28%;}
 
@@ -421,3 +132,17 @@ tr.time_now:nth-child(odd) {
     font-style: italic;
 }
 
+.delbutton {
+    background: red;
+    background: linear-gradient(#e22,#c00);
+    color: #faa;
+    font-weight: 800;
+    border-radius: 5px;
+    border: 1px solid #b50d0d;
+    text-shadow: -1px -1px 0px #b50d0d, 1px 1px 0px #e22;
+    /*box-shadow: inset 1px 1px 5px rgba(255,255,255,0.8);*/
+
+}
+.delbutton:hover {
+    background: linear-gradient(#d22, #522);
+}

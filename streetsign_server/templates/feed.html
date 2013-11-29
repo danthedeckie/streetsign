@@ -4,13 +4,13 @@
 {% block body %}
 <h1>Feed: {{ feed.name }} </h1>
 <h2>Posts: </h2>
-<table>
+<table class="table table-striped">
 <thead>
   <tr>
-    <td>Post</td>
-    <td>Author</td>
-    <td>Date</td>
-    <td colspan=2>{% if feed.user_can_write(user) %}<a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}" class="newbutton">NEW</a>{% endif %}</td>
+    <th>Post</th>
+    <th>Author</th>
+    <th>Date</th>
+    <th colspan=2>{% if feed.user_can_write(user) %}<a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}" class="newbutton">NEW</a>{% endif %}</th>
   </tr>
 </thead>
 <tbody>
@@ -45,23 +45,35 @@
 <input type="hidden" name="action" value="edit" />
 <div class="autowidth">
 <h2>Permissions for this feed.</h2>
-<div class="free_blocks">
-    <h3>Author Users:</h3>
+<div class="col-md-3"><div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">Author Users:</h3>
+</div>
+<div class="panel-body">
     {{ widgets.userselect("authors", allusers, feed.authors()) }}
 </div>
-<div class="free_blocks">
-    <h3>Publisher Users:</h3>
+</div></div>
+<div class="col-md-3"><div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">Publisher Users:</h3>
+</div>
+<div class="panel-body">
     {{ widgets.userselect("publishers", allusers, feed.publishers()) }}
 </div>
 
-<div class="free_blocks">
-    <h3>Author Groups:</h3>
+</div></div>
+<div class="col-md-3"><div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">Author Groups:</h3>
+</div>
+<div class="panel-body">
     {{ widgets.groupselect("author_groups", allgroups, feed.author_groups()) }}
 </div>
-<div class="free_blocks">
-    <h3>Publisher Groups:</h3>
+</div></div>
+<div class="col-md-3"><div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">Publisher Groups:</h3>
+</div>
+<div class="panel-body">
     {{ widgets.groupselect("publisher_groups", allgroups, feed.publisher_groups()) }}
 </div>
+</div></div>
 <input type="submit" value="Save">
 </form>
 {% else %}

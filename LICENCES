@@ -1,0 +1,36 @@
+The most part of this project (StreetSign Server) is copyright 2013 Daniel Fairhead,
+and is covered by the GNU General Public Licence (GPL), which can be found in the COPYING
+file.
+
+None of this would have been possible without the amazing open source libraries that I've been able to use.  The following are included in the distribution:
+
+jQuery: (for javascript/DOM awesomeness)
+ - MIT Licence. (http://jquery.org/licence)
+
+knockout.js: (for much easier complex UI elements in the admin interface)
+ - MIT Licence. (http://opensource.org/licences/mit-licence.php)
+
+knockout.mapping: (for turning JSON from the server into ko objects)
+ - MIT Licence. (http://opensource.org/licences/mit-licence.php)
+
+jQuery.anytime: (for converting dates and times sensibly)
+ - Creative Commons Attribution-Noncommercial-Share Alike 3.0 Unported Licence
+   (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+
+jQuery.timePicker: (for nice time-select ui widgets)
+ - MIT & GPL
+
+jsoneditor: (for editing json data)
+ - Apache 2.0 Licence
+
+wysihtml5: (simple html5 wysiwyg editor for posts)
+ - MIT Licence
+
+chosen: (even sweeter multiselect widget)
+ - MIT Licence
+
+twitter bootstrap: (easy UI theme for the interface)
+ - Apache Licence (2.0)
+
+All of these can be found in the streetsign_server/static/lib/ folder, with their
+ own copyright notices, and licence information.

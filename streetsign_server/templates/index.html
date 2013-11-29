@@ -4,6 +4,18 @@
 <html>
   <head>
     <title>{% block title %}{{ g.site_vars.site_title }}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap -->
+    {{ linkmacros.static_css('lib/bootstrap/css/bootstrap.min.css')}}
+    {{ linkmacros.static_css('lib/bootstrap/css/bootstrap-theme.css' )}}
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
     {% block htmlhead %}
         {{ linkmacros.static_css('lib/chosen/chosen.min.css') }}
         {{ linkmacros.static_css('style.css') }}
@@ -11,56 +23,98 @@
     {% endblock %}
   </head>
 <body>
-<div id="allwrapper">
-<header>
-  <h1><a href="{{ url_for('index') }}">{{ g.site_vars.site_title }}:{{ display_title }}</a></h1>
-  <nav>
+<div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle Navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{{ url_for('index') }}">{{ g.site_vars.site_title }}:{{ display_title }}</a>
+    </div> <!-- header... -->
+    
+  <div class="collapse navbar-collapse">
     {% block nav %}
-    <ul>
+    <ul class="nav navbar-nav">
         {% macro navitem(view, text) -%}
             <li><a href="{{ url_for(view) }}">{{text}}</a></li>
         {%- endmacro %}
+
         {% if session.display_admin_stuff %}
             {{ navitem('users',  'Users') }}
             {{ navitem('groups', 'Groups') }}
             {{ navitem('user_files_list', 'Uploaded Files') }}
         {% endif %}
+
         {{ navitem('feeds',  'Feeds') }}
         {{ navitem('posts',  'All Posts') }}
         {{ navitem('screens', 'Screens') }}
     </ul>
     {% endblock %}
-  </nav>
-  <a href="#" id="user_login_button">{{ session.username if session.logged_in else 'Login' }}</a>
-  <div class="cf"></div>
-</header>
-<article>
+
+  <ul class="nav navbar-nav navbar-right">
+
+  {% if session.logged_in %}
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> {{session.username}} <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          <li><a href="{{ url_for('user', userid=session.userid) }}">Preferences</a></li>
+          <li class="divider"></li>
+          <li>
+            <form action="{{ url_for('logout') }}" method="POST" class="form-inline">
+                <input type="hidden" name="from" value="{{ request.endpoint }}" />
+                <input class="menuitem btn" type="submit" value="Log out">
+            </form>
+          </li>
+        </ul>
+    </li>
+  {% else %}
+    <li>
+      <button class="btn btn-sm navbar-btn" href="#" id="user_login_button" data-toggle="modal" data-target="#login_box" >Login</button>
+    </li>
+  {% endif %}
+  </ul>
+  </div> <!-- /navbar-collapse -->
+</div> <!-- /navbar -->
+
+<article class="container">
 {% block body %}{% endblock %}
 <div class="cf"></div>
 </article>
+
 <ul id="flashed_notices">
 {% for msg in get_flashed_messages() %}
-  <li>{{ msg }}</li>
+  <li class="alert alert-dismissable">{{ msg }}</li>
 {% endfor %}
 </ul>
-<div id="login_box">
-<a style="padding:0.2em;color:white;float:left"href="#" id="login_box_close" class="delbutton">X</a>
-{% if session.logged_in %}
-    Logged in as {{ session.username }}.
-    <form action="{{ url_for('logout') }}" method="POST">
-        <input type="hidden" name="from" value="{{ request.endpoint }}" />
-        <input type="submit" value="Log out">
-    </form>
-{% else %}
-    <h2>Log in</h2>
-    <form action="{{ url_for('login') }}" method="POST">
-        <input name="username" placeholder="Your user name..." /><br />
-        <input name="password" type="password" placeholder="password" /><br />
-        <input type="hidden" name="from" value="{{ request.endpoint }}" />
-        <input type="submit" value="Log in" />
-    </form>
-{% endif %}
+
+<div id="login_box" class="modal fade"> <div class="modal-dialog"> <div class="modal-content">
+<form action="{{ url_for('login') }}" method="POST">
+<div class="modal-header">
+<h2>Log In</h2>
 </div>
+<div class="modal-body form-horizontal" role="form">
+<!-- <a style="padding:0.2em;color:white;float:left"href="#" id="login_box_close" class="delbutton">X</a>-->
+<div class="form-group">
+<label class="col-sm-2 control-label" for="username">Name:</label>
+    <div class="col-sm-10">
+    <input name="username" placeholder="Your user name..." class="form-control" />
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label" for="password">Password:</label>
+  <div class="col-sm-10">
+    <input name="password" type="password" placeholder="password" class="form-control" /><br />
+    <input type="hidden" name="from" value="{{ request.endpoint }}" />
+  </div>
+</div>
+</div>
+<div class="modal-footer">
+    <input class="btn btn-primary" type="submit" value="Log in" />
+</div>
+</form>
+</div> </div> </div>
 <footer>
 (C) 2013. an <a href="http://omnivision.om.org/">OMNIvision</a> Project.<br/>
 This project released under the <a href="https://www.gnu.org/licenses/gpl.html">GPL</a>.</br>
@@ -70,6 +124,7 @@ This project released under the <a href="https://www.gnu.org/licenses/gpl.html">
 </div>
 {% block end_of_page_javascript %}
   <!-- jquery, ga, whatever goes here. -->
+  {{ linkmacros.static_js('lib/bootstrap/js/bootstrap.js') }}
   {{ linkmacros.static_js('lib/knockout-2.2.1.js') }}
   {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
   {{ linkmacros.static_js('main.js') }}
