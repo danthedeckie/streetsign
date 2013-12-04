@@ -67,9 +67,10 @@ fi
 
 if [[ ! -f "database.db" ]]; then
     echo "no database, so I'll make a default one"
+    $PYTHON -c "import db;db.make()"
+
     echo "the main user is 'admin' and the password is 'password'."
     echo "please change it!"
-    echo "make()" | ./db.py
 fi
 
 echo

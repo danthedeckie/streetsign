@@ -7,4 +7,5 @@ flask-peewee
 py-bcrypt
 passlib
 
-gunicorn
+#gunicorn
+simpleeval
