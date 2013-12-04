@@ -146,3 +146,32 @@ tr.time_now:nth-child(odd) {
 .delbutton:hover {
     background: linear-gradient(#d22, #522);
 }
+
+ul.optionrow {
+    display: inline;
+    margin: auto;
+    text-align: center;
+    list-style: none;
+}
+ul.optionrow > li {
+    border: 1px solid #999;
+    display: inline;
+    background: #ddd;
+    background: linear-gradient( #fff,#ddd);
+    box-shadow: inset 2px 2px 2px #fff, inset -2px -2px -2px #777;
+    padding: 0.5em;
+    margin: 0px;
+    list-style: none;
+}
+ul.optionrow > li:hover {
+    background: #aaa;
+}
+
+ul.optionrow > li:first-of-type {
+    border-radius: 10px 0 0 10px;
+}
+ul.optionrow > li:last-of-type {
+    border-radius: 0 10px 10px 0;
+}
+
+
