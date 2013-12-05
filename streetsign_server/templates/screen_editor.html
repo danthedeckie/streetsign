@@ -7,7 +7,7 @@
 {% block body %}
 
 <form id="screen_form" method="post">
- <input type="submit" id="save_btn" value="Save" style="float: right;"/>
+ <input type="submit" id="save_btn" value="Save" class="btn btn-primary pull-right"/>
 
 <div class="col-md-6">
   <div class="panel panel-default">
@@ -47,7 +47,7 @@
     <div class="fake_zone" data-bind="style: { top: top, left: left, right: right, bottom: bottom, color: color}, text: name"></div>
     <!-- /ko -->
     </div>
-    Aspect Ratio:<select id="aspect">
+    Preview Aspect Ratio:<select id="aspect">
     <option value=1.6>4:3</option>
     <option selected value=1.77777>16:9</option>
     <option value="0.5625">9:16</option>
@@ -65,9 +65,13 @@
 <!-- ko foreach: zones -->
   <div class="panel panel-default">
     <div class="panel-heading">
-      <input name="urlname" data-bind="value: name" style="width: 80%"
+      <div class="input-group">
+      <input name="urlname" data-bind="value: name"
            placeholder="zone name" class="form-control" />
-      <button data-bind="click:$root.removeZone " class="delbutton pull-right">X</button>
+      <span class="input-group-btn">
+      <button data-bind="click:$root.removeZone " class="btn delbutton">&times;</button>
+      </span>
+      </div>
     </div>
     <div class="panel-body">
       <label>Feeds:

@@ -108,7 +108,8 @@ function make_time_observable(t){
 ko.bindingHandlers.timeHandler = {
     init: function(element, valueAccessor) {
         $(element).val(valueAccessor()());
-        $(element).timePicker();
+        //$(element).timePicker();
+        $(element).parent().datetimepicker({pickDate: false});
         $(element).change(function(e){
             valueAccessor()($(element).val());
             //alert('oh');

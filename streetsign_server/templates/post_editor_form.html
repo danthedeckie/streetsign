@@ -42,7 +42,7 @@
                 <input type="text" name="active_start" id="active_start"
                        class="form-control" {{ enabled_if(can_write) }}
                        value="{{ post.active_start }}"
-                       data-format="YYYY-MM-DD hh:mm:ss" />
+                       data-format="YYYY-MM-DD HH:mm:ss" />
                 <span class="input-group-addon">
                 <span class="glyphicon glyphicon-calendar"></span></span>
             </div>
@@ -66,7 +66,7 @@
     <br/>
     <label>How many seconds to show for at one time?
                 <input type="number" name="displaytime" data-min="1" data-max="500"
-                       class="from-control" value="{{ post.display_time }}" /></label>
+                       class="form-control" value="{{ post.display_time }}" /></label>
     </div>
 </div>
 <div class="panel panel-default">
@@ -89,8 +89,8 @@
     </th>
   </tr>
 <tr>
- <th>Start</th>
- <th>End</th>
+ <th class="col-sm-2">Start</th>
+ <th class="col-sm-2">End</th>
  <th>Why? (optional)</th>
  <th>{% if can_write %}<a class="btn btn-primary" href="#"
                           data-bind="click: $root.addTime">New</a>
@@ -99,11 +99,25 @@
 </head>
 <tbody data-bind="foreach: times">
   <tr>
-    <td><input type="time" data-bind="timeHandler: start" /></td>
-    <td><input type="time" data-bind="timeHandler: end" /></td>
-    <td><input data-bind="value: note" /></td>
-    <td>{% if can_write %}<a href="#" class="delbutton"
-                             data-bind="click: $root.removeTime">X</a>
+    <td>
+        <div class="form-group"> <div class="input-group date">
+            <input type="time" data-bind="timeHandler: start" class="form-control"
+                data-format="HH:mm" />
+            <span class="input-group-addon">
+            <span class="glyphicon glyphicon-time"></span></span>
+        </div> </div>
+    </td>
+    <td>
+        <div class="form-group"> <div class="input-group date">
+            <input type="time" data-bind="timeHandler: end" class="form-control"
+                data-format="HH:mm" />
+            <span class="input-group-addon">
+            <span class="glyphicon glyphicon-time"></span></span>
+        </div> </div>
+    </td>
+    <td><input data-bind="value: note" class="form-control" /></td>
+    <td>{% if can_write %}<a href="#" class="btn delbutton"
+                             data-bind="click: $root.removeTime">&times;</a>
         {% endif %}</td>
   </tr>
 </tbody>
