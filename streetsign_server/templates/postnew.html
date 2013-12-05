@@ -1,19 +1,11 @@
-{% extends "index.html" %}
+{% extends "post_editor.html" %}
 
 {% block title %} New Post {% endblock %}
-
-{% block htmlhead %}
-{{ super() }}
-{{ linkmacros.static_css('lib/jquery.timePicker/timePicker.css') }}
-{{ linkmacros.static_css('lib/jquery.anytime/anytime.css') }}
-{{ linkmacros.static_css('lib/colorpicker/bgrins-spectrum-2c2010c/spectrum.css') }}
-{% endblock %}
-
 
 {% block body %}
 <h2>New Post</h2>
 <div style="text-align:center">
-<ul class="optionrow">
+<ul class="nav nav-tabs">
 {%- for type in post_types -%}
   <li><a href='#' data-posttype="{{type.id}}" class="post_type_button">{{ type.name }}</a></li>
 {%- endfor -%}
@@ -26,28 +18,17 @@
 
 {% endblock %}
 
-{% block end_of_page_javascript %}
-    {{ super() }}
-    {{ linkmacros.static_js('post_editor.js') }}
-    {{ linkmacros.static_js('lib/jquery.timePicker/timePicker.js') }}
-    {{ linkmacros.static_js('lib/jquery-migrate-1.0.0.js') }}
-    {{ linkmacros.static_js('lib/jquery.anytime/anytime.js') }}
-    {{ linkmacros.static_js('lib/colorpicker/bgrins-spectrum-2c2010c/spectrum.js') }}
-    {{ linkmacros.static_js('lib/wysihtml5/parser_rules/advanced.js') }}
-    {{ linkmacros.static_js('lib/wysihtml5/dist/wysihtml5-0.3.0.js') }}
-    {{ linkmacros.static_js('post_times_editor.js') }}
-
-    <script type="text/javascript">
+   {% block page_specific_js %}
+   {{ linkmacros.static_js('post_editor.js') }}
+   <script type="text/javascript">
     // As the static js is static, we need in inject URLs here.
-    INITIAL_FEED="?initial_feed={{ initial_feed }}";
-    POST_TYPE_URL=function(id) {
+    var INITIAL_FEED = "?initial_feed={{ initial_feed }}";
+    var POST_TYPE_URL = function(id) {
         var o="{{url_for('postedit_type', typeid='-1')}}";
         return o.replace(/-1/, id)+INITIAL_FEED;
     };
-    var viewTimesModel = new TimesModel([]);
 
-    ko.applyBindings(viewTimesModel);
-
-</script>
-
-{% endblock %}
+    // Used by the TimesModel, initialised in post_editor.html
+    var TIME_RESTRICTIONS=[];
+    </script>
+    {% endblock %}

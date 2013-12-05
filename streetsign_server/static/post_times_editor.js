@@ -33,6 +33,14 @@ function any_time_options(newstuff) {
         newstuff ));
 };
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// Date/time pickers
+
+$('#datetimestart').datetimepicker();
+$('#datetimeend').datetimepicker();
+
+/*
 $('#active_start').AnyTime_picker(
     any_time_options({ lableTitle: 'Start' })
 ).change(function(e) {
@@ -45,6 +53,8 @@ $('#active_start').AnyTime_picker(
 });
 $('#active_end').AnyTime_picker(
     any_time_options({ labelTitle: 'End' }));
+*/
+
 
 $('input[type=number]').blur( function (e) {
     // 'fix' crap lack of type=number support in FF.

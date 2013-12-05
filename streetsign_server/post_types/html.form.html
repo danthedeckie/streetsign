@@ -1,9 +1,10 @@
 <div class="cf"></div>
 <label>Contents: (rich text/HTML) </label><br/>
 <label>Default Color:<input type="color" name="color" value="{{color}}"/></label>
-<div id="content-toolbar" style="display:none;">
-  <a data-wysihtml5-command="bold"><b>B</b></a>
-  <a data-wysihtml5-command="italic"><i>i</i></a>
+
+<div id="content-toolbar" style="display:none;" class="btn-group">
+  <a data-wysihtml5-command="bold" class="btn btn-default"><b>B</b></a>
+  <a data-wysihtml5-command="italic" class="btn btn-default"><i>i</i></a>
 </div>
 
 <textarea id="contenttextarea" name="content" rows="10" cols="80" style="width: 100%;">{{content}}</textarea>

@@ -6,6 +6,7 @@
 {{ linkmacros.static_css('lib/jquery.timePicker/timePicker.css') }}
 {{ linkmacros.static_css('lib/jquery.anytime/anytime.css') }}
 {{ linkmacros.static_css('lib/colorpicker/bgrins-spectrum-2c2010c/spectrum.css') }}
+{{ linkmacros.static_css('lib/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css') }}
 {% endblock %}
 
 {% block body %}
@@ -19,15 +20,27 @@
 
 {% block end_of_page_javascript %}
 {{ super() }}
-{{ linkmacros.static_js('lib/jquery.timePicker/timePicker.js') }}
 {{ linkmacros.static_js('lib/jquery-migrate-1.0.0.js') }}
+{{ linkmacros.static_js('lib/bootstrap-datetimepicker/moment.js') }}
+{{ linkmacros.static_js('lib/bootstrap-datetimepicker/bootstrap-datetimepicker.js') }}
+
+<!--
+{{ linkmacros.static_js('lib/jquery.timePicker/timePicker.js') }}
 {{ linkmacros.static_js('lib/jquery.anytime/anytime.js') }}
+-->
 {{ linkmacros.static_js('lib/colorpicker/bgrins-spectrum-2c2010c/spectrum.js') }}
+
 {{ linkmacros.static_js('lib/wysihtml5/parser_rules/advanced.js') }}
 {{ linkmacros.static_js('lib/wysihtml5/dist/wysihtml5-0.3.0.js') }}
+
 {{ linkmacros.static_js('post_times_editor.js') }}
+{% block page_specific_js %}}
 <script type="text/javascript">
-var viewTimesModel = new TimesModel({{ post.time_restrictions |safe }} );
+var TIME_RESTRICTIONS={{ post.time_restrictions |safe }};
+</script>
+{% endblock %}
+<script type="text/javascript">
+var viewTimesModel = new TimesModel(TIME_RESTRICTIONS);
 
 ko.applyBindings(viewTimesModel);
 </script>
