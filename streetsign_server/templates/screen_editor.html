@@ -6,42 +6,112 @@
 {% block title %}Edit Screen:{{ screen.id }}{% endblock %}
 {% block body %}
 
-<form id="screen_form" method="post">
- <input type="submit" id="save_btn" value="Save" class="btn btn-primary pull-right"/>
-
 <div class="col-md-6">
+<form id="screen_form" method="post">
   <div class="panel panel-default">
-  <div class="panel-heading">
-    <h2 class="panel-title">Screen ID:{{ screen.id }}</h2>
-  </div>
-  <div class="panel-body">
-        <label>Name<input type="text" name="urlname" value="{{ screen.urlname }}" /></label>
-        <label style="display:block; width: 40%;">Background:
-            <select  name="background" id="background" autocomplete="off" class="chosen">
-              {% for bg in backgrounds %}
-                <option {{ 'selected' if bg == screen.background }} value="{{bg}}">{{bg}}</option>
-              {% endfor %}
-            </select>
-        </label><!--
+    <div class="panel-heading">
+      <h2 class="panel-title">Screen ID:{{ screen.id }}
+      <input type="submit" id="save_btn" value="Save"
+             class="btn btn-sm btn-primary pull-right"/>
+      </h2>
+    </div>
+    <div class="panel-body">
+      <div class="col-md-6">
+        <label>Name<input type="text" name="urlname" value="{{ screen.urlname }}" class="form-control" /></label>
+      </div>
+      <div class="col-md-6">
+        <label style="display:block; width: 40%;">Background:</label>
+        <select name="background" id="background" autocomplete="off" class="chosen">
+          {% for bg in backgrounds %}
+            <option {{ 'selected' if bg == screen.background }} value="{{bg}}">{{bg}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="cf"></div>
+    <!--
       <label>Default Text color:
-      <input name="color" data-bind="value: color" type="color"></br>-->
-      Other Settings:<br/>
-      <textarea name="settings" data-bind="value: other_settings" style="width: 100%"></textarea>
-      CSS:<br/>
-      <textarea name="css" data-bind="value: css" style="width: 100%"></textarea>
+      <input name="color" data-bind="value: color" type="color"><br/>-->
+      <div class="col-md-12">
+        <label>Other Settings:</label><br/>
+        <textarea name="settings" data-bind="value: other_settings" class="form-control"></textarea>
+        <label>CSS:</label><br/>
+        <textarea name="css" data-bind="value: css" class="form-control"></textarea>
+      </div>
       <!-- where the actual saved data happens -->
       <input type="hidden" name="zones" data-bind="value: ko.mapping.toJSON(zones)"/>
+    </div> <!-- panel-body -->  
   </div>
-  </div>
-</div>
-</div>
-
-<div class="cf"></div>
-<hr/>
 </form>
 
-<div class="col-md-5 fake_screen_container">
+<div id="zones_container" class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Zones:
+    <span class="pull-right">
+    <button data-bind="click: addZone" class="btn btn-xs btn-primary">New Zone</button>
+    </span>
+    </h3>
+  </div>
+  <div class="panel-body">
+  <!-- ko foreach: zones -->
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="input-group">
+          <input name="urlname" data-bind="value: name"
+                 placeholder="zone name" class="form-control" />
+          <span class="input-group-btn">
+            <button data-bind="click:$root.removeZone " class="btn delbutton">&times;</button>
+          </span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="col-md-12">
+            <label>Feeds:</label>
+            <select multiple autocomplete="off" class="form-control"
+                    data-bind="options: AVAILABLE_FEEDS, optionsText:'name',
+                               optionsValue: 'id', selectedOptions: feeds" >
+            </select>
+        </div>
+        <div class="col-md-6">
+          <label>Zone type:</label>
+          <select class="form-control" data-bind="options: ZONE_TYPES, 
+              optionsText:'name', optionsValue:'id',selectedOptions: type"></select>
+        </div>
+        <div class="col-md-6">
+          <label>Fade time:</label>
+          <div class="input-group">
+            <input type="number" data-bind="value: fadetime"
+                   class="form-control" />
+            <span class="input-group-addon">msec</span>
+          </div>
+        </div>
 
+        <div class="col-md-6">
+          <label>Default Text Color:</label>
+            <input type="color" data-bind="value: color" class="form-control" />
+          <br/>
+          <label>Other CSS:</label>
+            <textarea name="css" data-bind="value: css" class="form-control"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label>Size:</label>
+          <div class="sizes_box" style="margin:auto;background:#777;border-radius:90px">
+            <input data-bind="value: top" placeholder="top" /><br/>
+            <input data-bind="value: left" placeholder="left" />-<input data-bind="value:right" placeholder="right" /><br/>
+            <input data-bind="value: bottom" placeholder="bottom" /><br/>
+          </div>
+        </div>
+
+      </div> <!-- (zone) /panel-body --> 
+    </div> <!-- (zone) /panel -->
+  <!-- /ko -->
+  </div> <!-- (zones-container) /panel-body -->
+</div> <!-- (zones-container) /panel -->
+
+</div> <!-- col-md-6 -->
+
+<div class="col-md-6">
+  <h2>Preview</h2>
+  <div class="well" data-spy="affix" data-offset-top="30" data-offset-bottom="30">
     <div id="my_fake_screen" class="fake_screen">
     <!-- ko foreach: zones -->
     <div class="fake_zone" data-bind="style: { top: top, left: left, right: right, bottom: bottom, color: color}, text: name"></div>
@@ -53,66 +123,8 @@
     <option value="0.5625">9:16</option>
     </select>
     <!--<textarea style="float: right;clear:right; width: 100%; height: 100px" data-bind="value: ko.mapping.toJSON($root, null, 2)"></textarea>-->
-
-</div>
-
-<div class="col-md-6">
-<div id="zones_container" class="panel panel-default">
-<div class="panel-heading">
-    <h3 class="panel-title">Zones:</h3> <button data-bind="click: addZone" class="btn btn-primary">New Zone</button>
-</div>
-<div class="panel-body">
-<!-- ko foreach: zones -->
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <div class="input-group">
-      <input name="urlname" data-bind="value: name"
-           placeholder="zone name" class="form-control" />
-      <span class="input-group-btn">
-      <button data-bind="click:$root.removeZone " class="btn delbutton">&times;</button>
-      </span>
-      </div>
-    </div>
-    <div class="panel-body">
-      <label>Feeds:
-        <select multiple autocomplete="off" class="form-control"
-                data-bind="options: AVAILABLE_FEEDS, optionsText:'name',
-                           optionsValue: 'id', selectedOptions: feeds" >
-        </select>
-      </label>
-      <hr/>
-      <label>Size:</label>
-      <div class="sizes_box" style="margin:auto;background:#777;border-radius:90px">
-          <input data-bind="value: top" placeholder="top" /><br/>
-          <input data-bind="value: left" placeholder="left" />-<input data-bind="value:right" placeholder="right" /><br/>
-          <input data-bind="value: bottom" placeholder="bottom" /><br/>
-      </div>
-      <hr/>
-      <div class="cf"></div>
-    <div>
-      <label>Zone type:</label>
-        <select class="form-control" data-bind="options: ZONE_TYPES, 
-                optionsText:'name', optionsValue:'id',selectedOptions: type"></select>
-      <br/>
-      <label>Fade time:</label>
-        <input type="number" data-bind="value: fadetime"
-               style="width: 3em" class="form-control" />
-      <br/>
-      <label>Default Text Color:
-        <input type="color" data-bind="value: color" class="form-control" />
-      </label>
-      <br/>
-      <label>CSS:
-        <textarea name="css" data-bind="value: css" class="form-control"></textarea>
-      </label>
-    </div>
-  </div>
-</div>
-<!-- /ko -->
 </div>
 </div>
-<div class="cf"></div>
-
 
 {% endblock %}
 
@@ -138,8 +150,6 @@ var viewScreenModel = new ScreenModel(BG, SETTINGS, CSS, ZONES);
 //ko.mapping.fromJS(ZONES, [], viewZonesModel.zones);
 //ko.mapping.fromJS(AVAILABLE_FEEDS, [], viewZonesModel.availableFeeds);
 ko.applyBindings(viewScreenModel);
-
-
 
 $('#background').change(function(){
     var newbg="url(/static/user_files/" + $('#background').val() + ')';

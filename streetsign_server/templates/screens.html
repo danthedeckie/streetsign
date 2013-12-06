@@ -6,7 +6,7 @@
 <thead>
   <tr>
     <th>View URL</th>
-    <th>Feed ID</th>
+    <th>Actions</th>
     <th>{% if session.display_admin_stuff %}<a href="{{ url_for('screenedit', screenid=-1) }}" class="btn btn-primary">New</a>{% endif %}</th>
   </tr>
 </thead>
@@ -14,10 +14,10 @@
 {% for s in screens %}
     <tr>
         <td><a href="{{url_for('screendisplay', template='basic', screenname=s.urlname)}}">{{url_for('screendisplay', template='basic', screenname=s.urlname)}}</a>
-        <td><a href="{{url_for('screendisplay', template='basic', screenname=s.urlname)}}">View</a>{% if session.display_admin_stuff %} - <a href="{{url_for('screenedit', screenid=s.id)}}">Edit</a>{% endif %}</td>
+        <td><a href="{{url_for('screendisplay', template='basic', screenname=s.urlname)}}" class="btn btn-sm btn-default">View</a>{% if session.display_admin_stuff %} - <a href="{{url_for('screenedit', screenid=s.id)}}" class="btn btn-sm btn-default" >Edit</a>{% endif %}</td>
         <td>{% if session.display_admin_stuff %}<form method="POST" action="{{ url_for('screenedit', screenid=s.id) }}">
             <input type="hidden" name="action" value="delete" />
-            <input type="submit" value="X" class="delbutton confirm_delete"></form>{% endif %}</td>
+            <input type="submit" value="&times; Delete" class="btn btn-sm delbutton confirm_delete"></form>{% endif %}</td>
     </tr>
 {% endfor %}
 </tbody>
