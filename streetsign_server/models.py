@@ -28,7 +28,11 @@ import sqlite3 # for catching an integrity error
 from passlib.hash import bcrypt # pylint: disable=no-name-in-module
 from uuid import uuid4 # for unique session ids
 from datetime import datetime
+from time import time
+
 from HTMLParser import HTMLParser # for stripping html tags
+from simpleeval import simple_eval
+
 import streetsign_server.post_types
 from streetsign_server import app
 
@@ -230,16 +234,20 @@ class Feed(DBModel):
 
     # Yes, I like comprehensions.
     def authors(self):
-        return [p.user for p in self.permissions if p.write == True and p.user]
+        return [p.user for p in self.permissions
+                if p.write == True and p.user]
 
     def publishers(self):
-        return [p.user for p in self.permissions if p.publish == True and p.user]
+        return [p.user for p in self.permissions
+                if p.publish == True and p.user]
 
     def author_groups(self):
-        return [p.group for p in self.permissions if p.write == True and p.group]
+        return [p.group for p in self.permissions
+                if p.write == True and p.group]
 
     def publisher_groups(self):
-        return [p.group for p in self.permissions if p.publish == True and p.group]
+        return [p.group for p in self.permissions
+                if p.publish == True and p.group]
 
     def user_can_read(self, user):
         ''' Checks read permission for a feed.  Not really used, as yet. '''
@@ -533,16 +541,58 @@ class Screen(DBModel):
 
     def json_all(self):
         ''' returns a JSON string ready for transmission '''
-        # TODO: replace this with a dict passed through flask.json for safety...
-        return ('{"id":' + str(self.id) + ', "urlname":"' + self.urlname + '",'\
-                 '"background":"' + (self.background if self.background else '') + '",' \
-                 '"settings":' + (self.settings if self.settings else '{}') + ',' \
-                 '"defaults":' + (self.defaults if self.defaults else '{}') + ',' \
-                 '"zones":' + (self.zones if self.zones else '[]') + '}')
+
+        return json.dumps({
+            "id":self.id,
+            "urlname": self.urlname,
+            "background": self.background if self.background else '',
+            "settings": safe_json_load(self.settings, {}),
+            "defaults": safe_json_load(self.defaults, {}),
+            "zones": safe_json_load(self.zones, []),
+            })
+
+class DataPuller(DBModel):
+    ''' How do we pull data in from external sources? '''
+    name = CharField()
+    type =  CharField()
+    settings = CharField(default='{}')
+    publish = BooleanField(default=False)
+    lifetime_start = CharField(default="NOW")
+    lifetime_end = CharField(default="NOW + 1 WEEK")
+
+    def current_lifetime_start(self):
+        ''' given the equation in the lifetime_start field, what should
+            the time be of a new post start time? '''
+        return datetime.fromtimestamp(
+                    eval_datetime_formula(self.lifetime_start))
+
+    def current_lifetime_end(self):
+        ''' given the equation in the lifetime_end field, what time
+            should the end of a new post lifetime be? '''
+        return datetime.fromtimestamp(
+                    eval_datetime_formula(self.lifetime_end))
+
 
 ##############################################################################
 
-# Class and function for stripping HTML tags
+
+def eval_datetime_formula(string):
+    ''' evaluate a simple date/time formula, returning a unix datetime stamp '''
+
+    replacements = [('WEEKS', '* 60400'),
+                    ('WEEK', '* 60400'),
+                    ('DAYS', '* 86400'),
+                    ('DAY', '* 86400'),
+                    ('MONTHS', '* 2592000'),  # 30 day month...
+                    ('MONTH', '* 2592000'),
+                   ]
+
+    for rep_str, out_str in replacements:
+        string = string.replace(rep_str, out_str)
+
+    return simple_eval(string, names={'NOW': time()})
+
+
 class MLStripper(HTMLParser):
     '''A class for stripping away html tags'''
 

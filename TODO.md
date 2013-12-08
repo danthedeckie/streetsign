@@ -63,3 +63,8 @@
   etc
   (rather than weird 'RSS' _post_ type a la concerto)
 - or would 'feed' level things be better? where you could have the feed 'controlled' by either rss/json/html, or whatever??
+- Would a CSS 'marquee' work better for scrolling, rather than jQuery?  Each
+  element inside the marquee could be a span within it....
+  I don't know if this would make posts going inactive while 'live' look ugly,
+  though...
+
