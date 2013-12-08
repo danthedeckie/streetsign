@@ -2,6 +2,7 @@
 {% block title %} Feed Lists {% endblock %}
 
 {% block body %}
+<div class="col-md-8">
 <table class="table table-striped">
 <thead>
   <tr>
@@ -20,14 +21,35 @@
 {% endfor %}
 </tbody>
 </table>
-{% if session.display_admin_stuff %}
-    <form action="{{ url_for('feeds') }}" method="POST">
-    <h2> New Feed </h2>
+</div>
 
-<span class="centerbox">
-    <label>Title:<input name="title" placeholder="new feed name..."/></label>
-    <input type="submit" value="Create!" class="newbutton" />
-    </form>
-</span>
+{% if session.display_admin_stuff %}
+<div class="col-md-4">
+  <form action="{{ url_for('feeds') }}" method="POST">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2 class="panel-title"> New Feed </h2>
+      </div>
+      <div class="panel-body">
+        <label>Title:</label>
+        <input name="title" placeholder="new feed name..." class="form-control" />
+        <hr/>
+        <input type="submit" value="Create!" class="btn btn-primary" />
+      </div>
+    </div>
+  </form>
+</div>
+<div class="cf"></div>
+
+<div class="col-md-12">
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h2 class="panel-title">External Data Importers</h2>
+  </div>
+  <div class="panel-body">
+    <p> Work In Progress  (TODO!) </p>
+  </div>
+</div>
+</div>
 {% endif %}
 {% endblock %}

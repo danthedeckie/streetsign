@@ -628,7 +628,7 @@ def create_all():
     ''' initialises the database, creates all needed tables. '''
     [t.create_table(True) for t in
         (User, UserSession, Group, UserGroup, Post, Feed,
-         FeedPermission, ConfigVar, Screen)]
+         FeedPermission, ConfigVar, DataPuller, Screen)]
 
 def by_id(model, ids):
     ''' returns a list of objects, selected by id (list) '''
