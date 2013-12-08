@@ -34,7 +34,7 @@ from streetsign_server import app
 
 SECRET_KEY = app.config.get('SECRET_KEY')
 
-DB = SqliteDatabase(app.config.get('DATABASE_FILE'))
+DB = SqliteDatabase(app.config.get('DATABASE_FILE'), threadlocals=True )
 
 __all__ = [ 'DB', 'user_login', 'user_logout', 'get_logged_in_user',
             'User', 'Group', 'Post', 'Feed', 'FeedPermission', 'UserGroup',
