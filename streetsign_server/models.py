@@ -508,38 +508,7 @@ class Post(DBModel):
         else:
             return 'now'
 
-
-# Class and function for stripping HTML tags
-class MLStripper(HTMLParser):
-    '''A class for stripping away html tags'''
-
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.reset()
-        self.fed = []
-
-    def handle_data(self, data):
-        '''Overriding handle_data'''
-        self.fed.append(data)
-
-    def get_data(self):
-        '''Get the html-stripped text'''
-        return ''.join(self.fed)
-
-def strip_tags(html):
-    '''Strip a string of html data'''
-    mls = MLStripper()
-    mls.feed(html)
-    return mls.get_data()
-
-
-##############################################################################
-
-class ConfigVar(DBModel):
-    ''' place to store site-wide front-end-editable settings. '''
-    id = CharField(primary_key=True)
-    value = CharField(null=True)
-    description = CharField(default="Setting")
+##################################################
 
 class Screen(DBModel):
     ''' Each URL for output is known as a screen. (You can point a web-browser
@@ -572,6 +541,38 @@ class Screen(DBModel):
                  '"zones":' + (self.zones if self.zones else '[]') + '}')
 
 ##############################################################################
+
+# Class and function for stripping HTML tags
+class MLStripper(HTMLParser):
+    '''A class for stripping away html tags'''
+
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.reset()
+        self.fed = []
+
+    def handle_data(self, data):
+        '''Overriding handle_data'''
+        self.fed.append(data)
+
+    def get_data(self):
+        '''Get the html-stripped text'''
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    '''Strip a string of html data'''
+    mls = MLStripper()
+    mls.feed(html)
+    return mls.get_data()
+
+##############################################################################
+
+class ConfigVar(DBModel):
+    ''' place to store site-wide front-end-editable settings. '''
+    id = CharField(primary_key=True)
+    value = CharField(null=True)
+    description = CharField(default="Setting")
+
 
 def create_all():
     ''' initialises the database, creates all needed tables. '''
