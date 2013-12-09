@@ -6,7 +6,7 @@
 # Sort of next
 
 - WYSIWYG editor for HTML posts. (bootstrap-wysihtml5) (with note that for more complex things, really it should be done as a designed image...)
-- Data puller
+- Data puller "external data sources"
 - API and other 'public' documentation.
 
 # Bugs:

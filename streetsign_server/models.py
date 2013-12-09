@@ -552,7 +552,7 @@ class Screen(DBModel):
             "zones": safe_json_load(self.zones, []),
             })
 
-class DataPuller(DBModel):
+class ExternalSource(DBModel):
     ''' How do we pull data in from external sources? '''
     name = CharField()
     type =  CharField()
@@ -606,7 +606,7 @@ def create_all():
     ''' initialises the database, creates all needed tables. '''
     [t.create_table(True) for t in
         (User, UserSession, Group, UserGroup, Post, Feed,
-         FeedPermission, ConfigVar, DataPuller, Screen)]
+         FeedPermission, ConfigVar, ExternalSource, Screen)]
 
 def by_id(model, ids):
     ''' returns a list of objects, selected by id (list) '''

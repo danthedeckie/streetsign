@@ -35,7 +35,10 @@ from streetsign_server.logic.feeds_and_posts import try_to_set_feed, \
                                       post_form_intake
 
 from streetsign_server import app
-from streetsign_server.models import User, Group, Feed, Post, by_id
+from streetsign_server.models import User, Group, Feed, Post, ExternalSource, \
+                                     by_id
+
+import streetsign_server.external_source_types as external_source_types
 
 ####################################################################
 # Feeds & Posts:
@@ -55,7 +58,10 @@ def feeds():
                 return redirect(url_for('feeds'))
             Feed(name=request.form.get('title','blank').strip()).save()
 
-    return render_template('feeds.html', feeds=Feed.select())
+    return render_template('feeds.html',
+                           feeds=Feed.select(),
+                           external_sources=ExternalSource.select(),
+                           source_types=external_source_types.types())
 
 @app.route('/feeds/<int:feedid>', methods=['GET','POST'])
 def feedpage(feedid):

@@ -17,11 +17,12 @@
 
     -------------------------------------
 
-    Main methods for working with multiple post_types.
+    Main methods for working with multiple external source types.
+
+    Yes, this is very similar to post_types.  If you feel like combining
+    bits and making it more general, go for it.
 
 """
-
-
 
 from os.path import dirname, basename, splitext, isfile, abspath
 from importlib import import_module
@@ -62,8 +63,8 @@ def module_dict(name):
     return {'id': name, 'name': name}
 
 def types():
-    ''' return a list of dicts of all post types.
-        TODO: find a way to cache this. '''
+    ''' return a list of dicts of all post types. '''
+    # TODO: find a way to cache this.
 
     return [ module_dict(m) for m in modules() ]
 
@@ -83,15 +84,3 @@ def receive(posttype, form):
 
     editor = load(posttype)
     return(editor.receive(form))
-
-def renderer_js(posttype):
-    ''' return the javascript for rendering a module's data '''
-
-    editor = load(posttype)
-    return(editor.renderer_js())
-
-def renderers():
-    ''' return the javascript for ALL post_types to be rendered. (as a list
-        - you still need to combine it as you like... '''
-
-    return [(e, load(e).screen_js()) for e in modules()]

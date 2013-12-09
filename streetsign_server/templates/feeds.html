@@ -47,7 +47,42 @@
     <h2 class="panel-title">External Data Importers</h2>
   </div>
   <div class="panel-body">
+  <div class="col-md-8">
+    <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Data Type</th>
+        <th>Name</th>
+        <th>Publish New Posts?</th>
+        <th>...</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for source in external_sources %}
+      <tr>
+        <td>{{ source.type }}</td>
+        <td>{{ source.name }}</td>
+        <td>{{ source.publish }}</td>
+        <td>More...</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    </div>
+    <div class="col-md-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2 class="panel-title">New Data Source</h2>
+      </div>
+      <div class="panel-body">
     <p> Work In Progress  (TODO!) </p>
+    <b>Types:</b>
+    {% for data_type in source_types %}
+        {{ data_type.name }}
+    {% endfor %}
+      </div>
+      </div>
+    </div>
   </div>
 </div>
 </div>
