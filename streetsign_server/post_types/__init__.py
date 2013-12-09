@@ -23,9 +23,11 @@
 
 
 
-from os.path import dirname, basename, splitext, isfile
+from os.path import dirname, basename, splitext, isfile, abspath
 from importlib import import_module
 from glob import glob
+import sys
+import inspect
 
 PATH = dirname(__file__)
 
@@ -36,6 +38,14 @@ def path_to_module(path):
         importing (just x) '''
 
     return splitext(basename(path))[0]
+
+def my(ending, level=1):
+    ''' given '.html', returns (if this is the foobar module)
+        the contents of: /where/this/file/is/foodbar.html.'''
+
+    with open(splitext(abspath(inspect.getfile(sys._getframe(level))))[0] + ending,'r') as f:
+        return f.read()
+
 
 def modules():
     ''' a list of all post types modules which can be used/imported '''

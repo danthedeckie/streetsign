@@ -3,10 +3,13 @@ pylint
 peewee
 flask-peewee
 
+feedparser
+bleach
+
 # for passwords:
 py-bcrypt
 passlib
 
-#gunicorn
 simpleeval
 waitress
+

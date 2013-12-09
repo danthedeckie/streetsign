@@ -20,26 +20,24 @@
 
 """
 
-
-
-from os.path import abspath, splitext
 from flask import render_template_string, escape
 
-def my(ending):
-    ''' given '.html', returns (if this is the foobar module)
-        the contents of: /where/this/file/is/foodbar.html '''
-
-    with open(splitext(abspath(__file__))[0] + ending,'r') as f:
-        return f.read()
+from streetsign_server.post_types import my
 
 def form(data):
+    ''' return the html for editing a text post '''
+    # pylint: disable=star-args
     return render_template_string(my('.form.html'), **data)
 
 def receive(data):
+    ''' recieve the data from the form, and return the dict to save in the
+        db '''
     return {'type':'text', 'content': escape(data.get('content',''))}
 
 def display(data):
+    ''' return the data to send to the display system (screen) '''
     return data['content']
 
 def screen_js():
+    ''' the js needed to display a post correctly. '''
     return my('.screen.js')

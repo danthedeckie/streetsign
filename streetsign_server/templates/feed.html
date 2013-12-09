@@ -10,7 +10,7 @@
     <th>Post</th>
     <th>Author</th>
     <th>Date</th>
-    <th colspan=2>{% if feed.user_can_write(user) %}<a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}" class="newbutton">NEW</a>{% endif %}</th>
+    <th colspan=2>{% if feed.user_can_write(user) %}<a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}" class="btn btn-primary">NEW</a>{% endif %}</th>
   </tr>
 </thead>
 <tbody>
@@ -25,7 +25,7 @@
                 <form method="POST" action="{{ url_for('postpage',postid=post.id) }}" >
                     <input type="hidden" name="action" value="
                         {{- 'unpublish' if post.published else 'publish' }}">
-                    <input type="submit" value="
+                    <input class="btn btn-default" type="submit" value="
                         {{- 'Unpublish' if post.published else 'Publish' }}">
                 </form>
             {% endif %}

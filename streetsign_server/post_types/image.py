@@ -21,28 +21,29 @@
 """
 
 
-
 from flask import render_template_string, request, g, flash
 from werkzeug import secure_filename # pylint: disable=no-name-in-module
 from os.path import splitext, join as pathjoin, isdir, abspath
 from subprocess import check_call
 from os import makedirs
 
-def my(ending):
-    ''' given '.html', returns (if this is the foobar module)
-        the contents of: /where/this/file/is/foodbar.html '''
-
-    with open(splitext(abspath(__file__))[0] + ending,'r') as f:
-        return f.read()
+from streetsign_server.post_types import my
 
 def allow_filetype(filename):
+    ''' what kinds of files are allowed? '''
+
     return splitext(filename)[-1].lower() in \
         ['.png','.jpg','.jpeg','.gif','.bmp','.svg']
 
 def form(data):
+    ''' return the html form for editing an image post '''
+    # pylint: disable=star-args
     return render_template_string(my('.form.html'), **data)
 
 def receive(data):
+    ''' revieve the form data, including the uploaded file, and put it
+        where it should be, and return all the image data we need. '''
+
     if 'upload' in data:
         f = request.files['image_file']
         if f and allow_filetype(f.filename):
@@ -73,8 +74,10 @@ def receive(data):
             'file_url': g.site_vars['user_url']+'/post_images/'+filename}
 
 def display(data):
+    ''' display the html to display the posted image. '''
     return ('<img class="post_image" src="{0}"'
            ' style="width:100%;height:auto" />'.format(data['file_url']))
 
 def screen_js():
+    ''' return the javascript for displaying these images correctly '''
     return my('.screen.js')

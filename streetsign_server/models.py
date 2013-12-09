@@ -29,8 +29,8 @@ from passlib.hash import bcrypt # pylint: disable=no-name-in-module
 from uuid import uuid4 # for unique session ids
 from datetime import datetime
 from time import time
+import bleach # html stripping.
 
-from HTMLParser import HTMLParser # for stripping html tags
 from simpleeval import simple_eval
 
 import streetsign_server.post_types
@@ -482,7 +482,8 @@ class Post(DBModel):
         # TODO: split this out to the various post_type modules, and cache it.
         content = safe_json_load(self.content, {'content':'None'})['content']
         if (self.type=='html'):
-            return strip_tags(content[0:14]) + '...(' + self.type + ')'
+            return bleach.clean(content, tags=[], strip=True)[0:15] + '...(' + \
+                    self.type + ')'
         elif (self.type=='text'):
             return content[0:14]
         elif (self.type=='image'):
@@ -591,29 +592,6 @@ def eval_datetime_formula(string):
         string = string.replace(rep_str, out_str)
 
     return simple_eval(string, names={'NOW': time()})
-
-
-class MLStripper(HTMLParser):
-    '''A class for stripping away html tags'''
-
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.reset()
-        self.fed = []
-
-    def handle_data(self, data):
-        '''Overriding handle_data'''
-        self.fed.append(data)
-
-    def get_data(self):
-        '''Get the html-stripped text'''
-        return ''.join(self.fed)
-
-def strip_tags(html):
-    '''Strip a string of html data'''
-    mls = MLStripper()
-    mls.feed(html)
-    return mls.get_data()
 
 ##############################################################################
 
