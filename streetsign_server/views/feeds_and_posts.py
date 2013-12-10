@@ -375,11 +375,12 @@ def external_source_run(source_id):
         return 'Invalid Source', 404
 
     now = datetime.now()
-    next_check = source.last_checked + timedelta(minutes=source.frequency)
+    if source.last_checked:
+        next_check = source.last_checked + timedelta(minutes=source.frequency)
 
-    if source.last_checked and (next_check > now):
-        return "Nothing to do. Last: {0}, Next: {1}, Now: {2} ".format(
-            source.last_checked, next_check, now)
+        if (next_check > now):
+            return "Nothing to do. Last: {0}, Next: {1}, Now: {2} ".format(
+                source.last_checked, next_check, now)
 
     module = external_source_types.load(source.type)
 

@@ -38,7 +38,9 @@
 <div class="col-md-2">
     <input class="btn btn-primary" type="submit" value="Save" />
     <a class="btn btn-success" href="#" id="test_btn">Test</a>
-    <a class="btn btn-info" href="{{ url_for('external_source_run', source_id=source.id) }}" >Run Now</a>
+    {% if source.id %}
+        <a class="btn btn-info" href="{{ url_for('external_source_run', source_id=source.id) }}" >Run Now</a>
+    {% endif %}
 </div>
 
 <div class="cf"></div>
