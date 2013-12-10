@@ -6,6 +6,8 @@ with a simpler basis.  This project was originally written for Teenstreet 2013 i
 Although this has been used at a large conference, it's still very much work in progress,
 so if you do use it, expect changes in the future, and some features missing.
 
+There is a full documentation in progress at http://streetsign.readthedocs.org/en/latest/
+
 ## Usage:
 
 clone this into the directory you want to use for the project, and type
