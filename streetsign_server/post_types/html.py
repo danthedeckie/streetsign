@@ -44,7 +44,7 @@ def safehtml(text):
               "tfoot"],
         attributes=['class','href','alt','src'])
 
-def safecolor(text, default="#abd"):
+def safecolor(text, default="#fff"):
     ''' check that a color string is actually a html hex-type color... '''
     if not text:
         return default
