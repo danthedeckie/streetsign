@@ -20,23 +20,20 @@
 
 """
 
-__MODULE__ == 'rss'
+__MODULE__ = 'rss'
 
-from os.path import abspath, splitext
-from flask import render_template_string, flash, json
+from flask import render_template_string
 import feedparser
-import re
 
-def my(ending):
-    ''' given '.html', returns (if this is the foobar module)
-        the contents of: /where/this/file/is/foodbar.html '''
+from streetsign_server.external_source_types import my
 
-    with open(splitext(abspath(__file__))[0] + ending,'r') as f:
-        return f.read()
+def receive(request):
+    ''' get data from the admin, extract the data, and return the object we
+        actually need to save. '''
+    return { "url": request.form.get('rss_url','')}
 
 def form(data):
     ''' the form for editing this type of post '''
+    # pylint: disable=star-args
     return render_template_string(my('.form.html'), **data)
 
-def display(data):
-    return data['content']

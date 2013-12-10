@@ -556,6 +556,8 @@ class ExternalSource(DBModel):
     ''' How do we pull data in from external sources? '''
     name = CharField()
     type =  CharField()
+    frequency = IntegerField(default=60)
+    feed = ForeignKeyField(Feed, related_name='external_sources')
     settings = CharField(default='{}')
     publish = BooleanField(default=False)
     lifetime_start = CharField(default="NOW")

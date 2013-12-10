@@ -75,7 +75,7 @@ def load(type_name):
         return _editors[type_name]
 
     #if isfile(PATH + '/' + type_name):
-    e = import_module( 'streetsign_server.post_types.' +  type_name )
+    e = import_module( 'streetsign_server.external_source_types.' +  type_name )
     _editors[type_name] = e
     return(e)
 

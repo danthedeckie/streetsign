@@ -47,41 +47,41 @@
     <h2 class="panel-title">External Data Importers</h2>
   </div>
   <div class="panel-body">
-  <div class="col-md-8">
+  <div class="col-md-12">
     <table class="table table-striped">
     <thead>
       <tr>
         <th>Data Type</th>
         <th>Name</th>
+        <th>Feed</th>
         <th>Publish New Posts?</th>
-        <th>...</th>
+        <th>
+          <div class="btn-group">
+          <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown">New <span class="caret"></span></button>
+          <ul class="dropdown-menu" role="menu">
+          {% for data_type in source_types %}
+            <li><a href="{{ url_for('external_data_source_edit', type=data_type.name) }}">{{ data_type.name}}</a></li>
+          {% endfor %}
+          </ul>
+          </div>
+        </th>
       </tr>
     </thead>
     <tbody>
     {% for source in external_sources %}
-      <tr>
+      <tr class="source_item">
         <td>{{ source.type }}</td>
-        <td>{{ source.name }}</td>
+        <td><a href="{{ url_for('external_data_source_edit', source_id=source.id) }}">{{ source.name }}</a></td>
+        <td>{{ source.feed.name }}</td>
         <td>{{ source.publish }}</td>
-        <td>More...</td>
+        <td>
+            <a class="btn btn-default" href="{{ url_for('external_data_source_edit', source_id=source.id) }}">Edit</a>
+            <a class="btn btn-danger confirm_ajax_delete" href="{{ url_for('external_data_source_edit', source_id=source.id) }}" data-item=".source_item"> &times;</a>
+        </td>
       </tr>
     {% endfor %}
     </tbody>
     </table>
-    </div>
-    <div class="col-md-4">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h2 class="panel-title">New Data Source</h2>
-      </div>
-      <div class="panel-body">
-    <p> Work In Progress  (TODO!) </p>
-    <b>Types:</b>
-    {% for data_type in source_types %}
-        {{ data_type.name }}
-    {% endfor %}
-      </div>
-      </div>
     </div>
   </div>
 </div>

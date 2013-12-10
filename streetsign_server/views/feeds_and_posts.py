@@ -26,6 +26,7 @@ from flask import render_template, url_for, request, redirect, \
                   flash, json 
 import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
+import peewee
 from datetime import datetime
 from streetsign_server.views.utils import PleaseRedirect
 
@@ -270,4 +271,62 @@ def postedit_type(typeid):
                            form_content = editor.form(request.form))
 
 
+###############################################################
 
+@app.route('/external_data_sources/NEW', defaults={'source_id': None}, methods=['GET','POST'])
+@app.route('/external_data_sources/<int:source_id>', methods=['GET', 'POST', 'DELETE'])
+def external_data_source_edit(source_id):
+    ''' Editing a external data source '''
+
+    if not user_session.is_admin():
+        flash('Only Admins can do this!')
+        return redirect(url_for('feeds'))
+
+    # first find the data type:
+
+    if request.method == 'DELETE':
+        ExternalSource.delete().where(ExternalSource.id==int(source_id)).execute()
+        return 'deleted'
+
+    if source_id == None:
+        try:
+            source = ExternalSource()
+            source.type = request.args['type']
+            source.name = "new " + source.type + " source"
+            source.feed = Feed.get() # set initial feed
+        except KeyError:
+            return 'No type specified.'
+    else:
+        try:
+            source = ExternalSource.get(id=source_id)
+        except peewee.DoesNotExist:
+            return 'Invalid id.', 404
+
+    # Try and load the external source type ( and check it's valid):
+
+    try:
+        module = external_source_types.load(source.type)
+    except ImportError:
+        return 'Invalid External Source Type', 404
+
+    # if it's a post, then update the data with 'receive':
+
+    if request.method == 'POST':
+        source.settings = json.dumps(module.receive(request))
+        source.name = request.form.get('name', source.name)
+        source.frequency = int(request.form.get('frequency', 60))
+        source.publish = request.form.get('publish', False)
+        source.lifetime_start = request.form.get('lifetime_start',
+                                                 source.lifetime_start)
+        source.lifetime_end = request.form.get('lifetime_end',
+                                                 source.lifetime_end)
+        try:                                         
+            source.feed = Feed.get(Feed.id==int(request.form.get('feed', 100)))
+            source.save()
+            flash('Updated.')
+        except Feed.DoesNotExist:
+            flash ("Can't save! Invalid Feed!{}".format(  int(request.form.get('feed','-11'))))
+
+    return render_template("external_source.html", source=source,
+            feeds=Feed.select(),
+            form=module.form(json.loads(source.settings)))
