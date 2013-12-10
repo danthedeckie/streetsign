@@ -2,21 +2,22 @@
 
 - Bootstrapification
   - why are chosen/select boxes funny sizes?
+- external data sources (rss, json, etc)
 
 # Sort of next
 
 - WYSIWYG editor for HTML posts. (bootstrap-wysihtml5) (with note that for more complex things, really it should be done as a designed image...)
-- Data puller "external data sources"
 - API and other 'public' documentation.
 
 # Bugs:
 
-- Single message on side-scrolling zone displays only once.
+- Single message on side-scrolling zone display doesn't go on for ever (some kind of timeout/race condition?)
 
 ## Urgent:
 
 - make sure user uploaded files have the right place to go etc for new projects,
 - make lack of thumbnail generator not an exception, but fall back happily.
+- remove to archive and finally deletion of old posts & related files/content.
 
 ## Needed, but copable for alpha version.
 
@@ -27,12 +28,10 @@
 - Group Editor, etc.
 - Better uploaded files editor.
 - Direction for scroller
-- Add waitress or cherrypy scripts for basic stand-alone server.
 
 # Good things for the future:
 
 - non-session auth as well for API, makes scripting easier.
-- 'create feeds from twitter/RSS/etc' importers? scripts, with cron???
 - Full Documentation
 - Output screens status, tracking which addresses are requesting info, alert when one goes down, etc.
 - Local machine mini-proxy which gets the latest info from the master server, but otherwise caches everything
@@ -56,15 +55,7 @@
 
 # Random ideas:
 
-- Feed type options:
-  - Locally fed (as normal)
-  - From RSS feed
-  - From twitter?
-  etc
-  (rather than weird 'RSS' _post_ type a la concerto)
-- or would 'feed' level things be better? where you could have the feed 'controlled' by either rss/json/html, or whatever??
 - Would a CSS 'marquee' work better for scrolling, rather than jQuery?  Each
   element inside the marquee could be a span within it....
   I don't know if this would make posts going inactive while 'live' look ugly,
   though...
-
