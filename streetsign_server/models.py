@@ -572,6 +572,12 @@ class ExternalSource(DBModel):
     # Should new posts from this source start off published?
     publish = BooleanField(default=False)
 
+    # Which user should be set as the owner / author of these?
+    post_as_user = ForeignKeyField(User, related_name='external_sources')
+
+    # initial post settings. (TODO)
+    post_template=CharField(default='{}')
+
     # Lifetime of new posts (formula)
     lifetime_start = CharField(default="NOW")
     lifetime_end = CharField(default="NOW + 1 WEEK")
@@ -595,8 +601,8 @@ class ExternalSource(DBModel):
 def eval_datetime_formula(string):
     ''' evaluate a simple date/time formula, returning a unix datetime stamp '''
 
-    replacements = [('WEEKS', '* 60400'),
-                    ('WEEK', '* 60400'),
+    replacements = [('WEEKS', '* 604800'),
+                    ('WEEK', '* 604800'),
                     ('DAYS', '* 86400'),
                     ('DAY', '* 86400'),
                     ('MONTHS', '* 2592000'),  # 30 day month...

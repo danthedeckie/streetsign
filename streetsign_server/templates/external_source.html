@@ -30,6 +30,7 @@
             <span class="input-group-addon">minutes</span>
           </div>
         </div>
+        (last checked: {{ source.last_checked }})
       </div>
     </div>
   </div>
@@ -37,6 +38,7 @@
 <div class="col-md-2">
     <input class="btn btn-primary" type="submit" value="Save" />
     <a class="btn btn-success" href="#" id="test_btn">Test</a>
+    <a class="btn btn-info" href="{{ url_for('external_source_run', source_id=source.id) }}" >Run Now</a>
 </div>
 
 <div class="cf"></div>
@@ -85,7 +87,7 @@
 $('#test_btn').click(function(e){
     e.preventDefault();
     $('#test_area').load(
-        "{{ url_for('external_source_test', source_id=source.id) }}",
+        "{{ url_for('external_source_test') }}",
         $('#source_form').serialize());
 });
 </script>

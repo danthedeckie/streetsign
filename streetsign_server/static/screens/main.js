@@ -207,6 +207,10 @@ function update_screen(screen_data, element) {
     };
 
     $.getJSON('/screens/json/' +  screen_data.id + '/X' , update);
+
+    // And for now, since there isn'r really anywhere better, lets also 
+    // tell all external sources to update if they need to.
+    $.getJSON('/external_data_sources/');
 }
 
 function background_from_value(text) {

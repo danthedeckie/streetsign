@@ -35,12 +35,14 @@ def safehtml(text):
     ''' used by 'recieve' to clean html,
         and not allow scripts and other nasties. '''
 
-    return bleach.clean(text, strip=True, tags=["div", "span", "b", "i", "u",
-                                                "em", "ul","li","ol", "a",
-                                                "code", "blockquote", "strong",
-                                                "small", "big", "img", "table",
-                                                "tr", "td", "th", "thead",
-                                                "tfoot"])
+    return bleach.clean(text, strip=True,
+        tags=["div", "span", "b", "i", "u",
+              "em", "ul","li","ol", "a",
+              "code", "blockquote", "strong",
+              "small", "big", "img", "table",
+              "tr", "td", "th", "thead",
+              "tfoot"],
+        attributes=['class','href','alt','src'])
 
 def safecolor(text, default="#abd"):
     ''' check that a color string is actually a html hex-type color... '''

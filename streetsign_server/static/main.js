@@ -47,3 +47,7 @@ $('a.confirm_ajax_delete').click(function(evt) {
     }
 
 });
+
+// And why not, lets also check if new data needs to be got (which
+// will then happen every time any back end page is checked.)
+$.getJSON('/external_data_sources/');

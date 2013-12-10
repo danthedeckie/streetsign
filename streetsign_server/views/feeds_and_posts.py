@@ -27,7 +27,7 @@ from flask import render_template, url_for, request, redirect, \
 import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
 import peewee
-from datetime import datetime
+from datetime import datetime, timedelta
 from streetsign_server.views.utils import PleaseRedirect
 
 from streetsign_server.logic.feeds_and_posts import try_to_set_feed, \
@@ -317,12 +317,15 @@ def external_data_source_edit(source_id):
     if request.method == 'POST':
         source.settings = json.dumps(module.receive(request))
         source.name = request.form.get('name', source.name)
+        source.post_as_user = user_session.get_user()
         source.frequency = int(request.form.get('frequency', 60))
         source.publish = request.form.get('publish', False)
         source.lifetime_start = request.form.get('lifetime_start',
                                                  source.lifetime_start)
         source.lifetime_end = request.form.get('lifetime_end',
                                                  source.lifetime_end)
+        source.post_template = request.form.get('post_template',
+                                                source.post_template)
         try:                                         
             source.feed = Feed.get(Feed.id==int(request.form.get('feed', 100)))
             source.save()
@@ -340,8 +343,8 @@ def external_data_source_edit(source_id):
             feeds=Feed.select(),
             form=module.form(json.loads(source.settings)))
 
-@app.route('/external_data_sources/<int:source_id>/test')
-def external_source_test(source_id):
+@app.route('/external_data_sources/test')
+def external_source_test():
     '''
         test an external source, and return some comforting HTML
         (for the editor)
@@ -361,3 +364,57 @@ def external_source_test(source_id):
     # and request the test html
     return module.test(request.args)
 
+@app.route('/external_data_sources/<int:source_id>/run')
+def external_source_run(source_id):
+    ''' use the importer specified to see if there is any new data,
+        and if there is, then import it. '''
+
+    try:
+        source = ExternalSource.get(id=source_id)
+    except ExternalSource.DoesNotExist:
+        return 'Invalid Source', 404
+
+    now = datetime.now()
+    next_check = source.last_checked + timedelta(minutes=source.frequency)
+
+    if source.last_checked and (next_check > now):
+        return "Nothing to do. Last: {0}, Next: {1}, Now: {2} ".format(
+            source.last_checked, next_check, now)
+
+    module = external_source_types.load(source.type)
+
+    settings_data = json.loads(source.settings)
+    new_posts = module.get_new(settings_data)
+
+    if new_posts:
+        for fresh_data in new_posts:
+            post = Post(type=fresh_data.get('type', 'html'), author=source.post_as_user)
+            editor = post_types.load(fresh_data.get('type', 'html'))
+
+            post.feed = source.feed
+            post_form_intake(post, fresh_data, editor)
+            post.active_start = source.current_lifetime_start()
+            post.active_end = source.current_lifetime_end()
+            if source.publish:
+                post.publisher = source.post_as_user
+                post.publish_date = datetime.now()
+                post.published = True
+            post.save()
+    # else, no new posts! oh well!
+
+    source.settings = json.dumps(settings_data)
+    source.last_checked = datetime.now()
+    source.save()
+
+    return 'Done!'
+
+
+# NOTE! This address is HARD CODED into some of the screen and back end .js
+# files.  If you change here, change there! (This isn't ideal, of course)
+
+@app.route('/external_data_sources/')
+def external_data_sources_update_all():
+    ''' update all external data sources. '''
+    sources = [x[0] for x in ExternalSource.select(ExternalSource.id).tuples()]
+    print sources
+    return json.dumps([(external_source_run(s), s) for s in sources])

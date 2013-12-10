@@ -22,22 +22,46 @@
 
 __MODULE__ = 'rss'
 
-from flask import render_template_string
+from flask import render_template_string, json
+from jinja2 import Template
 import feedparser
+import bleach
 
 from streetsign_server.external_source_types import my
+
+DEFAULT_TAGS="span,b,i,u,em,img"
 
 def receive(request):
     ''' get data from the admin, extract the data, and return the object we
         actually need to save. '''
+
     return { "url": request.form.get('url',''),
-        "display_detail": request.form.get('display_detail','')
+        "display_template": request.form.get('display_template','{}'),
+        "current_posts": json.loads(request.form.get('current_posts','[]')),
+        "allowed_tags": request.form.get('allowed_tags', DEFAULT_TAGS),
         }
 
 def form(data):
     ''' the form for editing this type of post '''
     # pylint: disable=star-args
-    return render_template_string(my('.form.html'), **data)
+    return render_template_string(my('.form.html'), default_tags=DEFAULT_TAGS, **data)
+
+def make_templater(data):
+    ''' from the info in data, return a html cleaner function. '''
+
+    tags=[x.strip() for x in 
+                data.get("allowed_tags", DEFAULT_TAGS).split(',')]
+    template = Template(data.get('display_template', '{{title}}'))
+
+    def templater(item):
+        return bleach.clean(template.render(**item),
+                            tags=tags,
+                            attributes=["class", "href", "alt", "src"],
+                            strip=True)
+
+    return templater
+
+
 
 def test(data):
     ''' we get sent a copy of the data, and should reply with some HTML
@@ -51,10 +75,31 @@ def test(data):
 
     try:
         first_post = feed.entries[0]
-        example_post = render_template_string(data['display_detail'],
-            **first_post)
-    except:
-        example_post = "No First Post"
+        example_post = make_templater(data)(first_post)
+    except Exception as e:
+        example_post = str(e)
 
     return render_template_string(my('.test.html'), feed=feed,
         example_post=example_post)
+
+def get_new(data):
+    ''' ok, actually go get us some new posts, alright? (return new posts, and
+        update data with any hidden fields updated that we need to
+        (current_posts, for instance))'''
+
+    feed = feedparser.parse(data['url'])
+
+    previous_list = data['current_posts']
+
+    new_posts = []
+
+    templater = make_templater(data)
+
+    for entry in feed.entries:
+        if entry.id not in previous_list:
+            new_posts.append({'type': 'html', 'color': None,
+                              'content': templater(entry) })
+
+    data['current_posts'] = [e.id for e in feed.entries]
+
+    return new_posts
