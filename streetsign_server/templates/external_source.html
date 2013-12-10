@@ -1,0 +1,92 @@
+{% extends "index.html" %}
+
+{% block body %}
+<form method="POST" role="form" id="source_form">
+<input type="hidden" name="type" value="{{ source.type}}" />
+
+<div class="col-md-10">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">External Data Source ({{ source.type }})</h2>
+    </div>
+    <div class="panel-body form">
+      <div class="form-group col-md-8">
+        <label class="control-label">Name:</label>
+        <input class="form-control" name="name" type="text" value="{{ source.name }}" />
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label">Feed:</label>
+          <select class="form-control" name="feed">
+            {% for f in feeds %}
+              <option value="{{f.id}}" {{ "selected" if f == source.feed else ""}}>{{f.name}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Check for updates every:</label>
+          <div class="input-group">
+            <input class="form-control" name="frequency" type="number" value="{{ source.frequency }}" />
+            <span class="input-group-addon">minutes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-md-2">
+    <input class="btn btn-primary" type="submit" value="Save" />
+    <a class="btn btn-success" href="#" id="test_btn">Test</a>
+</div>
+
+<div class="cf"></div>
+
+<div class="col-md-8">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title"> {{ source.type}} settings: </h2>
+    </div>
+    <div class="panel-body form">
+      {{ form |safe }}
+    </div>
+  </div>
+<div id="test_area">for tests...</div>
+</div>
+
+<div class="col-md-4"><div class="panel panel-default">
+  <div class="panel-heading">
+    <h2 class="panel-title">New Post Lifetime</h2>
+  </div>
+  <div class="panel-body form">
+    <div class="form-group">
+      <label class="control-label">Start Time Formula</label>
+      <div class="col-sm-10">
+        <input class="form-control" name="lifetime_start" type="text" value="{{source.lifetime_start}}"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label">End Time Formula</label>
+      <div class="col-sm-10">
+        <input class="form-control" name="lifetime_end" type="text" value="{{source.lifetime_end}}" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label">Publish automatically?</label>
+      <div class="col-sm-10">
+        <input class="form-control" name="publish" type="checkbox" {{ "checked" if source.publish else '' }} />
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</form>
+<script type="text/javascript">
+$('#test_btn').click(function(e){
+    e.preventDefault();
+    $('#test_area').load(
+        "{{ url_for('external_source_test', source_id=source.id) }}",
+        $('#source_form').serialize());
+});
+</script>
+{% endblock %}
