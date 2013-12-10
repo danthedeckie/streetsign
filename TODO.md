@@ -28,6 +28,7 @@
 - Group Editor, etc.
 - Better uploaded files editor.
 - Direction for scroller
+- abilty to have full-screen URGENT messages.
 
 # Good things for the future:
 
