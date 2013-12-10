@@ -555,11 +555,24 @@ class Screen(DBModel):
 class ExternalSource(DBModel):
     ''' How do we pull data in from external sources? '''
     name = CharField()
+
+    # source types are loaded in later, the same as post types.
     type =  CharField()
+
+    # how often to check for new data at the source...
     frequency = IntegerField(default=60)
+    last_checked = DateTimeField(null=True)
+
+    # Which feed should posts from this source show up in?
     feed = ForeignKeyField(Feed, related_name='external_sources')
+
+    # Where the actual per-type-specific settings are saved:
     settings = CharField(default='{}')
+
+    # Should new posts from this source start off published?
     publish = BooleanField(default=False)
+
+    # Lifetime of new posts (formula)
     lifetime_start = CharField(default="NOW")
     lifetime_end = CharField(default="NOW + 1 WEEK")
 

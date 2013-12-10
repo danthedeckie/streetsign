@@ -258,7 +258,8 @@ def postpage(postid):
                             current_feed = post.feed.id,
                             feedlist = user.writeable_feeds(),
                             can_write = can_write,
-                            form_content = editor.form(json.loads(post.content)))
+                            form_content = editor.form(json.loads(
+                                post.content)))
 
 @app.route('/posts/edittype/<typeid>')
 def postedit_type(typeid):
@@ -273,8 +274,10 @@ def postedit_type(typeid):
 
 ###############################################################
 
-@app.route('/external_data_sources/NEW', defaults={'source_id': None}, methods=['GET','POST'])
-@app.route('/external_data_sources/<int:source_id>', methods=['GET', 'POST', 'DELETE'])
+@app.route('/external_data_sources/NEW', defaults={'source_id': None},
+                                         methods=['GET','POST'])
+@app.route('/external_data_sources/<int:source_id>',
+                                         methods=['GET', 'POST', 'DELETE'])
 def external_data_source_edit(source_id):
     ''' Editing a external data source '''
 
@@ -323,10 +326,38 @@ def external_data_source_edit(source_id):
         try:                                         
             source.feed = Feed.get(Feed.id==int(request.form.get('feed', 100)))
             source.save()
-            flash('Updated.')
+            if source_id == None:
+                # new source!
+                return redirect(url_for('external_data_source_edit',
+                                        source_id = source.id))
+            else:
+                flash('Updated.')
         except Feed.DoesNotExist:
-            flash ("Can't save! Invalid Feed!{}".format(  int(request.form.get('feed','-11'))))
+            flash ("Can't save! Invalid Feed!{}".format(
+                int(request.form.get('feed', '-11'))))
 
     return render_template("external_source.html", source=source,
             feeds=Feed.select(),
             form=module.form(json.loads(source.settings)))
+
+@app.route('/external_data_sources/<int:source_id>/test')
+def external_source_test(source_id):
+    '''
+        test an external source, and return some comforting HTML
+        (for the editor)
+    '''
+    if not user_session.is_admin():
+        flash('Only Admins can do this!')
+        return redirect(url_for('feeds'))
+
+    '''
+    try:
+        source = ExternalSource.get(id=source_id)
+    except ExternalSource.DoesNotExist:
+        return 'Invalid Source.', 404
+    '''
+    # load the type module:
+    module = external_source_types.load(request.args.get('type', None))
+    # and request the test html
+    return module.test(request.args)
+

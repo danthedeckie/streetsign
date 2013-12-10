@@ -30,10 +30,31 @@ from streetsign_server.external_source_types import my
 def receive(request):
     ''' get data from the admin, extract the data, and return the object we
         actually need to save. '''
-    return { "url": request.form.get('rss_url','')}
+    return { "url": request.form.get('url',''),
+        "display_detail": request.form.get('display_detail','')
+        }
 
 def form(data):
     ''' the form for editing this type of post '''
     # pylint: disable=star-args
     return render_template_string(my('.form.html'), **data)
 
+def test(data):
+    ''' we get sent a copy of the data, and should reply with some HTML
+        that reassures the user if the url/whatever is correct (preferably
+        with some data from the feed) '''
+
+    try:
+        feed = feedparser.parse(data['url'])
+    except Exception as e:
+        return 'invalid url({})'.format(str(e))
+
+    try:
+        first_post = feed.entries[0]
+        example_post = render_template_string(data['display_detail'],
+            **first_post)
+    except:
+        example_post = "No First Post"
+
+    return render_template_string(my('.test.html'), feed=feed,
+        example_post=example_post)
