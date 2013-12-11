@@ -36,7 +36,6 @@ import bleach # html stripping.
 
 from simpleeval import simple_eval
 
-import streetsign_server.post_types
 from streetsign_server import app
 
 SECRET_KEY = app.config.get('SECRET_KEY')
