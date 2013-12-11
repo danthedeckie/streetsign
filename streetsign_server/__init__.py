@@ -30,8 +30,8 @@ import config
 app = Flask(__name__) # pylint: disable=invalid-name
 app.config.from_object('config')
 
-from streetsign_server import models
-from streetsign_server import views
+import streetsign_server.models as models
+import streetsign_server.views as views
 from streetsign_server.models import DB, User, Group, Post, Feed, FeedPermission
 
 #auth = Auth(app, db)
