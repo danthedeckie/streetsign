@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
-"""  StreetSign Digital Signage Project
-     (C) Copyright 2013 Daniel Fairhead
-
-    StreetSign is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    StreetSign is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with StreetSign.  If not, see <http://www.gnu.org/licenses/>.
-
-    ---------------------------------
+# StreetSign Digital Signage Project
+#     (C) Copyright 2013 Daniel Fairhead
+#
+#    StreetSign is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    StreetSign is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with StreetSign.  If not, see <http://www.gnu.org/licenses/>.
+#
+#    ---------------------------------
+'''
+    streetsign_server.user_session
 
     factor out the session handling stuff, so that the views don't need to
     worry about it.
 
-"""
+'''
 
 from flask import session
 from streetsign_server.models import user_login, user_logout, get_logged_in_user

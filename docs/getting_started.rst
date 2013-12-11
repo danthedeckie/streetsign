@@ -64,6 +64,12 @@ There are also external data sources, which can open RSS feeds (say the news
 from the BBC, or the latest pictures you put on tumblr ...) and import those
 as posts into whichever feed you desire.
 
+Posts, when they come in from an external source, can be set to be published
+automatically, or not.  You can also edit the posts once they've come in, or
+unpublish or delete them.  This is really useful when pulling data from sources
+that you're not in complete control of, such as a news feed, or twitter, when
+you want editorial control before they go live on screens.
+
 Displaying it all
 ~~~~~~~~~~~~~~~~~
 

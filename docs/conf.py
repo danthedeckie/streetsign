@@ -7,6 +7,9 @@
 import sys
 import os
 
+sys.path.append("../.virtualenv/lib/python2.7/site-packages/")
+sys.path.append("../")
+
 extensions = [
     'sphinx.ext.autodoc',
 ]

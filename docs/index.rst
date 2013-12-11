@@ -12,7 +12,8 @@ Contents:
    :maxdepth: 3
 
    getting_started
-   developer
+   developer-overview
+   developer-reference
    external_libs
 
 Indices and tables
