@@ -1,0 +1,3 @@
+include README.md run.py
+recursive-inclued streetsign_server
+
