@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block body %}
-  <h1> Edit Post </h1>
+  <h1> Edit Post (in <a href="{{ url_for('feedpage', feedid=post.feed.id) }}">{{ post.feed.name }}</a>)</h1>
  
  <form action="{{ form_action }}" method="POST" enctype="multipart/form-data">
   <input type="hidden" name="action" value="update" />

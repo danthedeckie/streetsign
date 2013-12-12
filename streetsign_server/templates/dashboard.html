@@ -70,8 +70,8 @@
       {% for feed in feeds %}
         <li><a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a> -
             {% if feed.user_can_write(user) %}
-                <a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}"
-                   class="newbutton">New Post</a>
+                <a href="{{ url_for('post_new', feed_id=feed.id) }}"
+                   class="btn btn-xs btn-default">New Post</a>
             {% endif %}
         </li>
       {% endfor %}

@@ -3,14 +3,13 @@
 
 {% block body %}
 <h1>Feed: {{ feed.name }} </h1>
-<h2>Posts: </h2>
 <table class="table table-striped">
 <thead>
   <tr>
     <th>Post</th>
     <th>Author</th>
     <th>Date</th>
-    <th colspan=2>{% if feed.user_can_write(user) %}<a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}" class="btn btn-primary">NEW</a>{% endif %}</th>
+    <th colspan=2>{% if feed.user_can_write(user) %}<a href="{{ url_for('post_new', feed_id=feed.id) }}" class="btn btn-primary">NEW</a>{% endif %}</th>
   </tr>
 </thead>
 <tbody>
@@ -34,14 +33,19 @@
                   ((not post.published) and feed.user_can_write(user)) %}
             <form method="POST" action="{{ url_for('postpage',postid=post.id) }}" >
             <input type="hidden" name="action" value="delete" />
-            <input class="delbutton confirm_delete" type="submit" value="X" /></form>
+            <input class="delbutton confirm_delete" type="submit" value="&times;" /></form>
             {% endif %}</td>
     </tr>
 {% endfor %}
 </tbody>
 </table>
 {% if user.is_admin %}
-<form method="POST" id="users_and_groups">
+<form method="POST" id="users_and_groups" class="form">
+<label for="post_types">What kind of new posts are allowed here?</label><br/>
+<input name="post_types" type="text" value="{{feed.post_types}}" class="form-control"/>
+(blank means all)
+<hr/>
+
 <input type="hidden" name="action" value="edit" />
 <div class="autowidth">
 <h2>Permissions for this feed.</h2>
@@ -74,7 +78,7 @@
     {{ widgets.groupselect("publisher_groups", allgroups, feed.publisher_groups()) }}
 </div>
 </div></div>
-<input type="submit" value="Save">
+<input type="submit" value="Save" class="btn btn-primary"/>
 </form>
 {% else %}
 <div class="leftside">

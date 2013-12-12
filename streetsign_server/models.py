@@ -32,7 +32,7 @@ from peewee import * # pylint: disable=wildcard-import,unused-wildcard-import
 import sqlite3 # for catching an integrity error
 from passlib.hash import bcrypt # pylint: disable=no-name-in-module
 from uuid import uuid4 # for unique session ids
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import time
 import bleach # html stripping.
 
@@ -292,11 +292,19 @@ class Feed(DBModel):
     #: the name of the feed.
     name = CharField(default='New Feed')
 
+    #: which types of posts are allowed in this feed (comma,separated)?
+    post_types = CharField(default='')
+
     def __repr__(self):
         return '<Feed:' + self.name + '>'
 
     def post_count(self):
+        ''' how many posts in this feed? '''
         return self.posts.count()
+
+    def post_types_as_list(self):
+        ''' return a list of post types, from the single field '''
+        return [i.strip() for i in self.post_types.split(',')]
 
     # Yes, I like comprehensions.
     def authors(self):
@@ -527,7 +535,7 @@ class Post(DBModel):
 
     # When should the feed actually be shown:
     active_start = DateTimeField(default=datetime.now) #: lifetime start
-    active_end = DateTimeField(default=datetime.now) #: lifetime end
+    active_end = DateTimeField(default=lambda:datetime.now() + timedelta(weeks=1)) #: lifetime end
 
     #: Time restrictions don't need to be cross queried, and honestly
     #: are easier just left in javascript/JSON land:

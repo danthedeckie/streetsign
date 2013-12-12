@@ -98,6 +98,9 @@ def feedpage(feedid):
 
         if action == 'edit':
             feed.name = request.form.get('title', feed.name).strip()
+
+            feed.post_types = request.form.get('post_types', '')
+            
             inlist = request.form.getlist
 
             feed.set_authors(by_id(User, inlist('authors')))
@@ -139,8 +142,8 @@ def posts():
         flash('Cleaned up old posts...')
         return render_template('posts.html', posts=Post.select())
 
-@app.route('/posts/new', methods=['GET','POST'])
-def post_new():
+@app.route('/posts/new/<int:feed_id>', methods=['GET','POST'])
+def post_new(feed_id):
     ''' create a new post! '''
 
     if not user_session.logged_in():
@@ -148,17 +151,39 @@ def post_new():
         return redirect(url_for('index'))
 
     user = user_session.get_user()
+    feed = Feed.get(id=feed_id)
+
+    if not feed.user_can_write(user):
+        flash("Sorry! You don't have permission to write here!")
+        return redirect(request.referrer)
 
     if request.method == 'GET':
         # send a blank form for the user:
 
-        feed = int(request.args.get('initial_feed', 1))
+        post = Post()
+        post.feed=feed
+
+        # give list of available post types:
+
+        all_posttypes = {x['id']:x for x in post_types.types()}
+
+        if post.feed.post_types:
+
+            allowed_post_types = []
+
+            for post_type in post.feed.post_types_as_list():
+                if post_type in all_posttypes:
+                    allowed_post_types.append(all_posttypes[post_type])
+        else:
+            allowed_post_types = all_posttypes.values()
+
+        # return the page:
+
         return render_template('postnew.html',
                 current_feed=feed,
-                post=Post(),
-                feedlist = user.writeable_feeds(),
-                can_write = True,
-                post_types=post_types.types())
+                post=post,
+                user=user,
+                post_types=allowed_post_types)
 
     else: # POST. new post!
         post_type = request.form.get('post_type')
@@ -168,10 +193,14 @@ def post_new():
             flash('Sorry! invalid post type.')
             return redirect(request.referrer)
 
+        if feed.post_types and post_type not in feed.post_types_as_list():
+            flash ('sorry! this post type is not allowed in this feed!')
+            return redirect(request.referrer)
+
         post = Post(type=post_type, author=user)
 
         try:
-            post.feed = try_to_set_feed(post, request.form, user)
+            post.feed = feed
 
             if_i_cant_write_then_i_quit(post, user)
 
@@ -264,10 +293,9 @@ def postpage(postid):
 
     return render_template('post_editor.html',
                             post = post,
-                            post_type = post.type,
                             current_feed = post.feed.id,
                             feedlist = user.writeable_feeds(),
-                            can_write = can_write,
+                            user=user,
                             form_content = editor.form(json.loads(
                                 post.content)))
 

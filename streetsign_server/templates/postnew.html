@@ -3,7 +3,7 @@
 {% block title %} New Post {% endblock %}
 
 {% block body %}
-<h2>New Post</h2>
+<h2>New Post (in {{ post.feed.name }})</h2>
 <div style="text-align:center">
 <ul class="nav nav-tabs">
 {%- for type in post_types -%}
@@ -22,10 +22,9 @@
    {{ linkmacros.static_js('post_editor.js') }}
    <script type="text/javascript">
     // As the static js is static, we need in inject URLs here.
-    var INITIAL_FEED = "?initial_feed={{ initial_feed }}";
     var POST_TYPE_URL = function(id) {
         var o="{{url_for('postedit_type', typeid='-1')}}";
-        return o.replace(/-1/, id)+INITIAL_FEED;
+        return o.replace(/-1/, id);
     };
 
     // Used by the TimesModel, initialised in post_editor.html

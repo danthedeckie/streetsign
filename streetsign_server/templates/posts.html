@@ -10,7 +10,12 @@
 <th>Content</th>
 <th>Author</th>
 <th>Feeds</th>
-<th> {% if session.display_admin_stuff %}<a class="btn btn-primary" href="{{ url_for('post_new') }}">New</a>{% endif %} </th>
+<th> {% if session.display_admin_stuff %}
+       {% for feed in user.writeable_feeds() %}
+        <a class="btn btn-primary" href="{{ url_for('post_new', feed_id=feed.id) }}">{{feed.name }}</a>
+      {% endfor %}
+    {% endif %}
+</th>
 </tr>
 </thead>
 <tbody>
