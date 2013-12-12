@@ -1,9 +1,20 @@
+'''
+    setup.py
+    --------
+    Simple distutils script, which in general streetsign use is probably
+    pointless, but nevertheless is kind of useful for ReadTheDocs to be able
+    to install streetsign_server as a module in its virtualenv.
+'''
+
 from distutils.core import setup
 
 setup(
     name = 'streetsign_server',
-    packages = ['streetsign_server'],
-    version = "0.5",
+    packages = ['streetsign_server', 'streetsign_server.views',
+                                     'streetsign_server.logic',
+                                     'streetsign_server.post_types',
+                                     'streetsign_server.external_source_types'],
+    version = "0.6",
     description = 'A simple python/flask/web based digital signage system',
     long_description=open('README.md','r').read(),
     author = 'Daniel Fairhead',

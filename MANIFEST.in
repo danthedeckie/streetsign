@@ -1,3 +1,5 @@
 include README.md run.py
 recursive-include streetsign_server *
+recursive-include streetsign_server/templates *
+recursive-include streetsign_server/static *
 

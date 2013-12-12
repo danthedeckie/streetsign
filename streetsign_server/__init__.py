@@ -25,7 +25,11 @@ from flask import Flask
 import flask
 #from flask_peewee.admin import Admin
 #from flask_peewee.auth import Auth
-import config
+try:
+    import config
+except:
+    print("Config file missing!!!")
+    import config_default
 
 app = Flask(__name__) # pylint: disable=invalid-name
 app.config.from_object('config')

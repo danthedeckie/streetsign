@@ -29,6 +29,11 @@
 - Better uploaded files editor.
 - Direction for scroller
 - abilty to have full-screen URGENT messages.
+- A bunch of good default background images.
+- "webpage" post type (creates an iframe to embed another url)
+- RSS post count limiter
+- HTML page importer (maybe uses md5? or last-changed? or something to know if it sould make a new post)
+- Export Screen Data (JSON) and import.
 
 # Good things for the future:
 
