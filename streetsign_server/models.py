@@ -17,9 +17,11 @@
 #
 #    -------------------------------
 '''
-    streetsign_server.models
+========================
+streetsign_server.models
+========================
     
-    peewee ORM database models.
+peewee ORM database models.
 
 '''
 
@@ -47,6 +49,14 @@ __all__ = [ 'DB', 'user_login', 'user_logout', 'get_logged_in_user',
             'ConfigVar', 'Screen',
             'create_all', 'by_id' ]
 
+
+'''
+--------------------------------------------------------------------------------
+Useful functions
+--------------------------------------------------------------------------------
+
+'''
+
 def safe_json_load(text, default):
     ''' either parse a string from JSON into python or else return default. '''
     try:
@@ -54,32 +64,74 @@ def safe_json_load(text, default):
     except:
         return default
 
+def eval_datetime_formula(string):
+    ''' evaluate a simple date/time formula, returning a unix datetime stamp '''
+
+    replacements = [('WEEKS', '* 604800'),
+                    ('WEEK', '* 604800'),
+                    ('DAYS', '* 86400'),
+                    ('DAY', '* 86400'),
+                    ('MONTHS', '* 2592000'),  # 30 day month...
+                    ('MONTH', '* 2592000'),
+                   ]
+
+    for rep_str, out_str in replacements:
+        string = string.replace(rep_str, out_str)
+
+    return simple_eval(string, names={'NOW': time()})
+
+def create_all():
+    ''' initialises the database, creates all needed tables. '''
+    [t.create_table(True) for t in
+        (User, UserSession, Group, UserGroup, Post, Feed,
+         FeedPermission, ConfigVar, ExternalSource, Screen)]
+
+def by_id(model, ids):
+    ''' returns a list of objects, selected by id (list) '''
+    return [x for x in model.select().where(model.id << [int(i) for i in ids])]
+
+'''
+--------------------------------------------------------------------------------
+Other
+--------------------------------------------------------------------------------
+'''
 
 class DBModel(Model):
-    ''' base class '''
+    ''' base class for other database models '''
     # pylint: disable=too-few-public-methods
     class Meta:
         ''' store DB info '''
         database = DB
 
-##############################################################################
-#
-# Users & Groups:
-#
+'''
+--------------------------------------------------------------------------------
+Users & Groups
+--------------------------------------------------------------------------------
+'''
 
 class User(DBModel):
     ''' Back-end user. '''
 
-    loginname = CharField(unique=True)
-    displayname = CharField(null=True)
+    #: the unique name user to log in
+    loginname = CharField(unique=True) 
+    ''' logINNNNN '''
+    #: how the user would like to be displayed
+    displayname = CharField(null=True) 
+    #: how to contact the user:
     emailaddress = CharField()
 
+    #: bcrypt'd, salted, etc password hash
     passwordhash = CharField()
 
+    #: is the user an admin?
     is_admin = BooleanField(default=False)
+
+    #: you can lock out users, so they cannot log in for a while.
     is_locked_out = BooleanField(default=False)
 
+    #: when was the last attempt to log in?
     last_login_attempt = DateTimeField(default=datetime.now)
+    #: how many times has the user failed to log in?
     failed_logins = IntegerField(default=0)
 
     def set_password(self, password):
@@ -134,55 +186,6 @@ class User(DBModel):
 
         return True, self.groups()
 
-##########
-# login stuff:
-
-class UserSession(DBModel):
-    ''' Track user logged in sessions in the database. '''
-
-    id = CharField(primary_key=True)
-    username = CharField()
-
-    user = ForeignKeyField(User, related_name='sessions')
-    login_time = DateTimeField(default=datetime.now)
-
-
-class InvalidPassword(Exception):
-    ''' Oh no! Invalid password! '''
-
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
-
-def user_login(name, password):
-    ''' preferred way to get a user object, which checks the password,
-        and either returns a User object, or raises an exception '''
-
-    user = User.select().where(User.loginname == name).get()
-    # on error, raises: User.DoesNotExist
-
-    if bcrypt.verify(password + SECRET_KEY, user.passwordhash):
-        session = UserSession(id=str(uuid4()), username=user.loginname,
-                                               user=user)
-        session.save(force_insert=True)
-
-        return user, session.id
-    else:
-        raise InvalidPassword('Invalid Password!')
-
-def get_logged_in_user(name, uuid):
-    ''' either returns a logged in user, or raises an error '''
-    session = UserSession.get(id=uuid, username=name)
-    return session.user
-
-def user_logout(name, uuid):
-    ''' removes a session '''
-    UserSession.get(id=uuid, username=name).delete_instance()
-    return True
-
-
-#########################################
 
 class Group(DBModel):
     ''' User groups (for permissions.) Groups can be given permission to
@@ -220,15 +223,73 @@ class UserGroup(DBModel):
     user = ForeignKeyField(User)
     group = ForeignKeyField(Group)
 
-#############################################################################
-#
-# Posts & Feeds:
-#
-class Feed(DBModel):
-    ''' A Feed is kind of like a category of posts. Different 'zones' on screen
-        outputs will subscribe to these categories. '''
 
-    # pylint: disable=line-too-long
+'''
+--------------------------------------------------------------------------------
+Login Stuff
+--------------------------------------------------------------------------------
+
+Most of the time, these shouldn't be used directly, but instead use the
+functions in :ref:`streetsign_server.user_session`.
+
+'''
+
+class UserSession(DBModel):
+    ''' Track user logged in sessions in the database. '''
+
+    id = CharField(primary_key=True) #: unique id
+    username = CharField() #: which username?
+
+    user = ForeignKeyField(User, related_name='sessions') #: the user
+    login_time = DateTimeField(default=datetime.now) #: when did they log in?
+
+
+class InvalidPassword(Exception):
+    ''' Oh no! Invalid password! '''
+
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
+
+def user_login(name, password):
+    ''' preferred way to get a user object, which checks the password,
+        and either returns a User object, or raises an exception '''
+
+    user = User.select().where(User.loginname == name).get()
+    # on error, raises: User.DoesNotExist
+
+    if bcrypt.verify(password + SECRET_KEY, user.passwordhash):
+        session = UserSession(id=str(uuid4()), username=user.loginname,
+                                               user=user)
+        session.save(force_insert=True)
+
+        return user, session.id
+    else:
+        raise InvalidPassword('Invalid Password!')
+
+def get_logged_in_user(name, uuid):
+    ''' either returns a logged in user, or raises an error '''
+    session = UserSession.get(id=uuid, username=name)
+    return session.user
+
+def user_logout(name, uuid):
+    ''' removes a session '''
+    UserSession.get(id=uuid, username=name).delete_instance()
+    return True
+
+'''
+--------------------------------------------------------------------------------
+Posts & Feeds:
+--------------------------------------------------------------------------------
+'''
+
+class Feed(DBModel):
+    ''' A Feed is kind of like a collection, or category of posts.
+        Different 'zones' on screen outputs will subscribe to these Feeds. '''
+
+    #: the name of the feed.
     name = CharField(default='New Feed')
 
     def __repr__(self):
@@ -236,18 +297,22 @@ class Feed(DBModel):
 
     # Yes, I like comprehensions.
     def authors(self):
+        ''' return all users with write permission '''
         return [p.user for p in self.permissions
                 if p.write == True and p.user]
 
     def publishers(self):
+        ''' return all users with publishing permission '''
         return [p.user for p in self.permissions
                 if p.publish == True and p.user]
 
     def author_groups(self):
+        ''' return all groups with write permission '''
         return [p.group for p in self.permissions
                 if p.write == True and p.group]
 
     def publisher_groups(self):
+        ''' return all groups with publishing permission '''
         return [p.group for p in self.permissions
                 if p.publish == True and p.group]
 
@@ -435,21 +500,22 @@ class Post(DBModel):
         of post can be added quite easily later, without changing the
         schema. '''
 
-    type = TextField()
-    content = TextField()
-    feed = ForeignKeyField(Feed, related_name='posts')
+    type = TextField() #: used to load the content-type module for this post
+    content = TextField() #: JSON data sent to the content-type module
+    feed = ForeignKeyField(Feed, related_name='posts') #: which feed
 
-    author = ForeignKeyField(User, related_name='posts')
+    author = ForeignKeyField(User, related_name='posts') #: who wrote it?
 
-    write_date = DateTimeField(default=datetime.now)
+    write_date = DateTimeField(default=datetime.now) #: when was it written?
 
     #publisher info:
-    published = BooleanField(default=False)
-    publish_date = DateTimeField(null=True)
+    published = BooleanField(default=False) #: is this post published?
+    publish_date = DateTimeField(null=True) #: when was it published?
+    #: who published it?
     publisher = ForeignKeyField(User, related_name='published_posts', null=True)
 
     # Should it actually be displayed?
-    status = IntegerField(default=0)
+    status = IntegerField(default=0) #: can be 0:active/1:finished/2:archived.
     status_options = {
         0: 'active',
         1: 'finished',
@@ -457,20 +523,20 @@ class Post(DBModel):
         }
 
     # When should the feed actually be shown:
-    active_start = DateTimeField(default=datetime.now)
-    active_end = DateTimeField(default=datetime.now)
+    active_start = DateTimeField(default=datetime.now) #: lifetime start
+    active_end = DateTimeField(default=datetime.now) #: lifetime end
 
-    # Time restrictions don't need to be cross queried, and honestly
-    # are easier just left in javascript/JSON land:
-    # are these restrictions "Only show during these times" or
-    #                        "Do not show during these times" ?
+    #: Time restrictions don't need to be cross queried, and honestly
+    #: are easier just left in javascript/JSON land:
+    #: are these restrictions "Only show during these times" or
+    #: "Do not show during these times" ?
     time_restrictions_show = BooleanField(default=False)
 
-    # and the actual restrictions:
+    #: and the actual restrictions:
     time_restrictions = TextField(default='[]')
     # {"start_time", "end_time", "note"}
 
-    # For how long should it be displayed?
+    #: For how long should it be displayed?
     display_time = IntegerField(default=8)
 
     def __repr__(self):
@@ -505,6 +571,7 @@ class Post(DBModel):
               'time_restrictions_show': self.time_restrictions_show,
               'display_time': self.display_time * 1000 # in milliseconds
             })
+
     def active_status(self):
         ''' is this post active now, in the future, or the past?
             (returns a string 'now'/'future'/'past') '''
@@ -519,69 +586,39 @@ class Post(DBModel):
         else:
             return 'now'
 
-##################################################
-
-class Screen(DBModel):
-    ''' Each URL for output is known as a screen. (You can point a web-browser
-        with a physical screen at it.)  This stores the info needed to display
-        them.
-
-        Since most of the settings here are made with a JS interface,
-        and sent as json packets to another JS interface for display,
-        and don't need to be queried against, just leave 'em as JSON.
-
-        '''
-
-    # TODO: have JSON list Field types here, for validation, rather than
-    #       in the view/logic code...
-
-    urlname = CharField(unique=True, null=False)
-    background = CharField(null=True)
-    # JSON:
-    settings = TextField(default='{}')
-    defaults = TextField(default='{}')
-    zones = TextField(default='[]')
-
-    def json_all(self):
-        ''' returns a JSON string ready for transmission '''
-
-        return json.dumps({
-            "id":self.id,
-            "urlname": self.urlname,
-            "background": self.background if self.background else '',
-            "settings": safe_json_load(self.settings, {}),
-            "defaults": safe_json_load(self.defaults, {}),
-            "zones": safe_json_load(self.zones, []),
-            })
 
 class ExternalSource(DBModel):
     ''' How do we pull data in from external sources? '''
+
+    #: name, displayed in the interface
     name = CharField()
 
-    # source types are loaded in later, the same as post types.
+    #: source types are loaded in later, the same as post types.
     type =  CharField()
 
-    # how often to check for new data at the source...
+    #: how often to check for new data at the source...
     frequency = IntegerField(default=60)
+    #: when was it last checked?
     last_checked = DateTimeField(null=True)
 
-    # Which feed should posts from this source show up in?
+    #: Which feed should posts from this source show up in?
     feed = ForeignKeyField(Feed, related_name='external_sources')
 
-    # Where the actual per-type-specific settings are saved:
+    #: Where the actual per-type-specific settings are saved:
     settings = CharField(default='{}')
 
-    # Should new posts from this source start off published?
+    #: Should new posts from this source start off published?
     publish = BooleanField(default=False)
 
-    # Which user should be set as the owner / author of these?
+    #: Which user should be set as the owner / author of these?
     post_as_user = ForeignKeyField(User, related_name='external_sources')
 
-    # initial post settings. (TODO)
+    #: initial post settings. (TODO)
     post_template=CharField(default='{}')
 
-    # Lifetime of new posts (formula)
+    #: Lifetime start of new posts (formula)
     lifetime_start = CharField(default="NOW")
+    #: Lifetime end of new posts (formula)
     lifetime_end = CharField(default="NOW + 1 WEEK")
 
     def current_lifetime_start(self):
@@ -597,40 +634,60 @@ class ExternalSource(DBModel):
                     eval_datetime_formula(self.lifetime_end))
 
 
-##############################################################################
+'''
+--------------------------------------------------------------------------------
+Screens & Other Output Spec
+--------------------------------------------------------------------------------
+'''
+
+class Screen(DBModel):
+    ''' Each URL for output is known as a screen. (You can point a web-browser
+        with a physical screen at it.)  This stores the info needed to display
+        them.
+
+        Since most of the settings here are made with a JS interface,
+        and sent as json packets to another JS interface for display,
+        and don't need to be queried against, just leave 'em as JSON.
+
+        '''
+
+    # TODO: have JSON list Field types here, for validation, rather than
+    #       in the view/logic code...
+
+    #: the url where this will be available ``/screens/<urlname``
+    urlname = CharField(unique=True, null=False)
+
+    #: the background image
+    background = CharField(null=True)
+    
+    #: screen settings (JSON)
+    settings = TextField(default='{}')
+    #: default post settings (JSON)
+    defaults = TextField(default='{}')
+    #: spec all the zones (JSON)
+    zones = TextField(default='[]')
+
+    def json_all(self):
+        ''' returns a JSON string ready for transmission '''
+
+        return json.dumps({
+            "id":self.id,
+            "urlname": self.urlname,
+            "background": self.background if self.background else '',
+            "settings": safe_json_load(self.settings, {}),
+            "defaults": safe_json_load(self.defaults, {}),
+            "zones": safe_json_load(self.zones, []),
+            })
 
 
-def eval_datetime_formula(string):
-    ''' evaluate a simple date/time formula, returning a unix datetime stamp '''
-
-    replacements = [('WEEKS', '* 604800'),
-                    ('WEEK', '* 604800'),
-                    ('DAYS', '* 86400'),
-                    ('DAY', '* 86400'),
-                    ('MONTHS', '* 2592000'),  # 30 day month...
-                    ('MONTH', '* 2592000'),
-                   ]
-
-    for rep_str, out_str in replacements:
-        string = string.replace(rep_str, out_str)
-
-    return simple_eval(string, names={'NOW': time()})
-
-##############################################################################
+'''
+--------------------------------------------------------------------------------
+Misc
+--------------------------------------------------------------------------------
+'''
 
 class ConfigVar(DBModel):
     ''' place to store site-wide front-end-editable settings. '''
     id = CharField(primary_key=True)
     value = CharField(null=True)
     description = CharField(default="Setting")
-
-
-def create_all():
-    ''' initialises the database, creates all needed tables. '''
-    [t.create_table(True) for t in
-        (User, UserSession, Group, UserGroup, Post, Feed,
-         FeedPermission, ConfigVar, ExternalSource, Screen)]
-
-def by_id(model, ids):
-    ''' returns a list of objects, selected by id (list) '''
-    return [x for x in model.select().where(model.id << [int(i) for i in ids])]

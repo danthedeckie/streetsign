@@ -7,6 +7,17 @@ as I've enjoyed developing it so far.
 Installation instructions are in the Project README file.  It should be very
 easy on any linux/OSX or other unixy type computer.
 
+Essentially, once you've downloaded or cloned the project::
+
+    ./setup.sh
+
+Should download and install a virtualenv, and set up all the dependencies and
+the initial database (a local sqlite file).  Then ::
+
+    ./run.py
+
+To actually run a local test server.
+
 This document hopes to make the different concepts and terminology clear, so
 that you can be up to speed as quickly as possible.
 
@@ -27,6 +38,8 @@ and displays the content in organized layouts, which are specified by the
 designer.  These are simple HTML webpages, and simply displayed with a full-
 screen web browser. (They can also be connected to by smartphones, tablets,
 or other desktop machines if you so desire.)
+
+.. _content_intro:
 
 Content
 ~~~~~~~

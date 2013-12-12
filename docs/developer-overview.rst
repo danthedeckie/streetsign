@@ -5,7 +5,8 @@ This will contain the documentation for developers, either working
 *on* StreetSign, or making plugins/other software to work with it.
 
 It's assumed that you're reasonably familiar with StreetSign the end user web
-interface and basic terminology (Post, Feed, Screen, Zone, etc).
+interface and basic terminology (Post, Feed, Screen, Zone, etc). If not,
+see the :doc:`getting_started`
 
 Project Structure Overview
 --------------------------
@@ -25,6 +26,8 @@ models.py
 All the peewee ORM database models are defined in here.  These are fairly smart
 models, containing as much business logic as makes sense to keep in them.
 
+Full Reference: :doc:`developer/models`
+
 user_session.py
 ~~~~~~~~~~~~~~~
 
@@ -36,6 +39,8 @@ to log in with those credentials, and if it can, then it creates the
 appropriate ``UserSession`` database items, and adds useful items to the
 session cookie.
 
+Full Reference: :doc:`developer/user_session`
+
 views/
 ~~~~~~
 
@@ -44,6 +49,8 @@ application.  So the functions which generate the pages you see when
 you use the web interface, the screen rendering, etc.  It is mostly
 split out into submodules.
 
+Full Reference: :doc:`developer/views`
+
 logic/
 ~~~~~~
 
@@ -51,8 +58,10 @@ The logic package is where more complex logic is being moved to from the
 views package.  Once things start becoming more complex than simply pulling
 things from the database and rendering it, and the logic is application
 specific rather than model specific, then it should go in here.  There is
-more logic than really should be in ``views``, and in general, it should
+more logic than really should be in `views/`, and in general, it should
 be ported across to here.
+
+Full Reference: :doc:`developer/logic`
 
 static/
 ~~~~~~~

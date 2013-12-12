@@ -1,5 +1,5 @@
 streetsign_server.post_types
-========================
+============================
 
 Post types are the different kinds of posts. So plain text posts, rich html
 posts, image posts, etc.  Each type is defined in its own module here, so
