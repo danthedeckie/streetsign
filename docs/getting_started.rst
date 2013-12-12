@@ -89,6 +89,15 @@ Displaying it all
 It's all well and good to have everything organised nicely, but it's only
 useful if you can put your content where people can see it...
 
+Publish the posts!
+``````````````````
+
+Before the posts will show up anywhere, you will need to set them to be
+*published*, which is done on the Feed page.  You can have different users
+with permission to do different things - so you can have users who can create
+posts, but not publish them, and then a manager's user who can publish them
+after approval.
+
 Screens
 ```````
 
@@ -177,3 +186,13 @@ That's it!
 Hopefully that gives you a good overview of the system, it's designed to be
 reasonably easy to work with.
 
+Magic Variables
+---------------
+
+In HTML and plain text posts, you can put the following "magic variables":
+
+``%%TIME%%`` and ``%%DATE%%`` which will show up on the output screens as
+the current date and time, respectively.  *Note: this time is local to that
+screen's computer!  So if you are using a raspberry pi or similar, and you're
+on a closed network without internet access, then you'll also need to set up
+some kind of NTP server too.*

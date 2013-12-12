@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 3
 
    getting_started
+   admin_guide
    developer-overview
    developer-reference
    external_libs

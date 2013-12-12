@@ -41,11 +41,11 @@ def safehtml(text):
 
     return bleach.clean(text, strip=True,
         tags=["div", "span", "b", "i", "u",
-              "em", "ul","li","ol", "a",
+              "em", "ul","li","ol", "a","br",
               "code", "blockquote", "strong",
               "small", "big", "img", "table",
               "tr", "td", "th", "thead",
-              "tfoot"],
+              "tfoot","h1","h2","h3","h4","h5","h6","p"],
         attributes=['class','href','alt','src'])
 
 def safecolor(text, default="#fff"):

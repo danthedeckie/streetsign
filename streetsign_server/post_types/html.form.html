@@ -9,13 +9,20 @@
 
 <textarea id="contenttextarea" name="content" rows="10" cols="80" style="width: 100%;">{{content}}</textarea>
 <script type="text/javascript" defer>
+
 $( function() {
     $('input[type=color]').spectrum({
        clickoutFiresChange: true
     });
-    var editor = new wysihtml5.Editor("contenttextarea",
-        { toolbar: "content-toolbar",
-        parserRules: wysihtml5ParserRules
-        });
+
+    $("#contenttextarea").wysihtml5({
+        //"font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
+        "emphasis": true, //Italics, bold, etc. Default true
+        "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+        "html": true, //Button which allows you to edit the generated HTML. Default false
+        "image": true, //Button to insert an image. Default true,
+        "color": true //Button to change color of font  
+    });
+
 });
 </script>

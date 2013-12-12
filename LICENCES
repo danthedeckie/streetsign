@@ -26,10 +26,14 @@ jsoneditor: (for editing json data)
 wysihtml5: (simple html5 wysiwyg editor for posts)
  - MIT Licence
 
+ bootstrap3-wysihtml5: (wysihtml5 with bootstrap awesomeness)
+ - https://github.com/Waxolunist/bootstrap3-wysihtml5-bower
+ - MIT Licence
+
 chosen: (even sweeter multiselect widget)
  - MIT Licence
 
-twitter bootstrap: (easy UI theme for the interface)
+twitter bootstrap(3): (easy UI theme for the interface)
  - Apache Licence (2.0)
 
 All of these can be found in the streetsign_server/static/lib/ folder, with their
