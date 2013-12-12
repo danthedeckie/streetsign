@@ -1,0 +1,19 @@
+<div class="cf"></div>
+<label>Embed an External Web Page </label><br/>
+
+<label for="url">URL:</label>
+<input name="url" style="width: 100%;" value="{{url}}" />
+
+<hr/>
+<b>Preview:</b>
+<div id="preview" style="width: 100%;"></div>
+
+<script type="text/javascript" defer>
+
+$( function() {
+    $('input[name=url]').change(function(){
+        $("#preview").innerHTML = $(this).val;
+    });
+
+});
+</script>

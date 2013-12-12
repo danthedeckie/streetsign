@@ -63,8 +63,14 @@ def feeds():
                 return redirect(url_for('feeds'))
             Feed(name=request.form.get('title','blank').strip()).save()
 
+    try:
+        user = user_session.get_user()
+    except user_session.NotLoggedIn as e:
+        user = User()
+
     return render_template('feeds.html',
                            feeds=Feed.select(),
+                           user=user,
                            external_sources=ExternalSource.select(),
                            source_types=external_source_types.types())
 

@@ -295,6 +295,9 @@ class Feed(DBModel):
     def __repr__(self):
         return '<Feed:' + self.name + '>'
 
+    def post_count(self):
+        return self.posts.count()
+
     # Yes, I like comprehensions.
     def authors(self):
         ''' return all users with write permission '''
@@ -548,18 +551,18 @@ class Post(DBModel):
             then wrap it in Markup(), so jinja2 doesn't escape it. '''
 
         # TODO: split this out to the various post_type modules, and cache it.
-        content = safe_json_load(self.content, {'content':'None'})['content']
-        if (self.type=='html'):
-            return bleach.clean(content, tags=[], strip=True)[0:15] + '...(' + \
-                    self.type + ')'
-        elif (self.type=='text'):
-            return content[0:14]
-        elif (self.type=='image'):
+        try:
+            content = safe_json_load(self.content, {'content':'None'})['content']
+        except KeyError:
+            content = "N/A"
+
+        if (self.type=='image'):
             return Markup('<img src="{0}" alt="{1}" />'.format(
                         url_for('thumbnail', filename='post_images/'+content),
                         content))
         else:
-            return 'N/A'
+            return bleach.clean(content, tags=[], strip=True)[0:15] + '...(' + \
+                    self.type + ')'
 
     def dict_repr(self):
         ''' must give all info, for use on screens, etc. '''

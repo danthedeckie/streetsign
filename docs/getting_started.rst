@@ -186,8 +186,13 @@ That's it!
 Hopefully that gives you a good overview of the system, it's designed to be
 reasonably easy to work with.
 
+Notes when using the system
+---------------------------
+
+There are a few things which it's good to know:
+
 Magic Variables
----------------
+~~~~~~~~~~~~~~~
 
 In HTML and plain text posts, you can put the following "magic variables":
 
@@ -196,3 +201,16 @@ the current date and time, respectively.  *Note: this time is local to that
 screen's computer!  So if you are using a raspberry pi or similar, and you're
 on a closed network without internet access, then you'll also need to set up
 some kind of NTP server too.*
+
+Post Sizing/Scaling
+~~~~~~~~~~~~~~~~~~~
+
+When posts are displayed on the output screens, they will automatically be
+scaled to fit in the zone that they're displayed in.  If you're really
+struggling to get text big enough, there's a good chance that you simply have
+too much text to fit it all into that zone.
+
+Also, if you have text which is "Title 1" (``<h1>...</h1>`` for the HTML
+junkies) it can display as different sizes in different posts, as each post is
+scaled independently.
+

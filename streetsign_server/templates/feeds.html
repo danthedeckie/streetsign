@@ -8,17 +8,32 @@
   <tr>
     <th>Feed Name</th>
     <th></th>
+    <th></th>
   </tr>
 </thead>
 <tbody>
-{% for feed in feeds %}
+  {% for feed in feeds %}
     <tr>
-        <td><a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a></td>
-        <td>{% if session.display_admin_stuff %}<form method="POST" action="{{ url_for('feedpage', feedid=feed.id) }}">
-            <input type="hidden" name="action" value="delete" />
-            <input type="submit" value="X" class="delbutton confirm_delete"></form>{% endif %}</td>
+        <td>
+            <a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a>
+             <span class="badge">{{ feed.posts.count() }}</span>
+        </td>
+        <td>
+         {% if feed.user_can_write(user) %}
+            <a href="{{ url_for('post_new') }}?initial_feed={{ feed.id }}"
+               class="btn btn-default btn-sm">Create New Post</a>
+         {% endif %}
+        </td>
+        <td>
+          {% if session.display_admin_stuff %}
+            <form method="POST" action="{{ url_for('feedpage', feedid=feed.id) }}">
+              <input type="hidden" name="action" value="delete" />
+              <input type="submit" value="&times;" class="btn close confirm_delete" aria-hidden="true">
+            </form>
+          {% endif %}
+        </td>
     </tr>
-{% endfor %}
+  {% endfor %}
 </tbody>
 </table>
 </div>
