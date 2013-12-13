@@ -11,8 +11,8 @@
 <script type="text/javascript" defer>
 
 $( function() {
-    $('input[name=url]').change(function(){
-        $("#preview").innerHTML = $(this).val;
+    $('input[name="url"]').change(function(){
+        $("#preview").html('<iframe style="width:100%; min-height:200px;" src="' + $('input[name="url"]').val()+ '"/>');
     });
 
 });
