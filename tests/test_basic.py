@@ -6,6 +6,7 @@ import sys
 import os
 import tempfile
 import unittest
+import html5lib
 
 sys.path.append(os.path.dirname(__file__) + '/..')
 
@@ -44,6 +45,22 @@ class TestSetup(StreetSignTestCase):
 
         request = self.app.get('/posts')
         assert '<span class="post_count">No Posts at all!' in request.data
+
+class TestHTML(StreetSignTestCase):
+    ''' test for valid HTML '''
+
+    def validate(self, url):
+        ''' test that a URL is actually HTML5 compliant '''
+
+        request = self.app.get(url)
+        parser = html5lib.HTMLParser(strict=True)
+        doc = parser.parse(request.data)
+
+    def test_non_logged_in_pages(self):
+        ''' test HTML validity of all non-logged-in pages '''
+
+        self.validate('/')
+        self.validate('/posts')
 
 if __name__ == '__main__':
     unittest.main()
