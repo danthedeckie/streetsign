@@ -10,11 +10,19 @@
 <th>Content</th>
 <th>Author</th>
 <th>Feeds</th>
-<th> {% if session.display_admin_stuff %}
-       {% for feed in user.writeable_feeds() %}
-        <a class="btn btn-primary" href="{{ url_for('post_new', feed_id=feed.id) }}">{{feed.name }}</a>
+<th> 
+{% if user.id %}
+<div class="btn-group">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    New Post <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+     {% for feed in user.writeable_feeds() %}
+        <li><a href="{{ url_for('post_new', feed_id=feed.id) }}">{{feed.name }}</a></li>
       {% endfor %}
-    {% endif %}
+  </ul>
+  </div>
+{% endif %}
 </th>
 </tr>
 </thead>

@@ -42,8 +42,11 @@
 {% if user.is_admin %}
 <form method="POST" id="users_and_groups" class="form">
 <label for="post_types">What kind of new posts are allowed here?</label><br/>
-<input name="post_types" type="text" value="{{feed.post_types}}" class="form-control"/>
-(blank means all)
+<select multiple autocomplete="off" data-placeholder="blank means all types" class="chosen" name="post_types">
+  {% for type in all_posttypes %}
+    <option {{ "selected" if type.id in feed.post_types_as_list() }} value="{{type.id}}">{{type.name}}</option>
+  {% endfor %}
+</select>
 <hr/>
 
 <input type="hidden" name="action" value="edit" />

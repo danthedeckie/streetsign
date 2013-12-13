@@ -99,9 +99,10 @@ def feedpage(feedid):
         if action == 'edit':
             feed.name = request.form.get('title', feed.name).strip()
 
-            feed.post_types = request.form.get('post_types', '')
             
             inlist = request.form.getlist
+
+            feed.post_types = ','.join(inlist('post_types'))
 
             feed.set_authors(by_id(User, inlist('authors')))
             feed.set_publishers(by_id(User, inlist('publishers')))
@@ -118,6 +119,7 @@ def feedpage(feedid):
     return render_template('feed.html',
                      feed=feed,
                      user=user,
+                     all_posttypes = post_types.types(),
                      allusers=User.select(),
                      allgroups=Group.select()
                 )
