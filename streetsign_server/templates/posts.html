@@ -49,5 +49,11 @@
 </tbody>
 </table>
 
+<!-- careful of changing this next line, as unit tests require it. -->
+{% if posts.count() == 0 %}
+<span class="post_count">No Posts at all!</span>
+{% else %}
+<span class="post_count">{{ posts.count() }} posts</span>
+{% endif %}
 
 {% endblock %}

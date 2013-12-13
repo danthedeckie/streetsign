@@ -13,3 +13,4 @@ passlib
 simpleeval
 waitress
 
+nose

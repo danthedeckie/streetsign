@@ -1,17 +1,14 @@
 # In progress
 
 - Bootstrapification
-  - why are chosen/select boxes funny sizes?
-- external data sources (rss, json, etc)
-
-# Sort of next
-
-- WYSIWYG editor for HTML posts. (bootstrap-wysihtml5) (with note that for more complex things, really it should be done as a designed image...)
+- External Data Sources
 - API and other 'public' documentation.
+- Unit tests
 
 # Bugs:
 
 - Single message on side-scrolling zone display doesn't go on for ever (some kind of timeout/race condition?)
+- Test Firefox memory usage on screens display.
 
 ## Urgent:
 
@@ -30,21 +27,18 @@
 - Direction for scroller
 - abilty to have full-screen URGENT messages.
 - A bunch of good default background images.
-- "webpage" post type (creates an iframe to embed another url)
 - RSS post count limiter
 - HTML page importer (maybe uses md5? or last-changed? or something to know if it sould make a new post)
 - Export Screen Data (JSON) and import.
+- Post Types (and External Data Types) should have a 'display name' property.
 
 # Good things for the future:
 
 - non-session auth as well for API, makes scripting easier.
-- Full Documentation
 - Output screens status, tracking which addresses are requesting info, alert when one goes down, etc.
 - Local machine mini-proxy which gets the latest info from the master server, but otherwise caches everything
   and keeps it running locally happily until it can connect again.
-- Icons
 - favicon & other 'sundries' (404, 301 etc pages)
-- Unit tests
 - replace db.py & run.py with a single manage.py type script
 - Internationalisation / multilingual stuff.
 - basic password strength checking
@@ -56,8 +50,8 @@
   admin, or something.
 - image thumbnails for 'uploaded files' & posts.
   (possibly an auto-cache api, as part of the uploaded files section, which
-  then the images post_type (plugin) & the display reference?)
-  {{ url_for('thumbnail', filename=...) }} or something...
+  then the images `post_type` (plugin) & the display reference?)
+  `{{ url_for('thumbnail', filename=...) }}` or something...
 
 # Random ideas:
 
@@ -65,3 +59,6 @@
   element inside the marquee could be a span within it....
   I don't know if this would make posts going inactive while 'live' look ugly,
   though...
+- Extra flag to send to a screen url which would disable setting a background
+  (even black) so that it can be embedded easier inside another post?  This would
+  allow the "sublayouts" concept (although I imagine performance being an issue).

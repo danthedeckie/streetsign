@@ -42,7 +42,7 @@ from streetsign_server import app
 
 SECRET_KEY = app.config.get('SECRET_KEY')
 
-DB = SqliteDatabase(app.config.get('DATABASE_FILE'), threadlocals=True )
+DB = SqliteDatabase(None, threadlocals=True )
 
 __all__ = [ 'DB', 'user_login', 'user_logout', 'get_logged_in_user',
             'User', 'Group', 'Post', 'Feed', 'FeedPermission', 'UserGroup',
@@ -82,6 +82,9 @@ def eval_datetime_formula(string):
 
 def create_all():
     ''' initialises the database, creates all needed tables. '''
+
+    DB.init(app.config.get('DATABASE_FILE'))
+
     [t.create_table(True) for t in
         (User, UserSession, Group, UserGroup, Post, Feed,
          FeedPermission, ConfigVar, ExternalSource, Screen)]

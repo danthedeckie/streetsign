@@ -46,6 +46,7 @@ def before_the_action():
     ''' load some variables in for template etc to use, and connect the DB '''
 
     g.site_vars = app.config.get('SITE_VARS')
+    DB.init(app.config.get('DATABASE_FILE'))
     DB.connect()
 
 @app.teardown_request
