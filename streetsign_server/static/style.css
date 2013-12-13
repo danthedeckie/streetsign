@@ -179,4 +179,6 @@ ul.optionrow > li:last-of-type {
     border-radius: 0 10px 10px 0;
 }
 
-
+.chzn-container input {
+    min-height: 2em;
+}

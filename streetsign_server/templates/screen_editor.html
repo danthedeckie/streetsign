@@ -22,6 +22,7 @@
       <div class="col-md-6">
         <label style="display:block; width: 40%;">Background:</label>
         <select name="background" id="background" autocomplete="off" class="chosen">
+         <option {{ selecetd if not screen.background }} value="">None</option>
           {% for bg in backgrounds %}
             <option {{ 'selected' if bg == screen.background }} value="{{bg}}">{{bg}}</option>
           {% endfor %}
@@ -68,7 +69,7 @@
             <label>Feeds:</label>
             <select multiple autocomplete="off" class="form-control"
                     data-bind="options: AVAILABLE_FEEDS, optionsText:'name',
-                               optionsValue: 'id', selectedOptions: feeds" >
+                               optionsValue: 'id', selectedOptions: feeds, chosen:42" >
             </select>
         </div>
         <div class="col-md-6">
@@ -105,6 +106,10 @@
     </div> <!-- (zone) /panel -->
   <!-- /ko -->
   </div> <!-- (zones-container) /panel-body -->
+  <div class="panel-footer">
+    <button data-bind="click: addZone" class="btn btn-xs btn-primary">New Zone</button>
+  </div>
+
 </div> <!-- (zones-container) /panel -->
 
 </div> <!-- col-md-6 -->

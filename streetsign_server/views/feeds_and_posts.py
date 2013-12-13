@@ -133,14 +133,20 @@ def posts():
     ''' (HTML) list of ALL posts. (also deletes broken posts, if error) '''
 
     try:
-        return render_template('posts.html', posts=Post.select())
+        user = user_session.get_user()
+    except user_session.NotLoggedIn as e:
+        user = User()
+
+    try:
+        return render_template('posts.html', posts=Post.select(), user=user)
     except Feed.DoesNotExist as e:
         # Ah. Database inconsistancy! Not good, lah.
         ps = Post.raw('select post.id from post left join feed on feed.id = post.feed_id where feed.id is null;')
         for p in ps:
             p.delete_instance()
         flash('Cleaned up old posts...')
-        return render_template('posts.html', posts=Post.select())
+
+    return render_template('posts.html', posts=Post.select(), user=user)
 
 @app.route('/posts/new/<int:feed_id>', methods=['GET','POST'])
 def post_new(feed_id):

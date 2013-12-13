@@ -33,6 +33,18 @@ DEFAULT_ZONE = { name: "zone",
                  css: '',
                  classes: '' };
 
+// "chosen" plugin knockout binding:
+
+ko.bindingHandlers.chosen = {
+    init: function(element) {
+        $(element).addClass('chzn-select');
+        $(element).chosen();
+    },
+    update: function(element) {
+        $(element).trigger('liszt:updated');
+    }
+}
+
 
 var ScreenModel = function(background, other_settings, css, zones, color, type) {
     var self = this;
@@ -48,7 +60,7 @@ var ScreenModel = function(background, other_settings, css, zones, color, type) 
         }) , [], self.zones);
 
 
-    // stupid knockout treats <select> options as strings.
+    // Alas, knockout treats <select> options as strings.
     // the data comes in as ints.  so fake it.
     for (var zone in self.zones()){
         self.zones()[zone].feeds(
