@@ -171,7 +171,7 @@ can't be seen by the outside world, and the screens won't display them.  You
 can give permission to some users to create posts, but not publish them, if
 you desire.  This means you can have content authors who make content for
 specific feeds, but you can give publish permission on that feed only to
-certain line-managers or communication directors, if you desire.
+certain line-managers or communication directors, who then publish the posts.
 
 Permission to change the layout and design of the actual screens can only
 be done by "administrators", but still using the web interface.  An
@@ -214,3 +214,11 @@ Also, if you have text which is "Title 1" (``<h1>...</h1>`` for the HTML
 junkies) it can display as different sizes in different posts, as each post is
 scaled independently.
 
+The HTML "rich text" posts are intentionally somewhat limited.  If you want to
+have a post where the *design* is important, not just the textual content of
+the post, they you should use an external graphic design package, such as
+`Inkscape <http://www.inkscape.org>` (free), 
+`Adobe Illustrator <http://www.adobe.com/uk/products/illustrator.html>`
+(expensive), 
+`PixelMator <http://www.pixelmator.com/>` (good, not too expensive, mac only`),
+and then post as an Image type.
