@@ -54,7 +54,7 @@
   </div>
   <div class="panel-body">
   <!-- ko foreach: zones -->
-    <div class="panel panel-default">
+    <div class="panel panel-default" data-bind="attr: {'data-zoneedit': name}">
       <div class="panel-heading">
         <div class="input-group">
           <input name="urlname" data-bind="value: name"
@@ -64,7 +64,7 @@
           </span>
         </div>
       </div>
-      <div class="panel-body">
+      <div class="panel-body" data-bind="click: $root.selectZone, event: {mouseover: $root.selectZone}">
         <div class="col-md-12">
             <label>Feeds:</label>
             <select multiple autocomplete="off" class="form-control"
@@ -119,13 +119,14 @@
   <div class="well" data-spy="affix" data-offset-top="30" data-offset-bottom="30">
     <div id="my_fake_screen" class="fake_screen">
     <!-- ko foreach: zones -->
-    <div class="fake_zone" data-bind="style: { top: top, left: left, right: right, bottom: bottom, color: color}, text: name"></div>
+    <div class="fake_zone" data-bind="style: { top: top, left: left, right: right, bottom: bottom, color: color}, text: name, click: $root.selectZoneScroll, css: {selected: selected}"></div>
     <!-- /ko -->
     </div>
-    Preview Aspect Ratio:<select id="aspect">
-    <option value=1.6>4:3</option>
-    <option selected value=1.77777>16:9</option>
-    <option value="0.5625">9:16</option>
+    Preview Aspect Ratio:<select id="fake_screen_aspect" class="form-control">
+    <option value=1.333333>4:3</option>
+    <option selected value=1.77777>16:9 (widescreen)</option>
+    <option value="0.75">3:4 (sideways 4:3)</option>
+    <option value="0.5625">9:16 (sideways widescreen)</option>
     </select>
     <!--<textarea style="float: right;clear:right; width: 100%; height: 100px" data-bind="value: ko.mapping.toJSON($root, null, 2)"></textarea>-->
 </div>
@@ -138,6 +139,8 @@
 {{ linkmacros.static_js('lib/knockout.mapping-latest.js') }}
 {{ linkmacros.static_js('model_zones.js') }}
 <script type="text/javascript">
+// server specified values:
+
 BG="{{ screen.background }}";
 CSS=JSON.stringify({{ screen.css|safe if screen.css else '{}' }});
 SETTINGS=JSON.stringify({{ screen.settings|safe if screen.settings else '{}' }});
@@ -146,29 +149,55 @@ AVAILABLE_FEEDS = [
     {%- for feed in feeds -%}
         {id: "{{ feed.id }}", name: "{{ feed.name}}"} {{- ',' if not loop.last -}}
     {%- endfor -%} ];
-
 ZONE_TYPES= [
     {'id':'fade', 'name':'Fade In, Fade Out'},
     {'id':'scroll', 'name':'Scrolling text'}];
 
+// init the view model:
+
 var viewScreenModel = new ScreenModel(BG, SETTINGS, CSS, ZONES);
-//ko.mapping.fromJS(ZONES, [], viewZonesModel.zones);
-//ko.mapping.fromJS(AVAILABLE_FEEDS, [], viewZonesModel.availableFeeds);
 ko.applyBindings(viewScreenModel);
+
+///////////////////////////////////////////////////////////////////
+// Stuff for the "fake screen" preview.
+
+// when the background value changes, so should the fake screen:
 
 $('#background').change(function(){
     var newbg="url(/static/user_files/" + $('#background').val() + ')';
     $('#my_fake_screen').css('background-image', newbg );
 }).change();
 
-$('#aspect').change( function(e) {
-    $('#my_fake_screen').height($('#my_fake_screen').width() / $(this).val());
 
-    while ($('#my_fake_screen').height() > $(window).height()) {
-        $('#my_fake_screen').width($('#my_fake_screen').width() - 10);
-        $('#my_fake_screen').height($('#my_fake_screen').width() / $(this).val());
+function update_fake_screen_size(e) {
+    "use strict";
+
+    // This function updates the fake screen (preview) to have the specified
+    // aspect ratio.
+
+    var fake_screen = $('#my_fake_screen');
+
+    // reset width
+    fake_screen.width('100%');
+    // and set it to an absolute size, so scrolling doesn't mess it up.
+    fake_screen.width(fake_screen.width());
+
+    // set the height to the right aspect
+    fake_screen.height($('#my_fake_screen').width() / $('#fake_screen_aspect').val());
+
+    // and if the height is larger than the screen height, then reduce the
+    // width and re-apply the aspect ratio until it works:
+
+    while (fake_screen.height() > $(window).height() - 200) {
+        fake_screen.width(fake_screen.width() - 10);
+        fake_screen.height(fake_screen.width() / $('#fake_screen_aspect').val());
     }
-});
+}
+
+// initialise the aspect ratio:
+update_fake_screen_size();
+// and update the aspect when the dropdown changes.
+$('#fake_screen_aspect').change( update_fake_screen_size );
 
 </script>
 

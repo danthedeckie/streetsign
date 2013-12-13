@@ -28,6 +28,7 @@ DEFAULT_ZONE = { name: "zone",
                  bottom: "30%",
                  type: 'fade',
                  color: '#fff',
+                 selected: false,
                  fadetime: 250,
                  feeds: [],
                  css: '',
@@ -76,8 +77,25 @@ var ScreenModel = function(background, other_settings, css, zones, color, type) 
         $.extend(new_obj, DEFAULT_ZONE, {'name':'zone'+(self.zones().length+1)});
         self.zones.push(ko.mapping.fromJS(new_obj));
     };
-    self.removeZone = function(t) {
-        self.zones.remove(t);
+    self.removeZone = function(z) {
+        self.zones.remove(z);
     };
+
+    self.selectZone = function(z) {
+        // set a zone to be selected.
+        for (var zone in self.zones()){ self.zones()[zone].selected(false); };
+        if (z) {
+            z.selected(true);
+        }
+    };
+    self.selectZoneScroll = function(z){
+        // select a zone, and scroll to the edit area of that zone.
+        // (called when you click on a zone in the preview)
+
+        self.selectZone(z);
+        $('html, body').animate({
+            scrollTop: $('*[data-zoneedit="' + z.name() +'"]').offset().top - 60
+        }, 500);
+    }
 
 };

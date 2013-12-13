@@ -105,6 +105,10 @@ div.sizes_box {
     color: white;
     text-align: center;
 }
+.fake_zone.selected {
+    border: 2px solid white;
+    background: rgba(100,100,100,0.5);
+}
 input.half { max-width: 50%; }
 input.third { max-width: 28%;}
 
