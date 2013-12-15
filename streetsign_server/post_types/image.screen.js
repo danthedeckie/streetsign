@@ -8,7 +8,7 @@
                  + 'background-repeat:no-repeat;'
                  + 'background-size:contain;'
                  + 'background-position: center center;'
-                 + '"></div>').css('display','none')
+                 + '"></div>').css('opacity', 0)
                 .prependTo(zone));
     }
 }

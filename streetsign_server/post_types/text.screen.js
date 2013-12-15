@@ -10,6 +10,6 @@
 
         reduce_font_size_to_fit(newhtml.children('.post_inner'), $(zone));
 
-        return newhtml.css('display','none');
+        return newhtml.css('opacity', 0);
     }
 }

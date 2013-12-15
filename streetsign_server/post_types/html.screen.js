@@ -27,6 +27,6 @@
 
         // Return the HTML object, hiding it along the way.
 
-        return newhtml.css('display','none');
+        return newhtml.css('opacity', 0);
     }
 }
