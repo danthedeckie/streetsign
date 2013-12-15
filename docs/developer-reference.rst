@@ -8,6 +8,7 @@ docstrings.
 .. toctree::
    :maxdepth: 3
 
+   developer/api
    developer/models
    developer/user_session
    developer/views

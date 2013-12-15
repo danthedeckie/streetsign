@@ -1,5 +1,3 @@
-{%- import "link-macros.html" as linkmacros -%}
-{%- import "common_widgets.html"  as widgets -%}
 <!doctype html>
 <html>
 <head>
@@ -12,7 +10,7 @@
 </div>-->
 {% block end_of_page_javascript %}
   {{ linkmacros.static_js('lib/jquery.js') }}
-  {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
+  {{ linkmacros.static_js('lib/jquery.transit.min.js') }}
   {{ linkmacros.static_js('screens/globals.js') }}
   {{ linkmacros.static_js('screens/functions.js') }}
   {{ linkmacros.static_js('screens/basic.js') }}
@@ -21,9 +19,8 @@
 
   <script type="text/javascript">
 
-  window.SCREEN={{screendata.json_all() | safe }};
-  window.SCREENMD5="{{screenmd5}}";
-  window.SCREEN.version = SCREENMD5;
+  window.SCREEN={{screen.to_dict() | tojson }};
+  window.SCREEN.md5 = "{{screen.md5()}}";
 
   window.DEFAULTSCREEN={
         background: "black",
@@ -34,19 +31,18 @@
                    'classes':'text_dropshadow',
                    'css':{}},
         zones: {},
-        version: '12345'
+        md5: '12345'
                 };
 
-  {% if screendata.background %}
-      BG="url({{url_for('static',filename='user_files/' + screendata.background)}})"
+  {% if screen.background %}
+      BG="url({{url_for('static', filename='user_files/' + screen.background)}})"
   {% else %}
       BG="black"
   {% endif %}
 
-  POSTS_URL = "{{ url_for('screens_posts_from_feeds',json_feeds_list='-1') }}";
+  POSTS_URL = "{{ url_for('screens_posts_from_feeds', json_feeds_list='-1') }}";
 
   var screen_data = $.extend({}, DEFAULTSCREEN, SCREEN);
-
 init_screen(screen_data, '#zones')
 setTimeout(start_zones_scrolling, 2000);
   </script>

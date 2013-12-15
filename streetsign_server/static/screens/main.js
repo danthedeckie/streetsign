@@ -196,7 +196,7 @@ function update_screen(screen_data, element) {
     console.log('getting screen updates...');
 
     var update = function(data) {
-        if (data.md5 == screen_data.version) {
+        if (data.md5 == screen_data.md5) {
             setTimeout(function(){update_screen(screen_data, element);}, 12000);
         } else {
             // The md5 is different! we should do some updates!
@@ -206,9 +206,9 @@ function update_screen(screen_data, element) {
         }
     };
 
-    $.getJSON('/screens/json/' +  screen_data.id + '/X' , update);
+    $.getJSON('/screens/json/' +  screen_data.id + '/' + screen_data.md5, update);
 
-    // And for now, since there isn'r really anywhere better, lets also 
+    // And for now, since there isn't really anywhere better, lets also 
     // tell all external sources to update if they need to.
     $.getJSON('/external_data_sources/');
 }

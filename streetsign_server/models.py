@@ -35,6 +35,7 @@ from uuid import uuid4 # for unique session ids
 from datetime import datetime, timedelta
 from time import time
 import bleach # html stripping.
+from md5 import md5
 
 from simpleeval import simple_eval
 
@@ -681,17 +682,19 @@ class Screen(DBModel):
     #: spec all the zones (JSON)
     zones = TextField(default='[]')
 
-    def json_all(self):
-        ''' returns a JSON string ready for transmission '''
+    def to_dict(self):
+        ''' returns a dict, ready for transmission as JSON '''
 
-        return json.dumps({
+        return {
             "id":self.id,
             "urlname": self.urlname,
             "background": self.background if self.background else '',
             "settings": safe_json_load(self.settings, {}),
             "defaults": safe_json_load(self.defaults, {}),
             "zones": safe_json_load(self.zones, []),
-            })
+            }
+    def md5(self):
+        return md5(json.dumps(self.to_dict())).hexdigest()
 
 
 '''

@@ -131,6 +131,11 @@ Starting with the file layout:
 
 ``db.py`` - a very simple database shell.
 
+API/Urls
+--------
+
+Can be found in :doc:`developer/api`
+
 How Post Types work
 -------------------
 

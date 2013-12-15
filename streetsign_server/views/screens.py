@@ -28,15 +28,17 @@
 
 
 from flask import render_template, url_for, request, session, redirect, \
-                  flash, json, g
-import streetsign_server.user_session as user_session
-import streetsign_server.post_types as post_types
+                  flash, json, g, jsonify
+
+import sqlite3
 from glob import glob
 from os.path import basename
 import urllib
 from datetime import datetime
+
+import streetsign_server.user_session as user_session
+import streetsign_server.post_types as post_types
 from streetsign_server import app
-from md5 import md5
 from streetsign_server.models import Feed, Post, Screen, by_id
 
 
@@ -96,8 +98,16 @@ def screenedit(screenid):
             flash('deleted')
             return redirect(request.referrer)
 
+        # first check that name is OK:
+        try:
+            oldname = screen.urlname
+            screen.urlname = urllib.quote(request.form.get('urlname'), '')
+            screen.save()
+        except sqlite3.IntegrityError:
+            screen.urlname = oldname
+            flash("Sorry! That name is already being used!")
+
         screen.background = request.form.get('background')
-        screen.urlname = urllib.quote(request.form.get('urlname'), '')
         screen.settings = request.form.get('settings', {'css': ''})
         screen.zones = form_json('zones', {})
         screen.save()
@@ -117,8 +127,7 @@ def screendisplay(template, screenname):
     screen = Screen.get(urlname=screenname)
 
     return render_template('screens/' + template + '.html',
-                           screenmd5 = md5(screen.json_all()).hexdigest(), \
-                           screendata = screen)
+               screen = screen)
 
 
 @app.route('/screens/posts_from_feeds/<json_feeds_list>')
@@ -139,32 +148,31 @@ def screens_posts_from_feeds(json_feeds_list):
                    &(Post.active_end > time_now)
                    &(Post.published)
                    )]
-    return json.dumps({'posts': posts})
+    return jsonify(posts=posts)
 
-
-@app.route('/screens/json/<int:screenid>/<version>')
-def screen_version(screenid, version):
+@app.route('/screens/json/<int:screenid>', defaults={'old_md5':None})
+@app.route('/screens/json/<int:screenid>/<old_md5>')
+def screen_json(screenid, old_md5):
     '''
         When you edit a screen, it saves most of the data as JSON.  This
         requests the MD5sum of that data, (and that data).  You can then
         compare against what you're already displaying, and only update
-        if it's changed.
+        if it's changed. If the 
     '''
-
-    # TODO: if the version requested hasn't changed, don't bother sending
-    #       the whole data again... (save bandwidth and processing)
 
     try:
         screen = Screen.get(id=int(screenid))
     except:
         screen = Screen()
 
-    screenjson = screen.json_all()
+    screen_md5 = screen.md5()
 
-    data = json.dumps({'screen': screenid, \
-                       'md5':  md5(screenjson).hexdigest(), \
-                       'screen': json.loads(screenjson)})
-    return ( data, 200, {'Content-Type': 'application/javascript'})
+    if screen_md5 == old_md5:
+        return jsonify(screenid=screenid, md5=screen_md5)
+    else:
+        return jsonify(screenid=screenid,
+                       md5=screen_md5,
+                       screen=screen.to_dict())
 
 
 @app.route('/screens/post_types.js')
