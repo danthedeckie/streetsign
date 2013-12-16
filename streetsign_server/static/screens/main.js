@@ -22,14 +22,15 @@
 *************************************************************/
 
 function zone(container, obj) {
+    "use strict";
     // adds an object into the window zones list,
     // and gives it an element within the container for filling with stuff.
 
     var csspairs = [];
     // temporary!:
 
-    if (! 'type' in obj) {
-        obj.type='fade';
+    if (!obj.hasOwnProperty('type')) {
+        obj.type = 'fade';
     }
 
     window.zones.push(obj);
@@ -38,7 +39,7 @@ function zone(container, obj) {
 
     //obj.classes.map(function(x){ $(obj.el).addClass(x);});
     //alert(obj.classes);
-    if ('color' in obj) {
+    if (obj.hasOwnProperty('color')) {
         $(obj.el).css('color', obj.color);
     }
 
@@ -57,6 +58,8 @@ function zone(container, obj) {
 }
 
 function get_posts_length(zone) {
+    "use strict";
+
     try {
         if (zone.posts.length > 0) {
             return zone.posts.length;
