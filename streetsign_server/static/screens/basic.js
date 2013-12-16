@@ -39,35 +39,44 @@ function post_fadeout(post, fadetime, andthen) {
 
     fadetime = 1 * fadetime;
 
-    if ((fadetime === undefined)||(fadetime===NaN)) { fadetime = 0; }
-
+    if ((fadetime === undefined)||(isNaN(fadetime))) { fadetime = 0; }
 
     if (('type' in post.zone) && (post.zone.type == 'scroll')) {
         // do scroll stuff.
-        andthen();
+        $(post.zone.el).transition({'opacity': 0}, 500, function() {
+            $(post._el).css('opacity', 0);
+            $(post.zone.el).css('opacity', 1.0);
+            andthen()
+            });
+        //andthen();
     } else {
         $(post._el).transition({'opacity':0}, fadetime, andthen);
     }
 }
 
 function post_fadein(post, fadetime, andthen) {
+    var distance;
+
     if (!andthen) { andthen = function() {}; }
 
-    if (('type' in post.zone) && (post.zone.type == 'scroll')) {
-        var distance = $(post._el).width() + $(post.zone.el).width() + 20;
+    if (post.zone.hasOwnProperty('type') && (post.zone.type == 'scroll')) {
+        distance = $(post._el).width() + $(post.zone.el).width() + 20;
+
         // This is odd..
         //$(post._el).fadeIn(0, andthen);
         //$(post._el).css('left', $(post.zone.el).width() + 10);
+        
         $(post._el).css({'left': $(post.zone.el).width() + 10, 'opacity': 1.0});
 
         $(post._el).transition({'left': 0 - ($(post._el).width() + 10)}, distance * 17, 'linear'  );
         post.display_time = distance * 17;
+
         andthen();
 
         // do scroll stuff.
     } else {
         fadetime = 1 * fadetime;
-        if ((fadetime === undefined)||(fadetime===NaN)) { fadetime = 0; }
+        if ((fadetime === undefined)||(isNaN(fadetime))) { fadetime = 0; }
         $(post._el).transition({'opacity':1.0}, fadetime, andthen);
     }
 }

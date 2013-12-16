@@ -44,8 +44,11 @@
   POSTS_URL = "{{ url_for('screens_posts_from_feeds', json_feeds_list='-1') }}";
 
   var screen_data = $.extend({}, DEFAULTSCREEN, SCREEN);
-init_screen(screen_data, '#zones')
-setTimeout(start_zones_scrolling, 2000);
+  screen_data.defaults = $.extend({}, DEFAULTSCREEN.defaults, screen_data.defaults);
+
+  init_screen(screen_data, '#zones')
+  setTimeout(start_zones_scrolling, 2000);
+
   </script>
 {% endblock %}
 </body>
