@@ -339,7 +339,7 @@ function make_updater(z){
                 current_post_ids.push(zone.posts[i].id);
 
                 // update post with all info from server, in case stuff has changed.
-                update_post_data(zone.posts[i], data.posts[arrId];
+                update_post_data(zone.posts[i], data.posts[arrId]);
             } else {
 
                 // the current post id is NOT in the list of new posts from the server.
