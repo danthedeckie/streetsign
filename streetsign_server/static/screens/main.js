@@ -71,16 +71,28 @@ function get_posts_length(zone) {
 
 function next_post(zone) {
     "use strict";
-    /******************************
-     * start of new code for time restrictions...
-     ******************************/
+    // This function is called once a post has been shown for long enough.
+    // It fades out the old post, fades in the new one, and schedules itself
+    // to run again when the next one has been up for long enough.
+    //
+    // When it goes through the posts, determining which post to show next,
+    // it automatically prunes out any which are marked for deletion by the
+    // post list updater.
+    //
+    // If there are no posts, then it schedules itself to run later, without
+    // doing anything. (Sit around and wait for something to do).
 
     var appendlist = [];
     var nextpost = false;
     var thispost;
 
+    // call this function again, used as a callback:
     var call_me_again = function () { next_post(zone); };
+
+    // return a function for removing an element from the DOM.
     var make_remove_el = function (post) { return function () { post._el.remove(); }; };
+
+    // if there are no posts, then schedule to call this again later, and return:
 
     if ((!zone.hasOwnProperty("posts"))||(zone.posts.length === 0)) {
         // no posts!
@@ -90,49 +102,68 @@ function next_post(zone) {
         return;
     }
 
+    // go through all the current posts, move any which aren't tagged for deletion
+    // onto a new "appendlist". shunt any posts which are time restricted to the end
+    // of the list, so they won't get shown now, but stay in the list.
+
     while (zone.posts.length > 0) {
+
         thispost = zone.posts.shift();
+
+        // if it's sheduled for deletion, DON'T add it to the new list, but fade it out
+        // (if it is visible) and delete the element.
 
         if (thispost.hasOwnProperty('delete_me')){
             // it's popped!
             post_fadeout(thispost, zone.fadetime, make_remove_el(thispost));
 
-            console.log(zone.name + '|setting delete_me flag on post:'+ thispost.id);
+            console.log(zone.name + '|dropping post from feed (and removing el):'+ thispost.id);
             continue;
         }
+
+        // fine, it's not scheduled for deletion, so stuff it on the appendlist
+        // stack:
+
+        appendlist.push(thispost);
+
+        // check time restrictions.  If they allow this post to be shown, then we'll
+        // use it as the next one to display!
 
         if (thispost.time_restrictions_show) {
             if (any_relevent_restrictions(thispost)) {
                 // we have a winner!
                 nextpost = thispost;
-                appendlist.push(thispost);
-                console.log('Going to show post:' + nextpost.id);
                 break;
             }
-
-            appendlist.push(thispost);
-
-        } else {
-            if (any_relevent_restrictions(thispost)) {
-                appendlist.push(thispost);
-                //continue;
-            } else {
+        } else { // inverse restrictions...
+            if (!(any_relevent_restrictions(thispost))) {
                 // we have a winner!
                 nextpost = thispost;
-                appendlist.push(thispost);
                 break;
-            }
+            } 
         }
+
+        // alas, the time restrictions didn't let this post get selected. So
+        // wrap around to the next post...
     }
+
     // add delayed posts (including new 'thispost') on to the end of the queue.
     zone.posts = zone.posts.concat(appendlist);
 
+    //////////////////////////////////////////////////////////////////////////
+    //
+    // if a nextpost was selected, then let's display it.
+
     if (nextpost) {
+
+        // if there is no current post to fade from:
+
         if ((!zone.hasOwnProperty('current_post'))||(zone.current_post === false)) {
             // first post!
             zone.current_post = nextpost;
             post_fadein(zone.current_post, zone.fadetime);
 
+            // posttype 'display' callback:
             if (post_types[nextpost.type].hasOwnProperty('display')) {
                 post_types[nextpost.type].display(nextpost);
             }
@@ -142,36 +173,42 @@ function next_post(zone) {
 
         }
 
-        //if ((nextpost.id === zone.current_post.id)&&(zone.type !== 'scroll')) {
+        // if this post is *already* the current post:
+        
         if (nextpost.id === zone.current_post.id) {
-            // this is the only valid post!
+            // same post!
             zone.next_post_timer = setTimeout(call_me_again, nextpost.display_time);
             console.log('only this post is available');
             return;
         }
 
-        // if it's not return'd already, then we have a new post to fade to. hurrah!
+        // if it's not return'd already, then we have a new post to fade to.
 
         post_fadeout(zone.current_post, zone.fadetime, function () {
+            // callback *after* the previous post has faded out:
 
+            // posttype 'hide' callback:
             if (post_types[zone.current_post.type].hasOwnProperty('hide')) {
                 post_types[zone.current_post.type].hide(zone.current_post);
             }
 
+            // set current post, and fade it in:
+
             zone.current_post = nextpost;
             post_fadein(zone.current_post, zone.fadetime);
 
-            try {
-                if (post_types[nextpost.type].hasOwnProperty('display')) {
-                    post_types[nextpost.type].display(nextpost);
-                }
-            } catch (e) {
-                console.log('ERROR:wrong type:' + nextpost.type);
-
+            // posttype 'display' callback:
+            if (post_types[nextpost.type].hasOwnProperty('display')) {
+                post_types[nextpost.type].display(nextpost);
             }
+
+            // schedule this function to run again, once the post has been
+            // display'd for as long as it wants to be:
 
             zone.next_post_timer = setTimeout(call_me_again, nextpost.display_time);
         });
+
+        // My work here is done.
 
         return;
     }
@@ -179,11 +216,18 @@ function next_post(zone) {
     // if we've got this far, then it didn't return earlier with a next post. so...
     // no posts currently allowed!
     if (zone.current_post) {
+        // ok, no posts allowed, but there *is* a current post.
+        // let's get rid of it.
+
         post_fadeout(zone.current_post, zone.fadetime, function() {
+            // callback once the post is faded out...
+
             if (! zone.current_post) {
                 console.log('gone!');
                 return;
             }
+
+            // posttype 'hide' callback:
             if (post_types[zone.current_post.type].hasOwnProperty('hide')) {
                 post_types[zone.current_post.type].hide(zone.current_post);
             }
@@ -191,9 +235,10 @@ function next_post(zone) {
         });
 
     }
+
     zone.current_post = false;
     zone.next_post_timer = setTimeout(call_me_again, zone.no_posts_wait);
-    console.log('no posts currently valid in zone' + zone.name + '! : ' + JSON.stringify(zone.posts));
+    console.log('no posts currently valid in zone' + zone.name + '!');
     return;
 
 }
@@ -231,6 +276,34 @@ function background_from_value(text) {
     return 'url(/static/user_files/' + text + ')';
 }
 
+function update_post_data(post, update_data){
+    'use strict';
+    // update the data in a post with the new data sent from the server:
+    //
+    post.time_restrictions_show = update_data.time_restrictions_show;
+    post.time_restrictions = update_data.time_restrictions;
+    // Maybe better not ?
+    if (JSON.stringify(post.content) !== JSON.stringify(update_data.content)) {
+        console.log('differ!');
+        console.log (post.content);
+        console.log (update_data.content);
+        post.content = update_data.content;
+        if (zone.current_post === i) {
+            post_fadeout(post, zone.fadetime, function() {
+                post.remove();
+                });
+        }
+        console.log("replacing content in post:" + post.id);
+        post._el = post_types[post.type].render(zone.el, post)[0];
+        if (zone.current_post === i) {
+            post_fadein(post, zone.fadetime );
+        }
+    }
+    if (post.zone.type !== 'scroll') {
+        post.display_time = update_data.display_time;
+    }
+}
+
 function make_updater(z){
     'use strict';
     // Returns the 'update' closure, a function which is called
@@ -239,55 +312,34 @@ function make_updater(z){
     //    so it can be passed to the $.getJSON(...) callback.
     var zone = z;
     return function (data) {
-        var new_post_ids = [], current_post_ids = [], posts_to_pop = [], new_data, i, n;
+        var new_post_ids = {}, current_post_ids = [], posts_to_pop = [], new_data, i, n;
         var do_next_post = function() { next_post(zone); };
         var arrId = -1;
 
-        //zone.el.innerHTML = data.posts.length;
         if (! zone.hasOwnProperty('posts')) {zone.posts = [];}
 
         // what posts are in the new list?
 
         for (i=0; i < data.posts.length; i += 1){
-            new_post_ids.push(data.posts[i].id);
+            new_post_ids[data.posts[i].id]=i;
         }
 
         // what posts are currently in the zone?
 
         for (i=0; i < zone.posts.length; i += 1){
-            if ( i > zone.posts.length) {
-                console.log('oh no. ' + i + ' > ' + zone.posts.length);
-            }
 
-            arrId = $.inArray(zone.posts[i].id, new_post_ids);
             // keep current posts, and delete no-longer needed posts:
-            //
-            if (arrId !== -1) {
+            if (new_post_ids.hasOwnProperty(zone.posts[i].id)){
+
+                arrId = new_post_ids[zone.posts[i].id];
+
+                // therefore the post IS in the new list of posts from
+                // the server.  Let's keep it around then.
+
                 current_post_ids.push(zone.posts[i].id);
+
                 // update post with all info from server, in case stuff has changed.
-                zone.posts[i].time_restrictions_show = data.posts[arrId].time_restrictions_show;
-                zone.posts[i].time_restrictions = data.posts[arrId].time_restrictions;
-                // Maybe better not ?
-                //
-                if (JSON.stringify(zone.posts[i].content) !== JSON.stringify(data.posts[arrId].content)) {
-                    console.log('differ!');
-                    console.log (zone.posts[i].content);
-                    console.log (data.posts[arrId].content);
-                    zone.posts[i].content = data.posts[arrId].content;
-                    if (zone.current_post === i) {
-                        post_fadeout(zone.posts[i], zone.fadetime, function() {
-                            zone.posts[i].remove();
-                            });
-                    }
-                    console.log("replacing content in post:" + zone.posts[i].id);
-                    zone.posts[i]._el = post_types[zone.posts[i].type].render(zone.el, zone.posts[i])[0];
-                    if (zone.current_post === i) {
-                        post_fadein(zone.posts[i], zone.fadetime );
-                    }
-                }
-                if (zone.type !== 'scroll') {
-                    zone.posts[i].display_time = data.posts[arrId].display_time;
-                }
+                update_post_data(zone.posts[i], data.posts[arrId];
             } else {
 
                 // the current post id is NOT in the list of new posts from the server.

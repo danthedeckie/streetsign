@@ -38,6 +38,7 @@ function magic_time() {
     var d = new Date;
     var timestr = ((d.getHours()<10?'0':'') + d.getHours() + ':'
                   +(d.getMinutes()<10?'0':'') + d.getMinutes())
+
     $('.magic_time').each(function(i){
         this.innerHTML = timestr;
     });
@@ -60,8 +61,10 @@ function faketime(timestring) {
     // returns time in minutes, either of time NOW, if no argument,
     // or of parsed HH:MM string, if given.
 
+    var split, now;
+
     if (timestring) {
-        var split = timestring.match(/(\d\d):(\d\d)/);
+        split = timestring.match(/(\d\d):(\d\d)/);
         if (('length' in split)&&(split.length==3)) {
             return (60*parseInt(split[1]))+parseInt(split[2]);
         } else {
@@ -69,12 +72,13 @@ function faketime(timestring) {
             return 0;
         }
     } else {
-        var now = new Date();
+        now = new Date();
         return (60*now.getHours())+now.getMinutes();
     }
 }
 
 function restriction_relevant(now, restriction) {
+    'use strict';
     // returns True if we're curently within a time restriction's jurisdiction, else False;
 
     var start = faketime(restriction.start);
@@ -84,10 +88,14 @@ function restriction_relevant(now, restriction) {
 }
 
 function any_relevent_restrictions(post) {
+    'use strict';
+
     // returns True if *any* time restriction catches the current time.
 
     var now = faketime();
-    for (var i in post.time_restrictions) {
+    var i;
+
+    for (i=0; i< post.time_restrictions.length; i += 1) {
         if (restriction_relevant(now, post.time_restrictions[i])) {
             return true;
         }
@@ -97,6 +105,8 @@ function any_relevent_restrictions(post) {
 }
 
 function reload_page() {
+    'use strict';
+
     $.get(document.URL, function() { window.location.reload(); });
     // and if that doesn't work, we'll try again later:
     setTimeout(reload_page, REFRESH_PAGE_TIMER);
@@ -108,11 +118,12 @@ function reduce_font_size_to_fit(inner, outer) {
 
     var height = 0;
     var zone_height = $(outer).height();
+    var i = 100;
 
     height = inner.height();
 
     if ( height > zone_height ) {
-        for (var i=100; i>10;i-=3){
+        for (i=100; i>10;i-=3){
 
             height = inner.height();
             if (height <= zone_height) {

@@ -45,14 +45,19 @@ def receive(request):
 def form(data):
     ''' the form for editing this type of post '''
     # pylint: disable=star-args
-    return render_template_string(my('.form.html'), default_tags=DEFAULT_TAGS, **data)
+    x = render_template_string(my('.form.html'),
+                                  default_tags=DEFAULT_TAGS, **data)
+    return x
 
 def make_templater(data):
     ''' from the info in data, return a html cleaner function. '''
 
     tags=[x.strip() for x in 
                 data.get("allowed_tags", DEFAULT_TAGS).split(',')]
-    template = Template(data.get('display_template', '{{title}}'))
+    try:
+        template = Template(data.get('display_template', '{{title}}'))
+    except:
+        template = Template(" Bad Template ")
 
     def templater(item):
         return bleach.clean(template.render(**item),
