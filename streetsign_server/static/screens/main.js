@@ -23,7 +23,7 @@
 
 // small functions, to go elsewhere:
 
-function cssPairs(cssText){
+function cssPairs(cssText) {
     "use strict";
     // given some css as text, return a list of pairs for adding on to an object.
 
@@ -32,7 +32,7 @@ function cssPairs(cssText){
         return cssText.split(/[\n;]+/).map(function (x) {
                                            var y = x.match(/^(.*):(.*)$/);
                                            return [y[1].trim(), y[2].trim()]; });
-    }catch (e) {
+    } catch (e) {
         if (cssText) {
             console.log("invalid CSS!");
         }
@@ -61,20 +61,27 @@ function background_from_value(text) {
 function Zone(container, initial_data) {
     "use strict";
 
-    var csspairs = cssPairs(initial_data.css), i;
+    var csspairs = cssPairs(initial_data.css), i, that = this;
+
+    var update = function (name) {
+        if (initial_data.hasOwnProperty(name)) {
+            that[name] = initial_data[name];
+        }
+        };
 
     // default "mutable type" properties:
     this.posts = [];
     this.feeds = [];
 
+
     // update zone from initial data.
     // this could probably be done better by some ECMA5 function?
     // or even $.extend...
-    if (initial_data["feeds"]) this.feeds = initial_data.feeds;
-    if (initial_data["color"]) this.color = initial_data.color;
-    if (initial_data["name"]) this.name = initial_data.name;
-    if (initial_data["type"]) this.type = initial_data.type;
-
+    update('feeds');
+    update('color');
+    update('name');
+    update('type');
+    console.log(this.type);
 
     this.el = $(zone_html(initial_data.name,
                           initial_data.top,
@@ -84,8 +91,8 @@ function Zone(container, initial_data) {
                           initial_data.css,
                           initial_data.type)).prependTo(container)[0];
 
-    for (i=0; i<csspairs.length;i += 1) {
-        $(obj.el).css(csspairs[i][0], csspairs[i][1]);
+    for (i = 0; i < csspairs.length; i += 1) {
+        $(this.el).css(csspairs[i][0], csspairs[i][1]);
     }
 
 }
@@ -101,13 +108,15 @@ Zone.prototype = {
     current_post: false,
 
     // methods:
-    addPost: function(index) {
+    addPost: function (index) {
+        "use strict";
     },
 
-    delPost: function(index) {
+    delPost: function (index) {
+        "use strict";
     },
 
-    updatePost: function(post, newData) {
+    updatePost: function (post, newData) {
         'use strict';
         // update the data in a post with the new data sent from the server:
         var that = this;
@@ -123,7 +132,7 @@ Zone.prototype = {
 
             if (this.current_post.id === post.id) {
                 old_opacity = $(post.el).css('opacity');
-                $(post.el).transition({'opacity':0}, 200, function() {
+                $(post.el).transition({'opacity':0}, 200, function () {
                     console.log("replacing content in live post");
                     post.el.remove();
                     post.el = post_types[post.type].render(that.el, post)[0];
@@ -136,7 +145,7 @@ Zone.prototype = {
             }
 
         }
-        
+
         // scroll zones set new display_time values, based on size of
         // item, and scroll speed, so don't update from server.
 
@@ -146,11 +155,11 @@ Zone.prototype = {
 
     },
 
-    showPost: function(post) {
+    showPost: function (post) {
         "use strict";
         // show this post object, fading out any current post,
         // and setting this post to be the new current post.
-        var that=this;
+        var that = this;
 
         // if there is no current post to fade from:
 
@@ -169,12 +178,15 @@ Zone.prototype = {
         }
 
         // if this post is *already* the current post:
-        
+
         if (post.id === this.current_post.id) {
             // same post!
             console.log('only this post is available');
-            if (this.type == 'scroll') {
+            if (this.type === 'scroll') {
                 post_fadein(post, this.fadetime);
+            } else {
+                console.log (this.type);
+                console.log('scroll');
             }
             return;
         }
@@ -207,13 +219,13 @@ Zone.prototype = {
 
     },
 
-    findNextPost: function() {
+    findNextPost: function () {
         "use strict";
         // go through all the posts in this feed, move any which are
         // disallowed by time restrictions to the end of the list, and
         // return the next post to display, if there is one, else undefined.
 
-        var appendlist = [], thispost = undefined, nextpost = undefined;
+        var appendlist = [], thispost, nextpost;
 
         // return a function for removing an element from the DOM.
         var make_removeel = function (post) {
@@ -227,12 +239,12 @@ Zone.prototype = {
             // if it's sheduled for deletion, DON'T add it to the new list,
             // but fade it out (if it is visible) and delete the element.
 
-            if (thispost.hasOwnProperty('delete_me')){
+            if (thispost.hasOwnProperty('delete_me')) {
                 // it's popped!
                 post_fadeout(thispost, this.fadetime, make_removeel(thispost));
 
                 console.log(this.name +
-                            '|dropping post from feed (and removing el):'+
+                            '|dropping post from feed (and removing el):' +
                             thispost.id);
                 continue;
             }
@@ -256,7 +268,7 @@ Zone.prototype = {
                     // we have a winner!
                     nextpost = thispost;
                     break;
-                } 
+                }
             }
 
             // alas, the time restrictions didn't let this post get selected. So
@@ -272,7 +284,7 @@ Zone.prototype = {
 
     },
 
-    postTimeFinished: function() {
+    postTimeFinished: function () {
         "use strict";
         // This function is called once a post has been shown for long enough.
         // It fades out the old post, fades in the new one, and schedules itself
@@ -285,7 +297,7 @@ Zone.prototype = {
         // If there are no posts, then it schedules itself to run later, without
         // doing anything. (Sit around and wait for something to do).
 
-        var nextpost = false, that=this;
+        var nextpost = false, that = this;
 
         // call this function again, used as a callback:
         var call_me_again = function () { that.postTimeFinished(); };
@@ -296,7 +308,7 @@ Zone.prototype = {
             // no posts!
             that.current_post = false;
             setTimeout(call_me_again, that.no_posts_wait);
-            console.log('no posts for '+ that.name + '!');
+            console.log('no posts for ' + that.name + '!');
             return;
         }
 
@@ -322,10 +334,10 @@ Zone.prototype = {
             // ok, no posts allowed, but there *is* a current post.
             // let's get rid of it.
 
-            post_fadeout(that.current_post, that.fadetime, function() {
+            post_fadeout(that.current_post, that.fadetime, function () {
                 // callback once the post is faded out...
 
-                if (! that.current_post) {
+                if (!that.current_post) {
                     console.log('gone!');
                     return;
                 }
@@ -347,25 +359,25 @@ Zone.prototype = {
 
     },
 
-    pollForNewPosts: function() {
+    pollForNewPosts: function () {
         'use strict';
         // poll the server for new feeds.
-        var i, zone=this;
+        var that=this;
 
         $.getJSON(url_insert(POSTS_URL, JSON.stringify(this.feeds)),
                   make_updater(this));
 
         // schedule myself to un again later...
-        setTimeout(function(){ zone.pollForNewPosts(); },
+        setTimeout(function () { that.pollForNewPosts(); },
                    this.update_zones_timer);
     }
-}
+};
 
 //////////////////////////////////////////////////////////////////////////////
 
-function StreetScreen(element, initial_data){
+function StreetScreen(element, initial_data) {
     "use strict";
-    var i, that=this;
+    var i, that = this;
 
     // default mutable type properties:
     this.zones = [];
@@ -382,14 +394,14 @@ function StreetScreen(element, initial_data){
     this.md5 = initial_data.md5;
 
     // add the zones:
-    for(i=0; i<initial_data.zones.length; i+=1){
+    for (i = 0; i < initial_data.zones.length; i += 1) {
         this.zones.push(new Zone(this.el, initial_data.zones[i]));
         this.zones[i].pollForNewPosts();
     }
 
     // start it all off!
     //update_zones_posts();
-    setTimeout(function(){that.update();}, 3000);
+    setTimeout(function () { that.update(); }, 3000);
 
 
 }
@@ -398,8 +410,8 @@ StreetScreen.prototype = {
     background: "black",
     css:"",
     md5: "12345",
-    
-    update: function() {
+
+    update: function () {
         'use strict';
         // get JSON data from the server, check that the screen hasn't changed
         // too much, and if it has, reload.
@@ -407,9 +419,9 @@ StreetScreen.prototype = {
 
         //console.log('getting screen updates...');
 
-        var update = function(data) {
+        var update = function (data) {
             if (data.md5 === that.md5) {
-                setTimeout(function(){that.update();}, 20000);
+                setTimeout(function () {that.update();}, 20000);
             } else {
                 // The md5 is different! we should do some updates!
                 // TODO: proper reloading, including pre-downloading background
@@ -425,7 +437,7 @@ StreetScreen.prototype = {
         $.getJSON('/external_data_sources/');
     },
 
-    start_zones: function() {
+    start_zones: function () {
         'use strict';
         // go through all the zones, and start them off pulling posts
         // from the server.
@@ -436,11 +448,11 @@ StreetScreen.prototype = {
             this.zones[i].postTimeFinished();
         }
     }
-}
+};
 
 //////////////////////////////////////////////////////////////////////////////
 
-function make_updater(z){
+function make_updater(z) {
     'use strict';
     // Returns the 'update' closure, a function which is called
     //    when we get new data (posts) from the server, and adds
@@ -449,30 +461,29 @@ function make_updater(z){
     var zone = z;
 
     return function (data) {
-        "use strict";
 
         var new_post_ids = {},
-            current_post_ids = [], 
+            current_post_ids = [],
             posts_to_pop = [],
             new_data, i, n;
 
-        var do_next_post = function() { zone.postTimeFinished(); };
+        var do_next_post = function () { zone.postTimeFinished(); };
         var arrId = -1;
 
         if (! zone.hasOwnProperty('posts')) {zone.posts = [];}
 
         // make mapping of ids to new data posts array:
 
-        for (i=0; i < data.posts.length; i += 1){
+        for (i=0; i < data.posts.length; i += 1) {
             new_post_ids[data.posts[i].id]=i;
         }
 
         // go through old posts. check if they're in need of change:
 
-        for (i=0; i < zone.posts.length; i += 1){
+        for (i=0; i < zone.posts.length; i += 1) {
 
             // keep current posts, and delete no-longer needed posts:
-            if (typeof new_post_ids[zone.posts[i].id]!== "undefined"){
+            if (typeof new_post_ids[zone.posts[i].id] !== "undefined") {
 
                 arrId = new_post_ids[zone.posts[i].id];
 
@@ -506,7 +517,7 @@ function make_updater(z){
             }
         }
 
-        for (i=0; i<posts_to_pop.length; i++) {
+        for (i = 0; i < posts_to_pop.length; i += 1) {
             console.log(posts_to_pop[i], zone.posts.length);
             console.log(zone.name + '|popping!:' + zone.posts[posts_to_pop[i]].id);
             zone.posts.pop(posts_to_pop[i]);
@@ -519,12 +530,12 @@ function make_updater(z){
             if ($.inArray(new_data.id, current_post_ids) === -1) {
 
                 // add the new post to zone.posts, and get the array index:
-                n = zone.posts.push(new_data) - 1;
+                new_data.zone = zone;
+                new_data.el =
+                    post_types[new_data.type].render(zone.el, new_data)[0];
 
-                // update the zone info, and create a new html element.
-                zone.posts[n].zone = zone;
-                zone.posts[n].el =
-                    post_types[zone.posts[n].type].render(zone.el, zone.posts[n])[0];
+                zone.posts.push(new_data);
+
             }
         }
     }; // end of closure...
