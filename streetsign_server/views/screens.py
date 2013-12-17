@@ -113,6 +113,9 @@ def screenedit(screenid):
         screen.save()
         flash('saved.')
 
+        if int(screenid) == -1:
+            return redirect(url_for('screenedit', screenid=screen.id))
+
     return render_template('screen_editor.html',
                 feeds=Feed.select(),
                 backgrounds = backgrounds,

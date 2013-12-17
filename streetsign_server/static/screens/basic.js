@@ -74,7 +74,7 @@ function post_fadein(post, fadetime, andthen) {
         $(post.el).css({'left': $(post.zone.el).width() + 10,
                         'opacity': 1.0});
 
-        $(post.el).transition({'left': 0 - ($(post.el).width() + 10)},
+        $(post.el).animate({'left': 0 - ($(post.el).width() + 10)},
                               distance * 17,
                               'linear');
 
@@ -82,7 +82,6 @@ function post_fadein(post, fadetime, andthen) {
 
         andthen();
 
-        // do scroll stuff.
     } else {
         fadetime = 1 * fadetime;
         if ((fadetime === undefined)||(isNaN(fadetime))) { fadetime = 0; }

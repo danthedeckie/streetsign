@@ -81,6 +81,8 @@ function Zone(container, initial_data) {
     update('color');
     update('name');
     update('type');
+    update('fadetime');
+
     console.log(this.type);
 
     this.el = $(zone_html(initial_data.name,
@@ -103,7 +105,7 @@ Zone.prototype = {
     color: 'white',
     post_time: 4000,
     fadetime: 500,
-    update_zones_timer: 96000,
+    update_zones_timer: 6000,
     no_posts_wait: 10000,
     current_post: false,
 
@@ -149,13 +151,13 @@ Zone.prototype = {
         // scroll zones set new display_time values, based on size of
         // item, and scroll speed, so don't update from server.
 
-        if (this.type !== 'scroll') {
+        if (this.type === 'fade') {
             post.display_time = newData.display_time;
         }
 
     },
 
-    showPost: function (post) {
+    showPost: function (post, after_cb) {
         "use strict";
         // show this post object, fading out any current post,
         // and setting this post to be the new current post.
@@ -166,7 +168,7 @@ Zone.prototype = {
         if (this.current_post === false) {
             // first post!
             this.current_post = post;
-            post_fadein(this.current_post, this.fadetime);
+            post_fadein(this.current_post, this.fadetime, after_cb);
 
             // posttype 'display' callback:
             if (post_types[post.type].hasOwnProperty('display')) {
@@ -182,11 +184,11 @@ Zone.prototype = {
         if (post.id === this.current_post.id) {
             // same post!
             console.log('only this post is available');
-            if (this.type === 'scroll') {
-                post_fadein(post, this.fadetime);
+
+            if (this.type == 'scroll') {
+                post_fadein(post, this.fadetime, after_cb);
             } else {
-                console.log (this.type);
-                console.log('scroll');
+                after_cb();
             }
             return;
         }
@@ -204,7 +206,7 @@ Zone.prototype = {
             // set current post, and fade it in:
 
             that.current_post = post;
-            post_fadein(that.current_post, that.fadetime);
+            post_fadein(that.current_post, that.fadetime, after_cb);
 
             // posttype 'display' callback:
             if (post_types[post.type].hasOwnProperty('display')) {
@@ -240,7 +242,6 @@ Zone.prototype = {
             // but fade it out (if it is visible) and delete the element.
 
             if (thispost.hasOwnProperty('delete_me')) {
-                // it's popped!
                 post_fadeout(thispost, this.fadetime, make_removeel(thispost));
 
                 console.log(this.name +
@@ -323,8 +324,9 @@ Zone.prototype = {
         // if a nextpost was selected, then let's display it.
 
         if (nextpost) {
-            that.showPost(nextpost);
-            that.next_post_timer = setTimeout(call_me_again, nextpost.display_time);
+            that.showPost(nextpost, function () {
+                that.next_post_timer = setTimeout(call_me_again, nextpost.display_time);
+                });
             return;
         }
 
@@ -417,11 +419,11 @@ StreetScreen.prototype = {
         // too much, and if it has, reload.
         var that = this;
 
-        //console.log('getting screen updates...');
+        console.log('getting screen updates...');
 
         var update = function (data) {
             if (data.md5 === that.md5) {
-                setTimeout(function () {that.update();}, 20000);
+                setTimeout(function () {that.update();}, 50000);
             } else {
                 // The md5 is different! we should do some updates!
                 // TODO: proper reloading, including pre-downloading background
@@ -464,7 +466,7 @@ function make_updater(z) {
 
         var new_post_ids = {},
             current_post_ids = [],
-            posts_to_pop = [],
+            posts_to_drop = [],
             new_data, i, n;
 
         var do_next_post = function () { zone.postTimeFinished(); };
@@ -483,7 +485,7 @@ function make_updater(z) {
         for (i=0; i < zone.posts.length; i += 1) {
 
             // keep current posts, and delete no-longer needed posts:
-            if (typeof new_post_ids[zone.posts[i].id] !== "undefined") {
+            if (new_post_ids[zone.posts[i].id] !== undefined) {
 
                 arrId = new_post_ids[zone.posts[i].id];
 
@@ -510,25 +512,21 @@ function make_updater(z) {
                     clearTimeout(zone.next_post_timer);
                     zone.next_post_timer = setTimeout(do_next_post, 1000);
                 } else {
-                    console.log(zone.name + '|adding to popqueue:' + zone.posts[i].id);
-                    //zone.posts.pop(i);
-                    posts_to_pop.push(i);
+                    console.log(zone.name + '|adding to dropqueue:' + zone.posts[i].id);
+                    posts_to_drop.push(i);
                 }
             }
         }
 
-        for (i = 0; i < posts_to_pop.length; i += 1) {
-            console.log(posts_to_pop[i], zone.posts.length);
-            console.log(zone.name + '|popping!:' + zone.posts[posts_to_pop[i]].id);
-            zone.posts.pop(posts_to_pop[i]);
+        for (i = 0; i < posts_to_drop.length; i += 1) {
+            zone.posts.splice(posts_to_drop[i], 1);
         }
 
         // add new posts to the list!
         for (i=0; i<data.posts.length; i += 1) {
             new_data = data.posts[i];
 
-            if ($.inArray(new_data.id, current_post_ids) === -1) {
-
+            if (current_post_ids.indexOf(new_data.id) === -1) {
                 // add the new post to zone.posts, and get the array index:
                 new_data.zone = zone;
                 new_data.el =

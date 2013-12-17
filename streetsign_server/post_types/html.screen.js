@@ -27,8 +27,6 @@
 
         // Return the HTML object, hiding it along the way.
 
-        console.log(data.content.content.slice(0, 15));
-
         return newhtml.css('opacity', 0);
     }
 }

@@ -463,5 +463,4 @@ def external_source_run(source_id):
 def external_data_sources_update_all():
     ''' update all external data sources. '''
     sources = [x[0] for x in ExternalSource.select(ExternalSource.id).tuples()]
-    print sources
     return json.dumps([(external_source_run(s), s) for s in sources])
