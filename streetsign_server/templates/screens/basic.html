@@ -20,20 +20,8 @@
 
   <script type="text/javascript">
 
-  window.SCREEN={{screen.to_dict() | tojson }};
-  window.SCREEN.md5 = "{{screen.md5()}}";
-
-  window.DEFAULTSCREEN={
-        background: "black",
-        css:'',
-        defaults: {'no_posts_wait': 10000,
-                   'update_zones_timer': 96000,
-                   'post_time': 4000,
-                   'classes':'text_dropshadow',
-                   'css':{}},
-        zones: {},
-        md5: '12345'
-                };
+  var SCREEN_DATA={{screen.to_dict() | tojson }};
+  SCREEN_DATA.md5 = "{{screen.md5()}}";
 
   {% if screen.background %}
       BG="url({{url_for('static', filename='user_files/' + screen.background)}})"
@@ -43,11 +31,13 @@
 
   POSTS_URL = "{{ url_for('screens_posts_from_feeds', json_feeds_list='-1') }}";
 
-  var screen_data = $.extend({}, DEFAULTSCREEN, SCREEN);
-  screen_data.defaults = $.extend({}, DEFAULTSCREEN.defaults, screen_data.defaults);
+  //var screen_data = $.extend({}, DEFAULTSCREEN, SCREEN);
+  //screen_data.defaults = $.extend({}, DEFAULTSCREEN.defaults, screen_data.defaults);
 
-  init_screen(screen_data, '#zones')
-  setTimeout(start_zones_scrolling, 2000);
+  //init_screen(screen_data, '#zones')
+  //setTimeout(start_zones_scrolling, 2000);
+  window.SCREEN = new StreetScreen($('#zones'), SCREEN_DATA);
+  setTimeout(function(){window.SCREEN.start_zones();}, 2000);
 
   </script>
 {% endblock %}
