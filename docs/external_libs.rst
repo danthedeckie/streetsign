@@ -6,50 +6,58 @@ TODO (much more detail, and author/licence info)
 None of this would be even remotely possible without the amazing open source
 community, and the following fantastic libraries that I've been able to use:
 
-Flask
------
+`Flask`_
+--------
 
+
+`Flask`_ is cool
 Python (Micro) web framework
 
-Peewee
-------
+`Peewee`_
+---------
 
 Simple, splendid Python ORM
 
-Flask-Peewee
-~~~~~~~~~
+`Flask-Peewee`_
+~~~~~~~~~~~~~~~
 
 Joining flask and peewee together with ease
 
-Sqlite
-------
+`Sqlite`_
+---------
 
 Simple, Fast single-file database system.
 
-jQuery
-------
+`jQuery`_
+---------
 
 Better DOM for javascript in the browser
 
 Also these jQuery plugins:
 
-jQuery.anytime
-~~~~~~~~~~~~~~
+`jQuery.transit`_
+~~~~~~~~~~~~~~~~~
+
+Use CSS transitions for faster smoother animation.
+
+`jQuery.anytime`_
+~~~~~~~~~~~~~~~~~
+
 Converting dates and times nicely
 
-jQuery.timePicker
-~~~~~~~~~~~~~~~~~
+`jQuery.timePicker`_
+~~~~~~~~~~~~~~~~~~~~
 
 Seriously, why haven't browsers got this stuff built in? Oh well, this makes it
 easy!
 
-chosen
-~~~~~~
+`chosen`_
+~~~~~~~~~
 
 Very sweet multiselect boxes.
 
-knockout.js
------------
+`knockout.js`_
+--------------
 
 For doing interactive object modelling and user-interface stuff which would
 be horrible in javascript + html otherwise.
@@ -60,29 +68,27 @@ knockout.mapping
 Which turns non-schema/undefined messy JSON objects into knockout object arrays
 which can be assigned, modified, and played with.
 
-Twitter Bootstrap
------------------
+Twitter `Bootstrap`_
+--------------------
 
 I'm not a front-end CSS wizard, and this helps the admin interface look clean and
 professional with so little work from me.  It really does wonders.
 
-Pylint
-------
+`Pylint`_
+---------
 
 For making it so much easier to keep the code base consistent and clean.
 
 pylint git commit hook
 ~~~~~~~~~~~~~~~~~~~~~~
-
 forcing me to keep it clean.
 
-Bleach
-------
-
+`Bleach`_
+---------
 Stripping and cleaning HTML is so easy with this great library!
 
-FeedParser
-----------
+`FeedParser`_
+-------------
 
 Parsing XML (RSS & Atom) feeds has never been so easy!
 
@@ -91,8 +97,8 @@ Passlib & py-bcrypt
 
 There is no reason to keep passwords insecurely...
 
-Waitress
---------
+`Waitress`_
+-----------
 
 The simplest WSGI server ever...
 

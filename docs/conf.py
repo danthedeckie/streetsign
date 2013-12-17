@@ -33,6 +33,26 @@ pygments_style = 'sphinx'
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
 
+rst_epilog = """
+.. _Python: http://python.org/
+.. _Flask: http://flask.pocoo.org/
+.. _peewee: http://peewee.readthedocs.org/en/latest/
+.. _flask-peewee: https://github.com/coleifer/flask-peewee
+.. _jQuery: http://jquery.com/
+.. _jQuery.transit: https://github.com/rstacruz/jquery.transit
+.. _chosen: http://harvesthq.github.io/chosen/
+.. _knockout.js: http://knockoutjs.com/
+.. _pylint: http://www.pylint.org/ 
+.. _pylint git commit hook: https://github.com/sebdah/git-pylint-commit-hook
+.. _bleach: http://bleach.readthedocs.org/en/latest/index.html
+.. _Bootstrap: http://twbs.github.io/bootstrap/
+.. _sqlite: http://www.sqlite.org/
+.. _FeedParser: http://pythonhosted.org/feedparser/
+.. _Waitress: http://docs.pylonsproject.org/projects/waitress/en/latest/
+
+
+"""
+
 # ---------------------------------------------
 
 html_theme = 'default'
