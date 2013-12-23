@@ -21,6 +21,8 @@
 
 *************************************************************/
 
+var _mt = function(){};
+
 // Returns the HTML for a zone area
 // TODO: This should really be templated out.
 function zone_html(id, top, left, bottom, right, css, type) {
@@ -39,7 +41,7 @@ function zone_html(id, top, left, bottom, right, css, type) {
 function post_fadeout(post, fadetime, andthen) {
     "use strict";
 
-    if (!andthen) { andthen = function() {}; }
+    if (!andthen) { andthen = _mt; }
 
     fadetime = 1 * fadetime;
 
@@ -47,36 +49,64 @@ function post_fadeout(post, fadetime, andthen) {
 
     if (post.zone.type == 'scroll') {
         // do scroll stuff.
-        $(post.zone.el).transition({'opacity': 0}, 500, function() {
+        $(post.zone.el).css('opacity', 0);
+        setTimeout( function () {
             $(post.el).css('opacity', 0);
             $(post.zone.el).css('opacity', 1.0);
             andthen()
-            });
-        //andthen();
+        }, 1000);
     } else {
-        $(post.el).transition({'opacity':0}, fadetime, andthen);
+        //$(post.el).transition({'opacity':0}, fadetime, andthen);
+        $(post.el).removeClass('faded_in');
+        andthen();
+
     }
 }
 
 function post_fadein(post, fadetime, andthen) {
     "use strict";
     var distance;
+    var el;
+    var dotick;
+    var current;
+    var stopat;
+    var current_set;
 
-    if (!andthen) { andthen = function() {}; }
+    if (!andthen) { andthen = _mt; }
 
     if (post.zone.type == 'scroll') {
-        distance = $(post.el).width() + $(post.zone.el).width() + 20;
+        current = $(post.zone.el).width();
+
+        post.zone.current_scroll_num = post.zone.current_scroll_num || 1;
+        post.zone.current_scroll_num += 1;
+        current_set = post.zone.current_scroll_num;
+
+        distance = $(post.el).width() + current + 20;
 
         // This is odd..
         //$(post.el).fadeIn(0, andthen);
         //$(post.el).css('left', $(post.zone.el).width() + 10);
         
-        $(post.el).css({'left': $(post.zone.el).width() + 10,
+        $(post.el).css({'left': current + 10,
                         'opacity': 1.0});
 
-        $(post.el).animate({'left': 0 - ($(post.el).width() + 10)},
-                              distance * 17,
-                              'linear');
+        //$(post.el).animate({'left': 0 - ($(post.el).width() + 10)},
+        //                      distance * 17,
+        //                      'linear');
+        el = $(post.el).get()[0];
+        stopat = 0 - el.offsetWidth;
+
+        dotick = function () {
+        
+            if ((current_set == post.zone.current_scroll_num)&&(current > stopat)) {
+                current -= 1;
+                el.style.left = current + 'px';
+                requestAnimationFrame(dotick);
+            } else {
+                console.log('stopped');
+            }
+        }
+        dotick();
 
         post.display_time = distance * 17;
 
@@ -85,7 +115,9 @@ function post_fadein(post, fadetime, andthen) {
     } else {
         fadetime = 1 * fadetime;
         if ((fadetime === undefined)||(isNaN(fadetime))) { fadetime = 0; }
-        $(post.el).transition({'opacity':1.0}, fadetime, andthen);
+        //$(post.el).transition({'opacity':1.0}, fadetime, andthen);
+        $(post.el).addClass('faded_in');
+        andthen();
     }
 }
 

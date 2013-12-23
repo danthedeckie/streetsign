@@ -15,6 +15,7 @@ div.zone {
     display: table-cell;
     vertical-align: middle;
     background-size: cover;
+    transition: opacity 1s;
 }
 
 .zone_ .post, .zone_fade .post {
@@ -27,6 +28,13 @@ div.zone {
     height: 100%;
     margin: auto;
     display: table;
+    opacity: 0.0;
+    transition: opacity 1s;
+}
+
+.post.faded_in {
+    opacity: 1.0;
+    transition: opacity 1s;
 }
 
 .zone_scroll .post {

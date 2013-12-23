@@ -122,7 +122,6 @@ Zone.prototype = {
         'use strict';
         // update the data in a post with the new data sent from the server:
         var that = this;
-        var old_opacity;
 
         post.time_restrictions_show = newData.time_restrictions_show;
         post.time_restrictions = newData.time_restrictions;
@@ -133,13 +132,13 @@ Zone.prototype = {
             post.content = newData.content;
 
             if (this.current_post.id === post.id) {
-                old_opacity = $(post.el).css('opacity');
-                $(post.el).transition({'opacity':0}, 200, function () {
+                $(that.el).css('opacity', 0);
+                setTimeout( function () {
                     console.log("replacing content in live post");
                     post.el.remove();
                     post.el = post_types[post.type].render(that.el, post)[0];
-                    post.el.transition({'opacity': old_opacity}, 200);
-                    });
+                    $(that.el).css('opacity', 1.0);
+                    }, 1000);
             } else {
                 console.log("replacing content in post:" + post.id);
                 post.el.remove();
@@ -366,14 +365,30 @@ Zone.prototype = {
         // poll the server for new feeds.
         var that=this;
 
-        $.getJSON(url_insert(POSTS_URL, JSON.stringify(this.feeds)),
+        getJSON(url_insert(POSTS_URL, JSON.stringify(this.feeds)),
                   make_updater(this));
+
 
         // schedule myself to un again later...
         setTimeout(function () { that.pollForNewPosts(); },
                    this.update_zones_timer);
     }
 };
+
+
+function getJSON(url, callback) {
+    var xhr = new XMLHttpRequest();
+    if (callback) {
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState == 4) {
+         callback(JSON.parse(xhr.responseText));
+      }
+    }
+    }
+    xhr.open("GET", url, true);
+    xhr.send(null);
+
+}
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -432,11 +447,11 @@ StreetScreen.prototype = {
             }
         };
 
-        $.getJSON('/screens/json/' +  that.id + '/' + that.md5, update);
+        getJSON('/screens/json/' +  that.id + '/' + that.md5, update);
 
         // And for now, since there isn't really anywhere better, lets also
         // tell all external sources to update if they need to.
-        $.getJSON('/external_data_sources/');
+        getJSON('/external_data_sources/');
     },
 
     start_zones: function () {
@@ -461,18 +476,29 @@ function make_updater(z) {
     //    them into a zone. Captures zone (z) within the closure,
     //    so it can be passed to the $.getJSON(...) callback.
     var zone = z;
+    var do_next_post = function () { zone.postTimeFinished(); };
+    var new_post_ids = {},
+            current_post_ids = [],
+            posts_to_drop = [],
+            new_data, i, n, arrId;
+
+
+    if (! zone.hasOwnProperty('posts')) {zone.posts = [];}
 
     return function (data) {
 
-        var new_post_ids = {},
-            current_post_ids = [],
-            posts_to_drop = [],
-            new_data, i, n;
 
-        var do_next_post = function () { zone.postTimeFinished(); };
-        var arrId = -1;
+        // clear old values:
 
-        if (! zone.hasOwnProperty('posts')) {zone.posts = [];}
+        for (i in new_post_ids) {
+            if (new_post_ids.hasOwnProperty(i)){
+                delete new_post_ids[i];
+            }
+        }
+        current_post_ids.length = 0;
+        posts_to_drop.length = 0;
+
+        arrId = -1;
 
         // make mapping of ids to new data posts array:
 
