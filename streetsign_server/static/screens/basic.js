@@ -23,6 +23,14 @@
 
 var _mt = function(){};
 
+if (!window.hasOwnProperty('requestAnimationFrame')){
+    try {
+        window.requestAnimationFrame = mozRequestAnimationFrame;
+    } catch (ignore) {
+        window.requestAnimationFrame = webkitRequestAnimationFrame;
+    }
+}
+
 // Returns the HTML for a zone area
 // TODO: This should really be templated out.
 function zone_html(id, top, left, bottom, right, css, type) {
@@ -51,19 +59,23 @@ function post_fadeout(post, fadetime, andthen) {
         // do scroll stuff.
         //$(post.zone.el).css('opacity', 0);
         post.zone.el.style.opacity = 0;
+        post.el.style.transition = "";
+        post.el.style.webkitTransition = "";
+        post.el.style.mozTransition = "";
+
 
         setTimeout( function () {
             post.el.style.opacity = 0;
             post.zone.el.style.opacity = 1.0;
-
-            //$(post.el).css('opacity', 0);
-            //$(post.zone.el).css('opacity', 1.0);
             andthen()
-        }, 1000);
+        }, post.zone.fadetime);
+
     } else {
-        //$(post.el).transition({'opacity':0}, fadetime, andthen);
-        $(post.el).removeClass('faded_in');
-        andthen();
+        post.el.className = post.el.className.replace(' faded_in','');
+        setTimeout( function () {
+            post.el.style.display = 'none';
+            andthen();
+        }, post.zone.fadetime);
 
     }
 }
@@ -71,58 +83,40 @@ function post_fadeout(post, fadetime, andthen) {
 function post_fadein(post, fadetime, andthen) {
     "use strict";
     var distance;
-    var el;
     var dotick;
     var current;
-    var stopat;
     var current_set;
 
     if (!andthen) { andthen = _mt; }
 
+    post.el.style.display = "block";
+
     if (post.zone.type == 'scroll') {
-        current = $(post.zone.el).width();
 
-        post.zone.current_scroll_num = post.zone.current_scroll_num || 1;
-        post.zone.current_scroll_num += 1;
-        current_set = post.zone.current_scroll_num;
 
-        distance = $(post.el).width() + current + 20;
+        distance = post.el.offsetWidth + post.zone.el.offsetWidth + 20;
 
-        // This is odd..
-        //$(post.el).fadeIn(0, andthen);
-        //$(post.el).css('left', $(post.zone.el).width() + 10);
-        
-        $(post.el).css({'left': current + 10,
-                        'opacity': 1.0});
+        //el.style.display = "block";
+        post.el.style.marginLeft = (post.zone.el.offsetWidth + 10) + "px";
+        setTimeout( function () { 
 
-        //$(post.el).animate({'left': 0 - ($(post.el).width() + 10)},
-        //                      distance * 17,
-        //                      'linear');
-        el = $(post.el).get()[0];
-        stopat = 0 - el.offsetWidth;
+            post.el.style.opacity = "1.0";
+            post.el.style.transition = "margin " + (distance/70) + "s linear";
+            post.el.style.webkitTransition = "margin " + (distance/70) + "s linear";
+            post.el.style.mozTransition = "margin " + (distance/70) + "s linear";
+            post.el.style.marginLeft = (-10 - post.el.offsetWidth) + "px";
 
-        dotick = function () {
-        
-            if ((current_set == post.zone.current_scroll_num)&&(current > stopat)) {
-                current -= 1;
-                el.style.left = current + 'px';
-                requestAnimationFrame(dotick);
-            } else {
-                console.log('stopped');
-            }
-        }
-        dotick();
+            andthen();
+        }, 10);
 
-        post.display_time = distance * 17;
+        post.display_time = (distance + 100) * 14;
 
-        andthen();
 
     } else {
         fadetime = 1 * fadetime;
         if ((fadetime === undefined)||(isNaN(fadetime))) { fadetime = 0; }
-        //$(post.el).transition({'opacity':1.0}, fadetime, andthen);
-        $(post.el).addClass('faded_in');
-        andthen();
+        post.el.className += ' faded_in';
+        setTimeout(andthen, fadetime);
     }
 }
 

@@ -16,6 +16,10 @@ div.zone {
     vertical-align: middle;
     background-size: cover;
     transition: opacity 1s;
+    -webkit-transition: opacity: 1s;
+    // this mad extra forces webkit to give each zone it's own layer,
+    // which makes screen paints faster.  ***bizrre***
+    -webkit-transform: rotateX(20deg);
 }
 
 .zone_ .post, .zone_fade .post {
@@ -30,11 +34,13 @@ div.zone {
     display: table;
     opacity: 0.0;
     transition: opacity 1s;
+    -webkit-transition: opacity: 1s;
 }
 
 .post.faded_in {
     opacity: 1.0;
     transition: opacity 1s;
+    -webkit-transition: opacity: 1s;
 }
 
 .zone_scroll .post {
