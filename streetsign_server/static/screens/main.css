@@ -44,6 +44,7 @@ div.zone {
     height: 100%;
     /*display: inline;*/
     white-space: nowrap;
+    opacity: 0;
 }
 
 .zone_ div.post_inner, .zone_fade div.post_inner {

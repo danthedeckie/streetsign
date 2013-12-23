@@ -94,7 +94,8 @@ function Zone(container, initial_data) {
                           initial_data.type)).prependTo(container)[0];
 
     for (i = 0; i < csspairs.length; i += 1) {
-        $(this.el).css(csspairs[i][0], csspairs[i][1]);
+        this.el.style[csspairs[i][0]] = csspairs[i][1];
+        //$(this.el).css(csspairs[i][0], csspairs[i][1]);
     }
 
 }
@@ -132,12 +133,14 @@ Zone.prototype = {
             post.content = newData.content;
 
             if (this.current_post.id === post.id) {
-                $(that.el).css('opacity', 0);
+                that.el.style.opacity = 0;
+                //$(that.el).css('opacity', 0);
                 setTimeout( function () {
                     console.log("replacing content in live post");
                     post.el.remove();
                     post.el = post_types[post.type].render(that.el, post)[0];
                     $(that.el).css('opacity', 1.0);
+                    that.el.style.opacity = 1.0;
                     }, 1000);
             } else {
                 console.log("replacing content in post:" + post.id);
@@ -557,6 +560,8 @@ function make_updater(z) {
                 new_data.zone = zone;
                 new_data.el =
                     post_types[new_data.type].render(zone.el, new_data)[0];
+                //$(new_data.el).css('opacity',0);
+                //new_data.el.style.opacity = 0;
 
                 zone.posts.push(new_data);
 

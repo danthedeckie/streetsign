@@ -49,10 +49,15 @@ function post_fadeout(post, fadetime, andthen) {
 
     if (post.zone.type == 'scroll') {
         // do scroll stuff.
-        $(post.zone.el).css('opacity', 0);
+        //$(post.zone.el).css('opacity', 0);
+        post.zone.el.style.opacity = 0;
+
         setTimeout( function () {
-            $(post.el).css('opacity', 0);
-            $(post.zone.el).css('opacity', 1.0);
+            post.el.style.opacity = 0;
+            post.zone.el.style.opacity = 1.0;
+
+            //$(post.el).css('opacity', 0);
+            //$(post.zone.el).css('opacity', 1.0);
             andthen()
         }, 1000);
     } else {
