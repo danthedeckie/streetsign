@@ -27,7 +27,7 @@
 
 
 from flask import render_template, url_for, request, redirect, \
-                  flash, json 
+                  flash, json, jsonify
 import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
 import peewee
@@ -257,7 +257,7 @@ def postpage(postid):
             redirect(e.url)
 
         # if it's a publish or delete request, handle that instead:
-        DO = request.form.get('action','edit')
+        DO = request.form.get('action', 'edit')
         if DO == 'delete':
             post.delete_instance()
             flash('Deleted')
@@ -317,6 +317,14 @@ def postedit_type(typeid):
                            post_type = typeid,
                            form_content = editor.form(request.form))
 
+###############################################################
+
+@app.route('/posts/<int:postid>/json')
+def json_post(postid):
+    try:
+        return jsonify(Post.get(Post.id == postid).dict_repr())
+    except:
+        return jsonify({"error": "Invalid Post ID"})
 
 ###############################################################
 
@@ -389,6 +397,7 @@ def external_data_source_edit(source_id):
             feeds=Feed.select(),
             form=module.form(json.loads(source.settings)))
 
+
 @app.route('/external_data_sources/test')
 def external_source_test():
     '''
@@ -409,6 +418,7 @@ def external_source_test():
     module = external_source_types.load(request.args.get('type', None))
     # and request the test html
     return module.test(request.args)
+
 
 @app.route('/external_data_sources/<int:source_id>/run')
 def external_source_run(source_id):
@@ -435,7 +445,8 @@ def external_source_run(source_id):
 
     if new_posts:
         for fresh_data in new_posts:
-            post = Post(type=fresh_data.get('type', 'html'), author=source.post_as_user)
+            post = Post(type=fresh_data.get('type', 'html'),
+                        author=source.post_as_user)
             editor = post_types.load(fresh_data.get('type', 'html'))
 
             post.feed = source.feed

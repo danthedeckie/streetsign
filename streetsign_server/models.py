@@ -584,7 +584,8 @@ class Post(DBModel):
               'content': safe_json_load(self.content, {}),
               'time_restrictions': safe_json_load(self.time_restrictions, []),
               'time_restrictions_show': self.time_restrictions_show,
-              'display_time': self.display_time * 1000 # in milliseconds
+              'display_time': self.display_time * 1000, # in milliseconds
+              'changed': self.write_date
             })
 
     def active_status(self):

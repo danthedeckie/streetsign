@@ -71,9 +71,10 @@ function post_fadeout(post, fadetime, andthen) {
         }, post.zone.fadetime);
 
     } else {
-        post.el.className = post.el.className.replace(' faded_in','');
+        //post.el.className = post.el.className.replace(' faded_in','');
+        post.el.style.opacity = 0;
         setTimeout( function () {
-            post.el.style.display = 'none';
+            //post.el.style.display = 'none';
             andthen();
         }, post.zone.fadetime);
 
@@ -89,7 +90,7 @@ function post_fadein(post, fadetime, andthen) {
 
     if (!andthen) { andthen = _mt; }
 
-    post.el.style.display = "block";
+    //post.el.style.display = "block";
 
     if (post.zone.type == 'scroll') {
 
@@ -115,7 +116,8 @@ function post_fadein(post, fadetime, andthen) {
     } else {
         fadetime = 1 * fadetime;
         if ((fadetime === undefined)||(isNaN(fadetime))) { fadetime = 0; }
-        post.el.className += ' faded_in';
+        //post.el.className += ' faded_in';
+        post.el.style.opacity = 1.0;
         setTimeout(andthen, fadetime);
     }
 }

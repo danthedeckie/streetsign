@@ -95,13 +95,15 @@ function any_relevent_restrictions(post) {
     var now = faketime();
     var i;
 
+
     for (i=0; i< post.time_restrictions.length; i += 1) {
         if (restriction_relevant(now, post.time_restrictions[i])) {
-            return true;
+            if (!thispost.time_restrictions_show) {
+                return true;
+            } 
         }
     }
-
-    return false;
+    return post.time_restrictions_show;
 }
 
 function reload_page() {

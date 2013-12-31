@@ -28,7 +28,7 @@ logic for feeds_and_posts views, separated out for clarity.
 from flask import flash, url_for, json
 from streetsign_server.views.utils import PleaseRedirect
 from streetsign_server.models import Feed
-#from datetime import datetime
+from datetime import datetime
 
 def try_to_set_feed(post, form, user):
     ''' Is this user actually allowed to set the feed of this post to what
@@ -142,4 +142,5 @@ def post_form_intake(post, form, editor):
             == 'only_show')
     post.time_restrictions = form.get('time_restrictions_json','[]')
     post.display_time = min(100, max(2, int(form.get('displaytime', 8))))
+    post.write_date = datetime.now()
 
