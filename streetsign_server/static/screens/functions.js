@@ -118,22 +118,24 @@ function reduce_font_size_to_fit(inner, outer) {
     'use strict';
     // reduce fontsize until inner.height() < outer.height()...
 
-    var height = 0;
+    var percent = 100;
     var zone_height = $(outer).height();
     var i = 100;
-
-    height = inner.height();
+    var height = inner.height();
 
     if ( height > zone_height ) {
-        for (i=100; i>10;i-=3){
-
+        while(i>1){ 
             height = inner.height();
-            if (height <= zone_height) {
-                console.log ('reducing font size to ' + i + '%');
-                break;
+            i = i / 2;
+            if (height < zone_height) {
+                percent += i;
+            } else if (height > zone_height) {
+                percent -= i;
             }
-            inner.css('font-size', i + '%');
+            inner.css('font-size', percent + '%');
         }
+        inner.css('font-size', parseInt(percent) + '%');
+        //console.log ('reducing font size to ' + parseInt(percent) + '%');
     }
 }
 

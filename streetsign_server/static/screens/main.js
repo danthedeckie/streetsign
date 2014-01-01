@@ -128,7 +128,7 @@ function Zone(container, initial_data) {
     // and store width and height for less layout thrashing later on...
 
     this.height = this.el.offsetHeight;
-    this.width = this.el.offsetWidth;
+    this.width = this.el.scrollWidth;
 
     // apply new CSS tags:
 
@@ -156,8 +156,8 @@ Zone.prototype = {
         new_data.zone = this;
         new_data.el =
             post_types[new_data.type].render(this.el, new_data)[0];
-        new_data.width = new_data.el.offsetWidth;
-        new_data.height = new_data.el.offsetHeight;
+        new_data.width = new_data.el.scrollWidth;
+        new_data.height = new_data.el.scrollHeight;
 
         // TODO is this right?
         new_data.el.style.transition = "opacity 0." + this.fadetime + "s";
@@ -191,7 +191,7 @@ Zone.prototype = {
                     console.log("replacing content in live post");
                     post.el.remove();
                     post.el = post_types[post.type].render(that.el, post)[0];
-                    post.width = post.el.offsetWidth;
+                    post.width = post.el.scrollWidth;
                     post.height = post.el.offsetHeight;
                     //$(that.el).css('opacity', 1.0);
                     that.el.style.opacity = 1.0;
@@ -445,7 +445,11 @@ function StreetScreen(element, initial_data) {
     for (i = 0; i < initial_data.zones.length; i += 1) {
         zone = new Zone(this.el, initial_data.zones[i]);
         this.zones.push(zone);
-        zone.update_zones_timer += i * 200;
+
+        // 100 * i so that we separate our requests out,
+        // in theory, we shouldn't have to handle multiple
+        // in the same render frame later on.
+
         zone.pollForNewPosts (100 * i);
     }
 
@@ -501,13 +505,12 @@ StreetScreen.prototype = {
 
 //////////////////////////////////////////////////////////////////////////////
 
-function make_updater(z) {
+function make_updater(zone) {
     'use strict';
     // Returns the 'update' closure, a function which is called
     //    when we get new data (posts) from the server, and adds
     //    them into a zone. Captures zone (z) within the closure,
-    //    so it can be passed to the $.getJSON(...) callback.
-    var zone = z;
+    //    so it can be passed to the getJSON(...) callback.
     var do_next_post = function () { zone.postTimeFinished(); };
 
     var update_post = function (thiszone, post, data) {
@@ -517,9 +520,9 @@ function make_updater(z) {
         };
 
     var new_post_ids = {},
-            current_post_ids = [],
-            posts_to_drop = [],
-            new_data, i, n, arrId;
+        current_post_ids = [],
+        posts_to_drop = [],
+        new_data, i, n, arrId;
 
 
     if (! zone.hasOwnProperty('posts')) {zone.posts = [];}

@@ -84,6 +84,12 @@ var zone_types = {
 
             if (!post.scroll_stylesheet) {
 
+                // Why does this need to be set here? it seems like the
+                // previous setting in main.js (Zone.prototype.addPost)
+                // gets an incorrect value...
+
+                post.width = post.el.scrollWidth;
+
                 // if we're on an old webkit browser, add their prefixes
 
                 if (post.el.style.hasOwnProperty('webkitAnimation')){
@@ -94,12 +100,17 @@ var zone_types = {
                 stylesheet.appendChild(document.createTextNode(
                       "@"+prefix+"keyframes slide_" + post.id
                     + " { from { "+prefix+"transform:"
-                               + " translateX("+ (post.zone.width + 50) + "px)"
+                               + " translateX("+ post.zone.width + "px)"
                     + " } to { "+prefix+"transform:"
-                               + " translateX(-"+ (post.width + 50) + "px)}}"));
+                               + " translateX(-"+ post.width + "px)}}"));
+                               
+                console.log('new keyframe anim('+post.id+'):' + post.zone.width
+                            + ' => -' + post.width);
 
                 post.scroll_stylesheet = document.head.appendChild(stylesheet);
             }
+
+            console.log('w:' + post.width + ' real:' + post.el.offsetWidth);
 
             // set up initial translation position, etc
 
@@ -111,8 +122,7 @@ var zone_types = {
             post.el.style.display = 'block';
             post.el.style.opacity = 0;
 
-            post.display_time = (
-                post.width + post.zone.width + 100) * 14;
+            post.display_time = (post.width + post.zone.width) * 14;
 
             // give it a fraction of a second to stablilse the DOM,
             // then start the animation.
@@ -121,8 +131,8 @@ var zone_types = {
                 post.el.style.opacity = "1.0";
 
                 css = (("slide_" + post.id + " ")
-                      + parseInt(post.display_time/1200)
-                      + "s linear 0s both");
+                      + parseInt(post.display_time/1000)
+                      + "s linear 0s 1 both");
 
                 post.el.style.webkitAnimation = css;
                 post.el.style.animation = css;
