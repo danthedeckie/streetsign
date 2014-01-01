@@ -75,7 +75,7 @@
         <div class="col-md-6">
           <label>Zone type:</label>
           <select class="form-control" data-bind="options: ZONE_TYPES, 
-              optionsText:'name', optionsValue:'id',selectedOptions: type"></select>
+              optionsText:'display', optionsValue:'name', value: type"></select>
         </div>
         <div class="col-md-6">
           <label>Fade time:</label>
@@ -128,7 +128,7 @@
     <option value="0.75">3:4 (sideways 4:3)</option>
     <option value="0.5625">9:16 (sideways widescreen)</option>
     </select>
-    <!--<textarea style="float: right;clear:right; width: 100%; height: 100px" data-bind="value: ko.mapping.toJSON($root, null, 2)"></textarea>-->
+    <textarea style="float: right;clear:right; width: 100%; height: 100px" data-bind="value: ko.mapping.toJSON($root, null, 2)"></textarea>
 </div>
 </div>
 
@@ -150,8 +150,8 @@ AVAILABLE_FEEDS = [
         {id: "{{ feed.id }}", name: "{{ feed.name}}"} {{- ',' if not loop.last -}}
     {%- endfor -%} ];
 ZONE_TYPES= [
-    {'id':'fade', 'name':'Fade In, Fade Out'},
-    {'id':'scroll', 'name':'Scrolling text'}];
+    {'name': 'fade', 'display': 'Fade In, Fade Out'},
+    {'name': 'scroll', 'display': 'Scrolling text'}];
 
 // init the view model:
 

@@ -143,7 +143,9 @@ def posts():
         return render_template('posts.html', posts=Post.select(), user=user)
     except Feed.DoesNotExist as e:
         # Ah. Database inconsistancy! Not good, lah.
-        ps = Post.raw('select post.id from post left join feed on feed.id = post.feed_id where feed.id is null;')
+        ps = Post.raw('select post.id from post'
+                      ' left join feed on feed.id = post.feed_id'
+                      ' where feed.id is null;')
         for p in ps:
             p.delete_instance()
         flash('Cleaned up old posts...')

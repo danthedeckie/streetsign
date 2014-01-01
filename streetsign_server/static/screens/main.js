@@ -84,9 +84,13 @@ function Zone(container, initial_data) {
 
     var csspairs = cssPairs(initial_data.css), i, that = this;
 
-    var update = function (name) {
+    var update = function (name, type) {
         if (initial_data.hasOwnProperty(name)) {
-            that[name] = initial_data[name];
+            try { 
+                that[name] = type(initial_data[name]);
+            } catch (ignore) {
+                that[name] = initial_data[name];
+            }
         }
         };
 
@@ -104,7 +108,7 @@ function Zone(container, initial_data) {
     update('color');
     update('name');
     update('type');
-    update('fadetime');
+    update('fadetime', parseInt);
 
     this.feedsurl = url_insert(POSTS_URL, JSON.stringify(this.feeds));
 
@@ -120,6 +124,11 @@ function Zone(container, initial_data) {
                           initial_data.right,
                           initial_data.css,
                           initial_data.type)).prependTo(container)[0];
+
+    // and store width and height for less layout thrashing later on...
+
+    this.height = this.el.offsetHeight;
+    this.width = this.el.offsetWidth;
 
     // apply new CSS tags:
 
@@ -147,7 +156,10 @@ Zone.prototype = {
         new_data.zone = this;
         new_data.el =
             post_types[new_data.type].render(this.el, new_data)[0];
+        new_data.width = new_data.el.offsetWidth;
+        new_data.height = new_data.el.offsetHeight;
 
+        // TODO is this right?
         new_data.el.style.transition = "opacity 0." + this.fadetime + "s";
         new_data.el.style.webkitTransition = "opacity 0." + this.fadetime + "s";
         //new_data.el.style.display = "none";
@@ -179,6 +191,8 @@ Zone.prototype = {
                     console.log("replacing content in live post");
                     post.el.remove();
                     post.el = post_types[post.type].render(that.el, post)[0];
+                    post.width = post.el.offsetWidth;
+                    post.height = post.el.offsetHeight;
                     //$(that.el).css('opacity', 1.0);
                     that.el.style.opacity = 1.0;
                     }, 1000);
@@ -210,7 +224,7 @@ Zone.prototype = {
         if (this.current_post === false) {
             // first post!
             this.current_post = post;
-            post_fadein(this.current_post, this.fadetime, after_cb);
+            post_fadein(this.current_post, after_cb);
 
             // posttype 'display' callback:
             if (post_types[post.type].hasOwnProperty('display')) {
@@ -228,7 +242,7 @@ Zone.prototype = {
             console.log('only this post is available');
 
             if (this.type == 'scroll') {
-                post_fadein(post, this.fadetime, after_cb);
+                post_fadein(post, after_cb);
             } else {
                 // leave the post up, but run the specified 'after fadein' callback
                 after_cb();
@@ -238,7 +252,7 @@ Zone.prototype = {
 
         // if it's not return'd already, then we have a new post to fade to.
 
-        post_fadeout(this.current_post, this.fadetime, function () {
+        post_fadeout(this.current_post, function () {
             // callback *after* the previous post has faded out:
 
             // call posttype 'hide' callback:
@@ -249,7 +263,7 @@ Zone.prototype = {
             // set current post, and fade it in:
 
             that.current_post = post;
-            post_fadein(that.current_post, that.fadetime, after_cb);
+            post_fadein(that.current_post, after_cb);
 
             // call posttype 'display' callback:
             if (post_types[post.type].hasOwnProperty('display')) {
@@ -297,9 +311,7 @@ Zone.prototype = {
                             '|dropping post from feed (and removing el):' +
                             thispost.id);
 
-                post_fadeout(thispost,
-                             this.fadetime,
-                             make_removeel(this.posts.splice(i, 1)));
+                post_fadeout(thispost, make_removeel(this.posts.splice(i, 1)));
 
                 if (this.current_post_index > i) {
                     this.current_post_index -= 1;
@@ -370,7 +382,7 @@ Zone.prototype = {
             // ok, no posts allowed, but there *is* a current post.
             // let's get rid of it.
 
-            post_fadeout(that.current_post, that.fadetime, function () {
+            post_fadeout(that.current_post, function () {
                 // callback once the post is faded out...
 
                 if (!that.current_post) {

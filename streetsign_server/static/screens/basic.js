@@ -36,7 +36,6 @@ if (!window.hasOwnProperty('requestAnimationFrame')){
 function zone_html(id, top, left, bottom, right, css, type) {
     "use strict";
 
-    console.log('TYPE: zone_' + type + '...');
     return ('<div id="_zone_'+id+'" class="zone zone_'+type+'" style="'
             +'left:' + left
             +';right:' + right
@@ -46,79 +45,125 @@ function zone_html(id, top, left, bottom, right, css, type) {
 
 /***************************************************************************/
 
-function post_fadeout(post, fadetime, andthen) {
-    "use strict";
+// These are the different kinds of zones, fading or scrolling only for now.
+// To add new zone types, all you need to do is add them in here, and in
+// the list of ZONE_TYPES in screen_editor.html
 
-    if (!andthen) { andthen = _mt; }
+var zone_types = {
+    fade: {
+        start: function (post, cb){
+            "use strict";
 
-    fadetime = 1 * fadetime;
+            // TODO: in zone setup, set zone > post opacity fadetimes...
+            post.el.style.opacity = 1.0;
+            setTimeout(cb, post.zone.fadetime);
+        },
+        stop: function (post, cb){
+            "use strict";
 
-    if ((fadetime === undefined)||(isNaN(fadetime))) { fadetime = 0; }
-
-    if (post.zone.type == 'scroll') {
-        // do scroll stuff.
-        //$(post.zone.el).css('opacity', 0);
-        post.zone.el.style.opacity = 0;
-        post.el.style.transition = "";
-        post.el.style.webkitTransition = "";
-        post.el.style.mozTransition = "";
-
-
-        setTimeout( function () {
             post.el.style.opacity = 0;
-            post.zone.el.style.opacity = 1.0;
-            andthen()
-        }, post.zone.fadetime);
+            setTimeout( function () {
+                //post.el.style.display = 'none';
+                cb && cb();
+            }, post.zone.fadetime);
 
-    } else {
-        //post.el.className = post.el.className.replace(' faded_in','');
-        post.el.style.opacity = 0;
-        setTimeout( function () {
-            //post.el.style.display = 'none';
-            andthen();
-        }, post.zone.fadetime);
+        }
+    },
+   scroll: {
+        start: function (post, cb) {
+            "use strict";
 
+            var stylesheet;
+            var prefix = "";
+            var css;
+
+            // create a new stylesheet with the @keyframes defined for
+            // movement the keyframes animation is named 
+            // 'slide_<zoneid>_<postid>'
+            // TODO   ^^^^^^^^
+
+            if (!post.scroll_stylesheet) {
+
+                // if we're on an old webkit browser, add their prefixes
+
+                if (post.el.style.hasOwnProperty('webkitAnimation')){
+                    prefix = '-webkit-';
+                }
+
+                stylesheet = document.createElement('style');
+                stylesheet.appendChild(document.createTextNode(
+                      "@"+prefix+"keyframes slide_" + post.id
+                    + " { from { "+prefix+"transform:"
+                               + " translateX("+ (post.zone.width + 50) + "px)"
+                    + " } to { "+prefix+"transform:"
+                               + " translateX(-"+ (post.width + 50) + "px)}}"));
+
+                post.scroll_stylesheet = document.head.appendChild(stylesheet);
+            }
+
+            // set up initial translation position, etc
+
+            //css = "translateX("+ post.zone.width + "px)";
+
+            //post.el.style.webkitTransform = css;
+            //post.el.style.transform = css;
+
+            post.el.style.display = 'block';
+            post.el.style.opacity = 0;
+
+            post.display_time = (
+                post.width + post.zone.width + 100) * 14;
+
+            // give it a fraction of a second to stablilse the DOM,
+            // then start the animation.
+
+            //setTimeout( function () { 
+                post.el.style.opacity = "1.0";
+
+                css = (("slide_" + post.id + " ")
+                      + parseInt(post.display_time/1200)
+                      + "s linear 0s both");
+
+                post.el.style.webkitAnimation = css;
+                post.el.style.animation = css;
+
+                // and call the 'after starting' callback:
+                cb && cb();
+            //}, 10);
+
+            },
+        stop: function (post, cb) {
+            "use strict";
+
+            post.zone.el.style.opacity = 0;
+
+            setTimeout( function () {
+                post.el.style.display = 'none';
+
+                post.el.style.webkitAnimation = "";
+                post.el.style.mozAnimation = "";
+                post.el.style.animation = "";
+                
+                post.el.style.opacity = 0;
+                //post.scroll_stylesheet.remove()
+                //delete post.scroll_stylesheet;
+
+               post.zone.el.style.opacity = 1.0;
+                cb && cb()
+            }, 1001);
+        }
     }
-}
+    };
 
-function post_fadein(post, fadetime, andthen) {
+
+function post_fadein(post, cb) {
     "use strict";
-    var distance;
-    var dotick;
-    var current;
-    var current_set;
 
-    if (!andthen) { andthen = _mt; }
-
-    //post.el.style.display = "block";
-
-    if (post.zone.type == 'scroll') {
-
-
-        distance = post.el.offsetWidth + post.zone.el.offsetWidth + 20;
-
-        //el.style.display = "block";
-        post.el.style.marginLeft = (post.zone.el.offsetWidth + 10) + "px";
-        setTimeout( function () { 
-
-            post.el.style.opacity = "1.0";
-            post.el.style.transition = "margin " + (distance/70) + "s linear";
-            post.el.style.webkitTransition = "margin " + (distance/70) + "s linear";
-            post.el.style.mozTransition = "margin " + (distance/70) + "s linear";
-            post.el.style.marginLeft = (-10 - post.el.offsetWidth) + "px";
-
-            andthen();
-        }, 10);
-
-        post.display_time = (distance + 100) * 14;
-
-
-    } else {
-        fadetime = 1 * fadetime;
-        if ((fadetime === undefined)||(isNaN(fadetime))) { fadetime = 0; }
-        //post.el.className += ' faded_in';
-        post.el.style.opacity = 1.0;
-        setTimeout(andthen, fadetime);
-    }
+    return (zone_types[post.zone.type]||zone_types.fade).start(post, cb);
 }
 
+function post_fadeout(post, cb) {
+    "use strict";
+
+    return (zone_types[post.zone.type]||zone_types.fade).stop(post, cb);
+}
