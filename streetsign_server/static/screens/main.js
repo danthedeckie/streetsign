@@ -286,7 +286,7 @@ Zone.prototype = {
         // return a function for removing an element from the DOM.
         var make_removeel = function (post) {
             return function () {
-                post.el.remove(); }; };
+                post && post.el.remove(); }; };
 
 
         // check timing restrictions, 'delete_me' tags, and otherwise, use it.
@@ -305,6 +305,10 @@ Zone.prototype = {
             thispost = this.posts[i];
 
             // check delete_me tags:
+
+            if (! thispost) {
+                continue;
+                }
 
             if (thispost.hasOwnProperty('delete_me')) {
                 console.log(this.name +
