@@ -17,7 +17,7 @@
 #
 #    ---------------------------------
 
-""" 
+"""
     streetsign_server.views.feeds_and_posts
     ---------------------------------------
     Views for editing feeds and posts.
@@ -27,7 +27,7 @@
 
 
 from flask import render_template, url_for, request, redirect, \
-                  flash, json 
+                  flash, json
 import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
 import peewee
@@ -48,20 +48,22 @@ import streetsign_server.external_source_types as external_source_types
 ####################################################################
 # Feeds & Posts:
 
-@app.route('/feeds', methods=['GET','POST'])
+@app.route('/feeds', methods=['GET', 'POST'])
 def feeds():
+    ''' the back end list of feeds. '''
+
     if request.method == 'POST':
         if not user_session.is_admin():
             flash('Only Admins can do this!')
             return redirect(url_for('feeds'))
 
-        action = request.form.get('action','create')
+        action = request.form.get('action', 'create')
 
         if action == 'create':
-            if not request.form.get('title','').strip():
+            if not request.form.get('title', '').strip():
                 flash("I'm not making you an un-named feed!")
                 return redirect(url_for('feeds'))
-            Feed(name=request.form.get('title','blank').strip()).save()
+            Feed(name=request.form.get('title', 'blank').strip()).save()
 
     try:
         user = user_session.get_user()
@@ -74,8 +76,10 @@ def feeds():
                            external_sources=ExternalSource.select(),
                            source_types=external_source_types.types())
 
-@app.route('/feeds/<int:feedid>', methods=['GET','POST'])
+@app.route('/feeds/<int:feedid>', methods=['GET', 'POST'])
 def feedpage(feedid):
+    ''' the back end settings for one feed. '''
+
     try:
         feed = Feed.get(id=feedid)
         user = user_session.get_user()
@@ -94,15 +98,15 @@ def feedpage(feedid):
             flash('Sorry! Only Admins can change these details.')
             return redirect(request.referrer)
 
-        action = request.form.get('action','none')
+        action = request.form.get('action', 'none')
 
         if action == 'edit':
             feed.name = request.form.get('title', feed.name).strip()
 
-            
+
             inlist = request.form.getlist
 
-            feed.post_types = ','.join(inlist('post_types'))
+            feed.post_types = ', '.join(inlist('post_types'))
 
             feed.set_authors(by_id(User, inlist('authors')))
             feed.set_publishers(by_id(User, inlist('publishers')))
@@ -119,7 +123,7 @@ def feedpage(feedid):
     return render_template('feed.html',
                      feed=feed,
                      user=user,
-                     all_posttypes = post_types.types(),
+                     all_posttypes=post_types.types(),
                      allusers=User.select(),
                      allgroups=Group.select()
                 )
@@ -143,14 +147,16 @@ def posts():
         return render_template('posts.html', posts=Post.select(), user=user)
     except Feed.DoesNotExist as e:
         # Ah. Database inconsistancy! Not good, lah.
-        ps = Post.raw('select post.id from post left join feed on feed.id = post.feed_id where feed.id is null;')
+        ps = Post.raw('select post.id from post'
+                      ' left join feed on feed.id = post.feed_id'
+                      ' where feed.id is null;')
         for p in ps:
             p.delete_instance()
         flash('Cleaned up old posts...')
 
     return render_template('posts.html', posts=Post.select(), user=user)
 
-@app.route('/posts/new/<int:feed_id>', methods=['GET','POST'])
+@app.route('/posts/new/<int:feed_id>', methods=['GET', 'POST'])
 def post_new(feed_id):
     ''' create a new post! '''
 
@@ -169,11 +175,11 @@ def post_new(feed_id):
         # send a blank form for the user:
 
         post = Post()
-        post.feed=feed
+        post.feed = feed
 
         # give list of available post types:
 
-        all_posttypes = {x['id']:x for x in post_types.types()}
+        all_posttypes = dict([(x['id'], x) for x in post_types.types()])
 
         if post.feed.post_types:
 
@@ -202,7 +208,7 @@ def post_new(feed_id):
             return redirect(request.referrer)
 
         if feed.post_types and post_type not in feed.post_types_as_list():
-            flash ('sorry! this post type is not allowed in this feed!')
+            flash('sorry! this post type is not allowed in this feed!')
             return redirect(request.referrer)
 
         post = Post(type=post_type, author=user)
@@ -215,15 +221,15 @@ def post_new(feed_id):
             post_form_intake(post, request.form, editor)
 
         except PleaseRedirect as e:
-            flash (str(e.msg))
-            return(redirect(e.url if e.url else request.url))
+            flash(str(e.msg))
+            return redirect(e.url if e.url else request.url)
 
         post.save()
         flash('Saved!')
 
         return redirect(url_for('feedpage', feedid=post.feed.id))
 
-@app.route('/posts/<int:postid>', methods=['GET','POST'])
+@app.route('/posts/<int:postid>', methods=['GET', 'POST'])
 def postpage(postid):
     ''' Edit a post. '''
 
@@ -232,13 +238,13 @@ def postpage(postid):
         return redirect(url_for('posts'))
 
     try:
-        post = Post.get(Post.id==postid)
+        post = Post.get(Post.id == postid)
         editor = post_types.load(post.type)
         user = user_session.get_user()
 
     except Post.DoesNotExist:
         flash('Sorry! Post id:{0} not found!'.format(postid))
-        return(redirect(url_for('posts')))
+        return redirect(url_for('posts'))
 
     if request.method == 'POST':
         try:
@@ -257,7 +263,7 @@ def postpage(postid):
             redirect(e.url)
 
         # if it's a publish or delete request, handle that instead:
-        DO = request.form.get('action','edit')
+        DO = request.form.get('action', 'edit')
         if DO == 'delete':
             post.delete_instance()
             flash('Deleted')
@@ -268,9 +274,9 @@ def postpage(postid):
                 post.publisher = user
                 post.publish_date = datetime.now()
                 post.save()
-                flash ('Published')
+                flash('Published')
             else:
-                flash ('Sorry, You do NOT have publish' \
+                flash('Sorry, You do NOT have publish' \
                        ' permissions on this feed.')
             return redirect(request.referrer)
         elif DO == 'unpublish':
@@ -279,9 +285,9 @@ def postpage(postid):
                 post.publisher = None
                 post.publish_date = None
                 post.save()
-                flash ('Unpublished!')
+                flash('Unpublished!')
             else:
-                flash ('Sorry, you do NOT have permission' \
+                flash('Sorry, you do NOT have permission' \
                        ' to unpublish on this feed.')
             return redirect(request.referrer)
 
@@ -300,12 +306,11 @@ def postpage(postid):
     can_write, can_publish = can_user_write_and_publish(user, post)
 
     return render_template('post_editor.html',
-                            post = post,
-                            current_feed = post.feed.id,
-                            feedlist = user.writeable_feeds(),
-                            user=user,
-                            form_content = editor.form(json.loads(
-                                post.content)))
+                           post=post,
+                           current_feed=post.feed.id,
+                           feedlist=user.writeable_feeds(),
+                           user=user,
+                           form_content=editor.form(json.loads(post.content)))
 
 @app.route('/posts/edittype/<typeid>')
 def postedit_type(typeid):
@@ -314,14 +319,14 @@ def postedit_type(typeid):
     editor = post_types.load(typeid)
 
     return render_template('post_type_container.html',
-                           post_type = typeid,
-                           form_content = editor.form(request.form))
+                           post_type=typeid,
+                           form_content=editor.form(request.form))
 
 
 ###############################################################
 
 @app.route('/external_data_sources/NEW', defaults={'source_id': None},
-                                         methods=['GET','POST'])
+                                         methods=['GET', 'POST'])
 @app.route('/external_data_sources/<int:source_id>',
                                          methods=['GET', 'POST', 'DELETE'])
 def external_data_source_edit(source_id):
@@ -334,7 +339,7 @@ def external_data_source_edit(source_id):
     # first find the data type:
 
     if request.method == 'DELETE':
-        ExternalSource.delete().where(ExternalSource.id==int(source_id)).execute()
+        ExternalSource.delete().where(ExternalSource.id == int(source_id)).execute()
         return 'deleted'
 
     if source_id == None:
@@ -372,8 +377,8 @@ def external_data_source_edit(source_id):
                                                  source.lifetime_end)
         source.post_template = request.form.get('post_template',
                                                 source.post_template)
-        try:                                         
-            source.feed = Feed.get(Feed.id==int(request.form.get('feed', 100)))
+        try:
+            source.feed = Feed.get(Feed.id == int(request.form.get('feed', 100)))
             source.save()
             if source_id == None:
                 # new source!
@@ -382,7 +387,7 @@ def external_data_source_edit(source_id):
             else:
                 flash('Updated.')
         except Feed.DoesNotExist:
-            flash ("Can't save! Invalid Feed!{}".format(
+            flash("Can't save! Invalid Feed!{}".format(
                 int(request.form.get('feed', '-11'))))
 
     return render_template("external_source.html", source=source,
@@ -424,7 +429,7 @@ def external_source_run(source_id):
     if source.last_checked:
         next_check = source.last_checked + timedelta(minutes=source.frequency)
 
-        if (next_check > now):
+        if next_check > now:
             return "Nothing to do. Last: {0}, Next: {1}, Now: {2} ".format(
                 source.last_checked, next_check, now)
 

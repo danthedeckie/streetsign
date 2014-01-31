@@ -20,12 +20,12 @@
 ========================
 streetsign_server.models
 ========================
-    
+
 peewee ORM database models.
 
 '''
 
-# pylint: disable=invalid-name, too-many-public-methods, missing-docstring
+# pylint: disable=invalid-name, too-many-public-methods, missing-docstring, pointless-string-statement
 
 from flask import json, url_for, Markup
 from peewee import * # pylint: disable=wildcard-import,unused-wildcard-import
@@ -35,7 +35,7 @@ from uuid import uuid4 # for unique session ids
 from datetime import datetime, timedelta
 from time import time
 import bleach # html stripping.
-from md5 import md5
+from hashlib import md5
 
 from simpleeval import simple_eval
 
@@ -43,12 +43,12 @@ from streetsign_server import app
 
 SECRET_KEY = app.config.get('SECRET_KEY')
 
-DB = SqliteDatabase(None, threadlocals=True )
+DB = SqliteDatabase(None, threadlocals=True)
 
-__all__ = [ 'DB', 'user_login', 'user_logout', 'get_logged_in_user',
-            'User', 'Group', 'Post', 'Feed', 'FeedPermission', 'UserGroup',
-            'ConfigVar', 'Screen',
-            'create_all', 'by_id' ]
+__all__ = ['DB', 'user_login', 'user_logout', 'get_logged_in_user',
+           'User', 'Group', 'Post', 'Feed', 'FeedPermission', 'UserGroup',
+           'ConfigVar', 'Screen',
+           'create_all', 'by_id']
 
 
 '''
@@ -103,7 +103,7 @@ Other
 class DBModel(Model):
     ''' base class for other database models '''
     # pylint: disable=too-few-public-methods
-    class Meta:
+    class Meta(object):
         ''' store DB info '''
         database = DB
 
@@ -117,10 +117,10 @@ class User(DBModel):
     ''' Back-end user. '''
 
     #: the unique name user to log in
-    loginname = CharField(unique=True) 
+    loginname = CharField(unique=True)
     ''' logINNNNN '''
     #: how the user would like to be displayed
-    displayname = CharField(null=True) 
+    displayname = CharField(null=True)
     #: how to contact the user:
     emailaddress = CharField()
 
@@ -172,13 +172,13 @@ class User(DBModel):
         ''' Returns all the Groups that this user is part of. '''
 
         return [g for g in Group.select().join(UserGroup)
-                                .where(UserGroup.user==self)]
+                                .where(UserGroup.user == self)]
 
     def set_groups(self, groupidlist):
         ''' Set the grouplist for this user (and remove old groups) '''
 
         # clear old groups:
-        UserGroup.delete().where(UserGroup.user==self).execute()
+        UserGroup.delete().where(UserGroup.user == self).execute()
 
         #set new ones:
         for gid in groupidlist:
@@ -204,11 +204,11 @@ class Group(DBModel):
 
     def users(self):
         return [u for u in User.select().join(UserGroup)
-                                .where(UserGroup.group==self)]
+                                .where(UserGroup.group == self)]
 
     def set_users(self, useridlist):
         # clear old groups:
-        UserGroup.delete().where(UserGroup.group==self).execute()
+        UserGroup.delete().where(UserGroup.group == self).execute()
 
         #set new ones:
         for uid in useridlist:
@@ -366,8 +366,8 @@ class Feed(DBModel):
             return False
 
         # check for user-level read permission:
-        if self.permissions.where((FeedPermission.user==user) &
-                                  (FeedPermission.write==True)).exists():
+        if self.permissions.where((FeedPermission.user == user) &
+                                  (FeedPermission.write == True)).exists():
             return True
 
         # check for group-level read permission:
@@ -392,8 +392,8 @@ class Feed(DBModel):
             return False
 
         # check for user-level read permission:
-        if self.permissions.where((FeedPermission.user==user) &
-                                  (FeedPermission.publish==True)).exists():
+        if self.permissions.where((FeedPermission.user == user) &
+                                  (FeedPermission.publish == True)).exists():
             return True
 
         # check for group-level read permission:
@@ -424,13 +424,13 @@ class Feed(DBModel):
 
         try:
             if user:
-                perm = FeedPermission.get((FeedPermission.feed==self)
-                                         &(FeedPermission.user==user)
-                                         &(p==True))
+                perm = FeedPermission.get((FeedPermission.feed == self)
+                                         &(FeedPermission.user == user)
+                                         &(p == True))
             elif group:
-                perm = FeedPermission.get((FeedPermission.feed==self)
-                                         &(FeedPermission.group==group)
-                                         &(p==True))
+                perm = FeedPermission.get((FeedPermission.feed == self)
+                                         &(FeedPermission.group == group)
+                                         &(p == True))
             else:
                 raise Exception('You must specify either a user or a group!')
         except FeedPermission.DoesNotExist as e:
@@ -454,44 +454,44 @@ class Feed(DBModel):
         ''' set the complete authorlist. deletes previous set '''
 
         # delete old permissions first.
-        FeedPermission.delete().where((FeedPermission.feed==self)
-                                     &(FeedPermission.write==True)
+        FeedPermission.delete().where((FeedPermission.feed == self)
+                                     &(FeedPermission.write == True)
                                      &(FeedPermission.user)).execute()
         for a in authorlist:
-            assert(isinstance(a, User))
+            assert isinstance(a, User)
             self.grant('Write', user=a)
 
     def set_publishers(self, publisherlist):
         ''' set the complete publisherlist. deletes previous set '''
         # delete old permissions first.
-        FeedPermission.delete().where((FeedPermission.feed==self)
-                                     &(FeedPermission.publish==True)
+        FeedPermission.delete().where((FeedPermission.feed == self)
+                                     &(FeedPermission.publish == True)
                                      &(FeedPermission.user)).execute()
 
         for p in publisherlist:
-            assert(isinstance(p, User))
+            assert isinstance(p, User)
             self.grant('Publish', user=p)
 
     def set_author_groups(self, authorlist):
         ''' set the complete author_groups list. deletes previous set '''
 
         # delete old permissions first.
-        FeedPermission.delete().where((FeedPermission.feed==self)
-                                     &(FeedPermission.publish==True)
+        FeedPermission.delete().where((FeedPermission.feed == self)
+                                     &(FeedPermission.publish == True)
                                      &(FeedPermission.group)).execute()
         for a in authorlist:
-            assert(isinstance(a, Group))
+            assert isinstance(a, Group)
             self.grant('Write', group=a)
 
     def set_publisher_groups(self, publisherlist):
         ''' set the complete publisher_groups list. deletes previous set '''
         # delete old permissions first.
-        FeedPermission.delete().where((FeedPermission.feed==self)
-                                     &(FeedPermission.publish==True)
+        FeedPermission.delete().where((FeedPermission.feed == self)
+                                     &(FeedPermission.publish == True)
                                      &(FeedPermission.group)).execute()
 
         for p in publisherlist:
-            assert(isinstance(p, Group))
+            assert isinstance(p, Group)
             self.grant('Publish', group=p)
 
 class FeedPermission(DBModel):
@@ -539,7 +539,8 @@ class Post(DBModel):
 
     # When should the feed actually be shown:
     active_start = DateTimeField(default=datetime.now) #: lifetime start
-    active_end = DateTimeField(default=lambda:datetime.now() + timedelta(weeks=1)) #: lifetime end
+    active_end = DateTimeField(default=lambda: datetime.now() + \
+                                               timedelta(weeks=1)) #: end
 
     #: Time restrictions don't need to be cross queried, and honestly
     #: are easier just left in javascript/JSON land:
@@ -568,7 +569,7 @@ class Post(DBModel):
         except KeyError:
             content = "N/A"
 
-        if (self.type=='image'):
+        if self.type == 'image':
             return Markup('<img src="{0}" alt="{1}" />'.format(
                         url_for('thumbnail', filename='post_images/'+content),
                         content))
@@ -579,12 +580,12 @@ class Post(DBModel):
     def dict_repr(self):
         ''' must give all info, for use on screens, etc. '''
         return (
-            { 'id': self.id,
-              'type': self.type,
-              'content': safe_json_load(self.content, {}),
-              'time_restrictions': safe_json_load(self.time_restrictions, []),
-              'time_restrictions_show': self.time_restrictions_show,
-              'display_time': self.display_time * 1000 # in milliseconds
+            {'id': self.id,
+             'type': self.type,
+             'content': safe_json_load(self.content, {}),
+             'time_restrictions': safe_json_load(self.time_restrictions, []),
+             'time_restrictions_show': self.time_restrictions_show,
+             'display_time': self.display_time * 1000 # in milliseconds
             })
 
     def active_status(self):
@@ -594,9 +595,9 @@ class Post(DBModel):
         time_now = datetime.now()
         if not (self.active_start and self.active_end):
             return 'future'
-        if (self.active_start > time_now):
+        if self.active_start > time_now:
             return 'future'
-        elif (self.active_end < time_now):
+        elif self.active_end < time_now:
             return 'past'
         else:
             return 'now'
@@ -609,7 +610,7 @@ class ExternalSource(DBModel):
     name = CharField()
 
     #: source types are loaded in later, the same as post types.
-    type =  CharField()
+    type = CharField()
 
     #: how often to check for new data at the source...
     frequency = IntegerField(default=60)
@@ -629,7 +630,7 @@ class ExternalSource(DBModel):
     post_as_user = ForeignKeyField(User, related_name='external_sources')
 
     #: initial post settings. (TODO)
-    post_template=CharField(default='{}')
+    post_template = CharField(default='{}')
 
     #: Lifetime start of new posts (formula)
     lifetime_start = CharField(default="NOW")
@@ -674,7 +675,7 @@ class Screen(DBModel):
 
     #: the background image
     background = CharField(null=True)
-    
+
     #: screen settings (JSON)
     settings = TextField(default='{}')
     #: default post settings (JSON)

@@ -4,9 +4,13 @@
 ####################################################
 # Config:
 
+# You shouldn't have to change this, but if you need to force a specific
+# version (2.7, say) this can be helpful.
+PYTHON_VERSION=python2
+
 VDIR=.virtualenv
 SDIR=.setup
-PYTHON=$VDIR/bin/python
+PYTHON=$VDIR/bin/$PYTHON_VERSION
 PIP=$VDIR/bin/pip
 
 # You shouldn't need to change these...
@@ -45,7 +49,7 @@ if [[ ! -f "$VIRTUALENV" ]]; then
 fi
 
 # if there's no python in virtualenv, make one:
-[[ -f "$PYTHON" ]] || python "$VIRTUALENV" "$VDIR"
+[[ -f "$PYTHON" ]] || $PYTHON_VERSION "$VIRTUALENV" "$VDIR"
 
 # get required python modules:
 echo "Checking requirements (python modules)"
@@ -57,7 +61,7 @@ fi
 
 # If no config.py, auto generate one:
 if [[ ! -f 'config.py' ]]; then
-    python .setup/make_initial_config_file.py > 'config.py'
+    $PYTHON_VERSION .setup/make_initial_config_file.py > 'config.py'
 fi
 
 # setup standard hooks.
