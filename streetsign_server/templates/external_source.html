@@ -39,7 +39,7 @@
     <input class="btn btn-primary" type="submit" value="Save" />
     <a class="btn btn-success" href="#" id="test_btn">Test</a>
     {% if source.id %}
-        <a class="btn btn-info" href="{{ url_for('external_source_run', source_id=source.id) }}" >Run Now</a>
+        <a class="btn btn-info" href="{{ url_for('external_source_run', source_id=source.id) }}" id="run_now">Run Now</a>
     {% endif %}
 </div>
 
@@ -91,6 +91,11 @@ $('#test_btn').click(function(e){
     $('#test_area').load(
         "{{ url_for('external_source_test') }}",
         $('#source_form').serialize());
+});
+
+$('#run_now').click(function(e){
+    e.preventDefault();
+    $.get(this.href, function() { location.reload(); });
 });
 </script>
 {% endblock %}

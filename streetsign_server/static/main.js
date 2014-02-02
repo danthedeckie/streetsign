@@ -58,3 +58,9 @@ $('#user_login_button').click(function(){
         $('input[name="username"]').focus();
     }, 500);
 });
+
+// and run any js which was inserted by a template, which needs jQuery.
+
+while (jLater.length) {
+    jLater.pop()($);
+}

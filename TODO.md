@@ -8,7 +8,6 @@
 # Bugs:
 
 - Single message on side-scrolling zone display doesn't go on for ever (some kind of timeout/race condition?)
-- rss 'run now' button should return somewhere sensible (preferably run as ajax...)
 
 ## Urgent:
 
@@ -63,7 +62,6 @@
   view, like the external data importer does.
 - post types as their own dir/packages, rather than all being jumbled together.
 - urgent alert post type, takes over whole display
-- move test button in external data (RSS) to a better place.
 - draggable borders of selected zone in the zones editor
 - better docs for post types js callbacks
 - html5 video post type
