@@ -51,3 +51,10 @@ $('a.confirm_ajax_delete').click(function(evt) {
 // And why not, lets also check if new data needs to be got (which
 // will then happen every time any back end page is checked.)
 $.getJSON('/external_data_sources/');
+
+// focus on username input box when 'login' clicked.
+$('#user_login_button').click(function(){
+    setTimeout( function() {
+        $('input[name="username"]').focus();
+    }, 500);
+});
