@@ -1,23 +1,26 @@
 # In progress
 
-- Bootstrapification
 - External Data Sources
 - API and other 'public' documentation.
 - Unit tests
+- reworking animation in screens display to use CSS3 keyframe animations, and much less 'janky' callbacks, etc. (dev branch)
 
 # Bugs:
 
 - Single message on side-scrolling zone display doesn't go on for ever (some kind of timeout/race condition?)
-- Test Firefox memory usage on screens display.
+- rss 'run now' button should return somewhere sensible (preferably run as ajax...)
 
 ## Urgent:
 
 - make sure user uploaded files have the right place to go etc for new projects,
 - make lack of thumbnail generator not an exception, but fall back happily.
 - remove to archive and finally deletion of old posts & related files/content.
+- HTML posts color css classes
 
-## Needed, but copable for alpha version.
+## Needed, but copeable for alpha version.
 
+- delete posts and publish/unpublish should be faster, using ajax.
+- there should be a 'show old posts' toggle (with cookie)
 - Dropdown select box for font for screen zones (easy)
 - Better 'CSS' editing for zones and whole-screen.
 - Smarter 'live' Screen info updating, w/o reloading the whole page.
@@ -53,12 +56,28 @@
   then the images `post_type` (plugin) & the display reference?)
   `{{ url_for('thumbnail', filename=...) }}` or something...
 
+- we need some nice default themes
+- default screen when the database is first initiated
+- default posts when the database is first initiated
+- remove old new-post view complexity with choosing types, etc.  It should be done as a single
+  view, like the external data importer does.
+- post types as their own dir/packages, rather than all being jumbled together.
+- urgent alert post type, takes over whole display
+- move test button in external data (RSS) to a better place.
+- draggable borders of selected zone in the zones editor
+- better docs for post types js callbacks
+- html5 video post type
+- youtube video post type
+- clicking on the text box should open up the time select for post lifetime
+- by default, don't show old posts
+- font select on zones.
+- CSS better on zones.
+- sub-zones post type, either horizontal or vertical mode, which adds two more zones to the fray, which are faded in and out due to this zone's timing.
+- post types add a repr field, also a UUID field, which can be used or set by the external data importes.
+
 # Random ideas:
 
-- Would a CSS 'marquee' work better for scrolling, rather than jQuery?  Each
-  element inside the marquee could be a span within it....
-  I don't know if this would make posts going inactive while 'live' look ugly,
-  though...
 - Extra flag to send to a screen url which would disable setting a background
   (even black) so that it can be embedded easier inside another post?  This would
   allow the "sublayouts" concept (although I imagine performance being an issue).
+  Better for sublayouts would be a post type which added new zones to the regular zones list, but had that post div as the parent...

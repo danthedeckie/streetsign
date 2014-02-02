@@ -27,43 +27,47 @@ from flask import render_template_string, json
 from jinja2 import Template
 import feedparser
 import bleach
+from collections import defaultdict
 
 from streetsign_server.external_source_types import my
 
-DEFAULT_TAGS="span,b,i,u,em,img"
+DEFAULT_TAGS = "span,b,i,u,em,img"
 
 def receive(request):
     ''' get data from the admin, extract the data, and return the object we
         actually need to save. '''
 
-    return { "url": request.form.get('url',''),
-        "display_template": request.form.get('display_template','{}'),
-        "current_posts": json.loads(request.form.get('current_posts','[]')),
-        "allowed_tags": request.form.get('allowed_tags', DEFAULT_TAGS),
-        }
+    return {"url": request.form.get('url', ''),
+            "display_template": request.form.get('display_template', '{}'),
+            "current_posts": json.loads(request.form.get('current_posts', '[]')),
+            "allowed_tags": request.form.get('allowed_tags', DEFAULT_TAGS),
+            }
 
 def form(data):
     ''' the form for editing this type of post '''
     # pylint: disable=star-args
-    x = render_template_string(my('.form.html'),
+    return render_template_string(my('.form.html'),
                                   default_tags=DEFAULT_TAGS, **data)
-    return x
 
 def make_templater(data):
     ''' from the info in data, return a html cleaner function. '''
 
-    tags=[x.strip() for x in 
-                data.get("allowed_tags", DEFAULT_TAGS).split(',')]
+    tags = [x.strip() for x in
+            data.get("allowed_tags", DEFAULT_TAGS).split(',')]
     try:
         template = Template(data.get('display_template', '{{title}}'))
     except:
         template = Template(" Bad Template ")
 
     def templater(item):
-        return bleach.clean(template.render(**item),
-                            tags=tags,
-                            attributes=["class", "href", "alt", "src"],
-                            strip=True)
+        ''' new function for running template... '''
+        try:
+            return bleach.clean(template.render(**defaultdict(lambda: '', item)),
+                                tags=tags,
+                                attributes=["class", "href", "alt", "src"],
+                                strip=True)
+        except:
+            return "bad template."
 
     return templater
 
@@ -104,7 +108,7 @@ def get_new(data):
     for entry in feed.entries:
         if entry.id not in previous_list:
             new_posts.append({'type': 'html', 'color': None,
-                              'content': templater(entry) })
+                              'content': templater(entry)})
 
     data['current_posts'] = [e.id for e in feed.entries]
 
