@@ -121,12 +121,12 @@ def feedpage(feedid):
             return redirect(url_for('feeds'))
 
     return render_template('feed.html',
-                     feed=feed,
-                     user=user,
-                     all_posttypes=post_types.types(),
-                     allusers=User.select(),
-                     allgroups=Group.select()
-                )
+                           feed=feed,
+                           user=user,
+                           all_posttypes=post_types.types(),
+                           allusers=User.select(),
+                           allgroups=Group.select()
+                          )
 
 
 
@@ -339,7 +339,9 @@ def external_data_source_edit(source_id):
     # first find the data type:
 
     if request.method == 'DELETE':
-        ExternalSource.delete().where(ExternalSource.id == int(source_id)).execute()
+        ExternalSource.delete() \
+                      .where(ExternalSource.id == int(source_id)) \
+                      .execute()
         return 'deleted'
 
     if source_id == None:
@@ -440,7 +442,8 @@ def external_source_run(source_id):
 
     if new_posts:
         for fresh_data in new_posts:
-            post = Post(type=fresh_data.get('type', 'html'), author=source.post_as_user)
+            post = Post(type=fresh_data.get('type', 'html'), \
+                        author=source.post_as_user)
             editor = post_types.load(fresh_data.get('type', 'html'))
 
             post.feed = source.feed
