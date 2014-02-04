@@ -217,8 +217,8 @@ scaled independently.
 The HTML "rich text" posts are intentionally somewhat limited.  If you want to
 have a post where the *design* is important, not just the textual content of
 the post, they you should use an external graphic design package, such as
-`Inkscape <http://www.inkscape.org>` (free), 
-`Adobe Illustrator <http://www.adobe.com/uk/products/illustrator.html>`
+`Inkscape <http://www.inkscape.org>`_ (free), 
+`Adobe Illustrator <http://www.adobe.com/uk/products/illustrator.html>`_
 (expensive), 
-`PixelMator <http://www.pixelmator.com/>` (good, not too expensive, mac only`),
+`PixelMator <http://www.pixelmator.com/>`_ (good, not too expensive, mac only`),
 and then post as an Image type.
