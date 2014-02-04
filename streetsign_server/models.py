@@ -118,7 +118,6 @@ class User(DBModel):
 
     #: the unique name user to log in
     loginname = CharField(unique=True)
-    ''' logINNNNN '''
     #: how the user would like to be displayed
     displayname = CharField(null=True)
     #: how to contact the user:
@@ -636,6 +635,9 @@ class ExternalSource(DBModel):
     lifetime_start = CharField(default="NOW")
     #: Lifetime end of new posts (formula)
     lifetime_end = CharField(default="NOW + 1 WEEK")
+
+    #: how long should each post be displayed for?
+    display_time = IntegerField(default=8)
 
     def current_lifetime_start(self):
         ''' given the equation in the lifetime_start field, what should
