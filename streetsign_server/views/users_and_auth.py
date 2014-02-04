@@ -25,12 +25,13 @@
 '''
 
 
-from flask import render_template, url_for, request, session, redirect, \
-                  flash, json, g
+from flask import render_template, url_for, request, redirect, flash
 import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
 from streetsign_server import app
 from streetsign_server.models import User, Group, Post, UserGroup
+
+# pylint: disable=no-member
 
 
 @app.route('/login', methods=['POST'])
@@ -152,8 +153,8 @@ def user(userid=-1):
                 flash('Sorry! You cannot delete yourself!')
                 return redirect(request.referrer)
 
-            user.delete_instance()
-            flash ('User:' + user.displayname + ' deleted.')
+            user.delete_instance(recursive=True)
+            flash ('User:' + user.displayname + ' deleted. (And all their posts)')
             return redirect(request.referrer)
 
     users_posts = Post.select().where(Post.author==user) \

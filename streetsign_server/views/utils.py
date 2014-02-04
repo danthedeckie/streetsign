@@ -23,6 +23,7 @@
     No actual views in here, only bits and pieces to make views more
     fun.
 """
+from flask import request
 
 class PleaseRedirect(Exception):
     '''
@@ -37,3 +38,28 @@ class PleaseRedirect(Exception):
     def __init__(self, url='index', msg='Something went wrong'):
         self.msg = msg
         self.url = url
+
+# these are some quick functions for getting sanitized form items,
+# later we should probably transition to WTForms, or similar. But these
+# will do for now.
+
+def getint(name, default, minimum=0, maximum=999999999):
+    """ get an integer from the request.form, capped with min and max,
+        and a default.  If its not a valid integer, return the default.  """
+    try:
+        return min(max(int(request.form.get(name, default)), minimum), maximum)
+    except:
+        return default
+
+def getbool(name, default):
+    """ get a bool from the request.form.  if it's not valid, return the
+        default. """
+    try:
+        return bool(request.form.get(name, default))
+    except:
+        return default
+
+def getstr(name, default):
+    """ get a string from request.form. if it's not there, then return the
+        default. """
+    return request.form.get(name, default)
