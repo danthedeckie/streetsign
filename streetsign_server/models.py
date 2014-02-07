@@ -301,9 +301,14 @@ class Feed(DBModel):
     def __repr__(self):
         return '<Feed:' + self.name + '>'
 
-    def post_count(self):
+    def post_count(self, published=True, expired=False):
         ''' how many posts in this feed? '''
-        return self.posts.count()
+        q = self.posts
+        if published:
+            q = q.where(Post.published==True)
+        if not expired:
+            q = q.where(Post.active_end > datetime.now())
+        return q.count()
 
     def post_types_as_list(self):
         ''' return a list of post types, from the single field '''

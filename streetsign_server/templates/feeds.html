@@ -16,7 +16,8 @@
     <tr>
         <td>
             <a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a>
-             <span class="badge">{{ feed.posts.count() }}</span>
+             <span class="badge">{{ feed.post_count(expired=True, published=False) }} posts</span>
+             <span class="badge">{{ feed.post_count() }} active</span>
         </td>
         <td>
          {% if feed.user_can_write(user) %}

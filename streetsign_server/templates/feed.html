@@ -9,7 +9,8 @@
     <th>Post</th>
     <th>Author</th>
     <th>Date</th>
-    <th colspan=2>{% if feed.user_can_write(user) %}<a href="{{ url_for('post_new', feed_id=feed.id) }}" class="btn btn-primary">NEW</a>{% endif %}</th>
+    <th>  <button type="button" class="btn btn-default" id="show_past_posts">Show Past Posts</button> </th>
+    <th colspan=2>{% if feed.user_can_write(user) %}<a href="{{ url_for('post_new', feed_id=feed.id) }}" class="btn btn-primary">NEW</a>{% endif %}  </th>
   </tr>
 </thead>
 <tbody>

@@ -59,8 +59,26 @@ $('#user_login_button').click(function(){
     }, 500);
 });
 
+// hide expired posts, unless cookie says don't.
+
+if ($.cookie('show_past_posts')) {
+    $('.time_past').show();
+    $('#show_past_posts').addClass('active');
+} else {
+    $('.time_past').hide();
+}
+
+$('#show_past_posts').click(function() {
+    $('.time_past').toggle();
+    $(this).toggleClass('active');
+    $.cookie('show_past_posts', $.cookie('show_past_posts') === true? false:true,
+             {"path": "/"});
+});
+
 // and run any js which was inserted by a template, which needs jQuery.
 
 while (jLater.length) {
     jLater.pop()($);
 }
+
+
