@@ -28,12 +28,20 @@ to run the server using the waitress WSGI server, or you can use any other WSGI 
 
 ## Requirements:
 
-Most packages will be installed by the ./setup.sh script into a folder called .virtualenv,
-but you will need Python 2.6/2.7 or so, and the Python headers package (python-dev on debian),
-probably also a functioning gcc is needed, for compiling the various requirements.  But
-python-dev should handle that (I hope!)
+Most packages will be installed by the ./setup.sh script into a folder called .virtualenv.
+
+You you will need Python 2.6/2.7 or so, and the Python headers package (python-dev on Debian, python-devel on CentOS),
+with a  functioning gcc for compiling the various requirements.
 
 For the thumbnail generation, and image-resizing, you'll need 'ImageMagick' installed (the 'convert' command).
+
+So on CentOS:
+
+    yum install python-devel ImageMagick
+
+or on Debian/Ubuntu:
+
+    apt-get install python-dev imagemagick
 
 ## More info:
 
