@@ -46,7 +46,7 @@ def receive(request):
 def form(data):
     ''' the form for editing this type of post '''
     # pylint: disable=star-args
-    return render_template_string(my('.form.html'),
+    return render_template_string(my('form.html'),
                                   default_tags=DEFAULT_TAGS, **data)
 
 def make_templater(data):
@@ -89,7 +89,7 @@ def test(data):
     except Exception as e:
         example_post = str(e)
 
-    return render_template_string(my('.test.html'), feed=feed,
+    return render_template_string(my('test.html'), feed=feed,
         example_post=example_post)
 
 def get_new(data):

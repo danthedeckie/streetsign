@@ -24,7 +24,7 @@
 
 """
 
-from os.path import dirname, basename, splitext, isfile, abspath
+from os.path import dirname, basename, splitext, isfile, abspath, join as pathjoin
 from importlib import import_module
 from glob import glob
 import sys
@@ -35,24 +35,22 @@ PATH = dirname(__file__)
 _editors = {}
 
 def path_to_module(path):
-    ''' given a path (/var/blah/x.py) return the name of x.py for
+    ''' given a path (/var/blah/x/__init__.py) return the name of x for
         importing (just x) '''
+    return basename(dirname(path))
 
-    return splitext(basename(path))[0]
+def my(filename, level=1):
+    ''' if this function is called from /x/y/z/blah.py, with filename='potato.html',
+        it will return the contents of /x/y/z/potato.html. '''
+    pathname = dirname(abspath(inspect.getfile(sys._getframe(level))))
 
-def my(ending, level=1):
-    ''' given '.html', returns (if this is the foobar module)
-        the contents of: /where/this/file/is/foobar.html '''
-
-    with open(splitext(abspath(inspect.getfile(sys._getframe(level))))[0] \
-              + ending,'r') as f:
+    with open(pathjoin(pathname, filename),'r') as f:
         return f.read()
 
 def modules():
     ''' a list of all post types modules which can be used/imported '''
 
-    all_list = [ path_to_module(p) for p in glob(PATH + '/*.py') ]
-    all_list.remove('__init__')
+    all_list = [ path_to_module(p) for p in glob(PATH + '/*/__init__.py') ]
     return all_list
 
 def module_dict(name):

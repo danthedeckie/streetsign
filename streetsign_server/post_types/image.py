@@ -33,11 +33,45 @@ from os import makedirs
 
 from streetsign_server.post_types import my
 
+########################################################################
+#
+# Helper functions:
+#
+
+def run_local_script(scriptname, *vargs):
+    ''' run an image.<scriptname> script, with <*vargs> '''
+    return check_call([splitext(abspath(__file__))[0] + scriptname] + list(vargs))
+
+def resize_image(filename):
+    ''' try to resize an image in place on the system. if fail,
+        just flash a message, don't actually freak out '''
+    try:
+        run_local_script('.makesmall.sh', filename)
+        flash('image imported and resized')
+    except:
+        flash('tried to resize... oh well.')
+
+def image_path():
+    ''' return the path to save images to, creating the folder if
+        it doesn't exist. '''
+    where = pathjoin(g.site_vars['user_dir'], 'post_images')
+
+    if not isdir(where):
+        makedirs(where)
+
+    return where
+
 def allow_filetype(filename):
     ''' what kinds of files are allowed? '''
 
     return splitext(filename)[-1].lower() in \
         ['.png','.jpg','.jpeg','.gif','.bmp','.svg']
+
+
+########################################################################
+#
+# Now the actual post_type required functions:
+#
 
 def form(data):
     ''' return the html form for editing an image post '''
@@ -49,22 +83,41 @@ def receive(data):
         where it should be, and return all the image data we need. '''
 
     if 'upload' in data:
+        # An image has been uploaded
+
         f = request.files['image_file']
         if f and allow_filetype(f.filename):
             filename = secure_filename(f.filename)
-            where = pathjoin(g.site_vars['user_dir'],'post_images')
-            if not isdir(where):
-                makedirs(where)
+            # TODO: check for '' returned from secure_filename???
 
-            f.save(pathjoin(where, filename))
-            try:
-                check_call([splitext(abspath(__file__))[0] +'.makesmall.sh',
-                        pathjoin(where, filename)])
-                flash ('image imported and resized')
-            except:
-                flash('tried to resize... oh well.')
+            full_path = pathjoin(image_path(), filename)
+            f.save(full_path)
+            resize_image(full_path)
+
         else:
             raise IOError('Invalid file. Sorry')
+    elif 'url' in data:
+        # Download an image file from an external URL.
+
+        filename = secure_filename(data['url'])
+        if filename and allow_filetype(filename):
+            full_path = pathjoin(image_path(), filename)
+
+            #try:
+            if True:
+                print data['url']
+                run_local_script('.getexternalimage.sh',
+                                 data['url'],
+                                 full_path)
+                flash('image Downloaded')
+            #except :
+            #    flash('tried to download image. Failed')
+            #    raise IOError('Unable to download image! (%s)' % full_path)
+
+            resize_image(full_path)
+        else:
+            raise IOError('Invalid file (%s). Sorry.' % data['url'])
+
     else:
         filename = data.get('filename')
         if filename and allow_filetype(filename):

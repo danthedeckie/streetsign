@@ -1,0 +1,19 @@
+<div class="panel panel-default">
+<div class="panel-heading">
+  <h2 class="panel-title">Test Data</h2>
+</div>
+<div class="panel-body">
+<b>Title:</b> {{ feed.feed.title }}<br/>
+<b>Entries:</b>{{ feed.entries |length }}<br/>
+
+<b>Entry Fields:</b>
+{% for key in feed.entries[0] %}
+    {{ key }}
+{% endfor %}<br/>
+<i>These fields can be used in the 'how should this be displayed' box as: <code>{{ "{{item}}" }}</code></i>
+<hr/>
+<div class="well">
+{{ example_post }}
+</div>
+</div>
+</div>
