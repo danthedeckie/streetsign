@@ -39,7 +39,7 @@
     <input class="btn btn-primary" type="submit" value="Save" />
     <a class="btn btn-success" href="#" id="test_btn">Test</a>
     {% if source.id %}
-        <a class="btn btn-info" href="{{ url_for('external_source_run', source_id=source.id) }}" >Run Now</a>
+        <a class="btn btn-info" href="{{ url_for('external_source_run', source_id=source.id) }}" id="run_now">Run Now</a>
     {% endif %}
 </div>
 
@@ -64,22 +64,30 @@
   <div class="panel-body form">
     <div class="form-group">
       <label class="control-label">Start Time Formula</label>
-      <div class="col-sm-10">
         <input class="form-control" name="lifetime_start" type="text" value="{{source.lifetime_start}}"/>
-      </div>
     </div>
+
     <div class="form-group">
       <label class="control-label">End Time Formula</label>
-      <div class="col-sm-10">
         <input class="form-control" name="lifetime_end" type="text" value="{{source.lifetime_end}}" />
-      </div>
     </div>
+
     <div class="form-group">
-      <label class="control-label">Publish automatically?</label>
-      <div class="col-sm-10">
-        <input class="form-control" name="publish" type="checkbox" {{ "checked" if source.publish else '' }} />
+      <label class="control-label">Display-time on screen</label>
+        <div class="input-group">
+            <input class="form-control" name="display_time" type="number" value="{{ source.display_time if source.display_time else 8 }}" title="How long should each post be displayed on screen for?" />
+            <span class="input-group-addon">seconds</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+      <div class="checkbox">
+      <label class="control-label" > Publish automatically?
+      <input name="publish" type="checkbox" {{ "checked" if source.publish else '' }} />
+      </label>
       </div>
     </div>
+
   </div>
 </div>
 </div>
@@ -91,6 +99,11 @@ $('#test_btn').click(function(e){
     $('#test_area').load(
         "{{ url_for('external_source_test') }}",
         $('#source_form').serialize());
+});
+
+$('#run_now').click(function(e){
+    e.preventDefault();
+    $.post(this.href, {"force":"yes"}, function() { location.reload(); });
 });
 </script>
 {% endblock %}

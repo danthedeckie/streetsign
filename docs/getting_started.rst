@@ -7,6 +7,22 @@ as I've enjoyed developing it so far.
 Installation instructions are in the Project README file.  It should be very
 easy on any linux/OSX or other unixy type computer.
 
+System Requirements
+-------------------
+
+- Python 2.7 is recommended, but 2.6 should work too.
+- Python development headerfiles & capable compiler:
+  `yum install python-devel` on CentOS/RPM based distros,
+  `apt-get install python-dev` on Debian/Ubuntu
+
+It's also recommended to install ImageMagick for creating image thumbnails:
+
+- `yum install ImageMagick` (on CentOS/RPM)
+  `apt-get install imagemagick` (on Debian/Ubuntu)
+
+Installing
+----------
+
 Essentially, once you've downloaded or cloned the project::
 
     ./setup.sh
@@ -18,7 +34,12 @@ the initial database (a local sqlite file).  Then ::
 
 To actually run a local test server.
 
-This document hopes to make the different concepts and terminology clear, so
+The initial administration user 'admin' is created, with a password of 'password'.
+
+If you need to start again with a fresh database, then delete the `database.db` file,
+and re-run `./setup.sh`.
+
+This rest of this document hopes to make the different concepts and terminology clear, so
 that you can be up to speed as quickly as possible.
 
 

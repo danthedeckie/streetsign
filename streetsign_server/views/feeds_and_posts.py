@@ -32,7 +32,7 @@ import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
 import peewee
 from datetime import datetime, timedelta
-from streetsign_server.views.utils import PleaseRedirect
+from streetsign_server.views.utils import PleaseRedirect, getint, getbool, getstr
 
 from streetsign_server.logic.feeds_and_posts import try_to_set_feed, \
                                       if_i_cant_write_then_i_quit, \
@@ -121,12 +121,12 @@ def feedpage(feedid):
             return redirect(url_for('feeds'))
 
     return render_template('feed.html',
-                     feed=feed,
-                     user=user,
-                     all_posttypes=post_types.types(),
-                     allusers=User.select(),
-                     allgroups=Group.select()
-                )
+                           feed=feed,
+                           user=user,
+                           all_posttypes=post_types.types(),
+                           allusers=User.select(),
+                           allgroups=Group.select()
+                          )
 
 
 
@@ -347,7 +347,9 @@ def external_data_source_edit(source_id):
     # first find the data type:
 
     if request.method == 'DELETE':
-        ExternalSource.delete().where(ExternalSource.id == int(source_id)).execute()
+        ExternalSource.delete() \
+                      .where(ExternalSource.id == int(source_id)) \
+                      .execute()
         return 'deleted'
 
     if source_id == None:
@@ -357,7 +359,7 @@ def external_data_source_edit(source_id):
             source.name = "new " + source.type + " source"
             source.feed = Feed.get() # set initial feed
         except KeyError:
-            return 'No type specified.'
+            return 'No type specified.', 500
     else:
         try:
             source = ExternalSource.get(id=source_id)
@@ -374,19 +376,22 @@ def external_data_source_edit(source_id):
     # if it's a post, then update the data with 'receive':
 
     if request.method == 'POST':
+        source.post_as_user = user_session.get_user()
+
         source.settings = json.dumps(module.receive(request))
         source.name = request.form.get('name', source.name)
-        source.post_as_user = user_session.get_user()
-        source.frequency = int(request.form.get('frequency', 60))
-        source.publish = request.form.get('publish', False)
+
+        source.frequency = getint('frequency', 60)
+        source.publish = getbool('publish', False)
         source.lifetime_start = request.form.get('lifetime_start',
                                                  source.lifetime_start)
         source.lifetime_end = request.form.get('lifetime_end',
                                                  source.lifetime_end)
+        source.display_time = getint('display_time', source.display_time)
         source.post_template = request.form.get('post_template',
                                                 source.post_template)
         try:
-            source.feed = Feed.get(Feed.id == int(request.form.get('feed', 100)))
+            source.feed = Feed.get(Feed.id == getint('feed', 100))
             source.save()
             if source_id == None:
                 # new source!
@@ -396,7 +401,8 @@ def external_data_source_edit(source_id):
                 flash('Updated.')
         except Feed.DoesNotExist:
             flash("Can't save! Invalid Feed!{}".format(
-                int(request.form.get('feed', '-11'))))
+                getint('feed', '-11')))
+
 
     return render_template("external_source.html", source=source,
             feeds=Feed.select(),
@@ -424,8 +430,7 @@ def external_source_test():
     # and request the test html
     return module.test(request.args)
 
-
-@app.route('/external_data_sources/<int:source_id>/run')
+@app.route('/external_data_sources/<int:source_id>/run', methods=['POST'])
 def external_source_run(source_id):
     ''' use the importer specified to see if there is any new data,
         and if there is, then import it. '''
@@ -436,12 +441,15 @@ def external_source_run(source_id):
         return 'Invalid Source', 404
 
     now = datetime.now()
-    if source.last_checked:
-        next_check = source.last_checked + timedelta(minutes=source.frequency)
+    if user_session.is_admin() and request.form.get('force', 'no') == 'yes':
+        flash ("Update forced.")
+    else:
+        if source.last_checked:
+            next_check = source.last_checked + timedelta(minutes=source.frequency)
 
-        if next_check > now:
-            return "Nothing to do. Last: {0}, Next: {1}, Now: {2} ".format(
-                source.last_checked, next_check, now)
+            if next_check > now:
+                return "Nothing to do. Last: {0}, Next: {1}, Now: {2} ".format(
+                    source.last_checked, next_check, now)
 
     module = external_source_types.load(source.type)
 
@@ -450,7 +458,7 @@ def external_source_run(source_id):
 
     if new_posts:
         for fresh_data in new_posts:
-            post = Post(type=fresh_data.get('type', 'html'),
+            post = Post(type=fresh_data.get('type', 'html'), \
                         author=source.post_as_user)
             editor = post_types.load(fresh_data.get('type', 'html'))
 
@@ -458,6 +466,8 @@ def external_source_run(source_id):
             post_form_intake(post, fresh_data, editor)
             post.active_start = source.current_lifetime_start()
             post.active_end = source.current_lifetime_end()
+            post.display_time = source.display_time
+
             if source.publish:
                 post.publisher = source.post_as_user
                 post.publish_date = datetime.now()
@@ -475,7 +485,7 @@ def external_source_run(source_id):
 # NOTE! This address is HARD CODED into some of the screen and back end .js
 # files.  If you change here, change there! (This isn't ideal, of course)
 
-@app.route('/external_data_sources/')
+@app.route('/external_data_sources/', methods=['POST'])
 def external_data_sources_update_all():
     ''' update all external data sources. '''
     sources = [x[0] for x in ExternalSource.select(ExternalSource.id).tuples()]

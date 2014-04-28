@@ -43,8 +43,8 @@ pypi packages you need too (``.virtualenv/bin/pip install gunicorn``, say).
 Some links:
 ~~~~~~~~~~~
 
-- `The official flask deployment docs <http://flask.pocoo.org/docs/deploying/>`
-- `The waitress server docs<https://pylons.readthedocs.org/projects/waitress/en/latest/>`
+- `The official flask deployment docs <http://flask.pocoo.org/docs/deploying/>`_
+- `The waitress server docs <https://pylons.readthedocs.org/projects/waitress/en/latest/>`_
 
 
 Users
@@ -59,4 +59,16 @@ it's probably a good idea if you are supporting other users, to create a 'normal
 user for yourself as well.  Then if someone is finding something confusing, you
 can check from that non-admin user quickly.
 
+Password hashes and moving the database
+---------------------------------------
 
+The user passwords are stored in the database hashed using two salts - an
+individual salt per password (stored in standard passlib style in the password
+field) and also with the site-wide "secret".  This "secret" is generated
+automatically when you run the setup script, and is stored in the ``config.py``
+file.  (It's also used by flask for encrypting session data, and so should
+NEVER be stored in a repository, or shared outside deployment.)
+
+What this means is that if you move a database.db file from one installation
+to anonther, you will also need to bring the same config.py (or, at least, copy
+the SECRET from there.)

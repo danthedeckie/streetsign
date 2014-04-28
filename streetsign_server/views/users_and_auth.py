@@ -25,12 +25,12 @@
 '''
 
 
-from flask import render_template, url_for, request, session, redirect, \
-                  flash, json, g
+from flask import render_template, url_for, request, redirect, flash
 import streetsign_server.user_session as user_session
-import streetsign_server.post_types as post_types
 from streetsign_server import app
 from streetsign_server.models import User, Group, Post, UserGroup
+
+# pylint: disable=no-member
 
 
 @app.route('/login', methods=['POST'])
@@ -42,7 +42,7 @@ def login():
     #       would it be better to use an absolute URL?  I dunno if this
     #       is better against XSS?
 
-    return_to = request.form.get('from','index')
+    #return_to = request.form.get('from', 'index')
     try:
         user_session.login(request.form['username'], request.form['password'])
     except:
@@ -54,7 +54,7 @@ def login():
 def logout():
     ''' log out, remove session cookies, etc. '''
 
-    return_to = request.form.get('from','index')
+    #return_to = request.form.get('from', 'index')
 
     # delete the session from the database:
     try:
@@ -73,8 +73,8 @@ def users():
     ''' list of all users (HTML page). '''
     return render_template('users.html', users=User.select())
 
-@app.route('/users/<int:userid>', methods=['GET','POST'])
-@app.route('/users/-1', methods=['GET','POST'])
+@app.route('/users/<int:userid>', methods=['GET', 'POST'])
+@app.route('/users/-1', methods=['GET', 'POST'])
 def user(userid=-1):
     ''' edit one user.  Admins can edit any user, but other users
         can only edit themselves. if userid is -1, create a new user. '''
@@ -127,7 +127,7 @@ def user(userid=-1):
                         == request.form.get('conf_newpass', '2') else False
 
             if newpass:
-                if current_user.confirm_password(request.form.get('currpass','')):
+                if current_user.confirm_password(request.form.get('currpass', '')):
                     user.set_password(request.form.get('newpass'))
                     flash('password changed')
                 else:
@@ -144,19 +144,19 @@ def user(userid=-1):
             if userid == -1:
                 return redirect(url_for('user', userid=user.id))
         elif action == 'delete':
-            if (not current_user.is_admin):
+            if not current_user.is_admin:
                 flash('Sorry! Only admins can delete users!')
                 return redirect(request.referrer)
 
-            if (user.id == current_user.id):
+            if user.id == current_user.id:
                 flash('Sorry! You cannot delete yourself!')
                 return redirect(request.referrer)
 
-            user.delete_instance()
-            flash ('User:' + user.displayname + ' deleted.')
+            user.delete_instance(recursive=True)
+            flash('User:' + user.displayname + ' deleted. (And all their posts)')
             return redirect(request.referrer)
 
-    users_posts = Post.select().where(Post.author==user) \
+    users_posts = Post.select().where(Post.author == user) \
                                .order_by(Post.write_date.desc()) \
                                .limit(10)
 
@@ -165,7 +165,7 @@ def user(userid=-1):
                             posts=users_posts, user=user)
 
 
-@app.route('/groups', methods=['GET','POST'])
+@app.route('/groups', methods=['GET', 'POST'])
 def groups():
     ''' (HTML) user-groups list, and creation of new ones. '''
 
@@ -174,22 +174,22 @@ def groups():
             flash('Only Admins can do this!')
             return redirect(url_for('groups'))
 
-        action = request.form.get('action','create')
+        action = request.form.get('action', 'create')
 
         if action == 'create':
-            if not request.form.get('name','').strip():
+            if not request.form.get('name', '').strip():
                 flash("I'm not making you an un-named group!")
                 return redirect(url_for('groups'))
-            Group(name=request.form.get('name','blank').strip()).save()
+            Group(name=request.form.get('name', 'blank').strip()).save()
 
     return render_template('groups.html', groups=Group.select())
 
-@app.route('/group/<int:groupid>', methods=['GET','POST'])
+@app.route('/group/<int:groupid>', methods=['GET', 'POST'])
 def group(groupid):
     ''' edit one user group. '''
 
     try:
-        group = Group.get(id=groupid)
+        thisgroup = Group.get(id=groupid)
     except:
         flash('Invalid group ID')
         return redirect(request.referrer)
@@ -199,18 +199,18 @@ def group(groupid):
             flash('Only Admins can do this!')
             return redirect(url_for('groups'))
 
-        if request.form.get('action','none') == 'delete':
-            UserGroup.delete().where(UserGroup.group==group).execute()
-            group.delete_instance()
-            flash('group:'+ group.name +' deleted.')
-            return (redirect(url_for('groups')))
+        if request.form.get('action', 'none') == 'delete':
+            UserGroup.delete().where(UserGroup.group == thisgroup).execute()
+            thisgroup.delete_instance()
+            flash('group:'+ thisgroup.name +' deleted.')
+            return redirect(url_for('groups'))
 
-        if request.form.get('action','none') == 'update':
-            group.name = request.form.get('groupname', group.name)
-            group.save()
+        if request.form.get('action', 'none') == 'update':
+            thisgroup.name = request.form.get('groupname', thisgroup.name)
+            thisgroup.save()
 
-            users = request.form.getlist('groupusers')
-            group.set_users(users)
+            groupusers = request.form.getlist('groupusers')
+            thisgroup.set_users(groupusers)
             flash('saved')
 
-    return render_template('group.html', group=group, allusers=User.select())
+    return render_template('group.html', group=thisgroup, allusers=User.select())

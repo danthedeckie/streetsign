@@ -16,6 +16,7 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
+    <script>var jLater = [];</script>
     {% block htmlhead %}
         {{ linkmacros.static_css('lib/chosen/chosen.min.css') }}
         {{ linkmacros.static_css('style.css') }}
@@ -127,6 +128,7 @@ Documentation is at <a href="http://streetsign.readthedocs.org">streetsign.readt
   {{ linkmacros.static_js('lib/bootstrap/js/bootstrap.js') }}
   {{ linkmacros.static_js('lib/knockout-2.2.1.js') }}
   {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
+  {{ linkmacros.static_js('lib/jquery.cookie.js') }}
   {{ linkmacros.static_js('main.js') }}
 {% endblock %}
 </body>

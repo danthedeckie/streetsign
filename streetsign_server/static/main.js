@@ -50,7 +50,7 @@ $('a.confirm_ajax_delete').click(function(evt) {
 
 // And why not, lets also check if new data needs to be got (which
 // will then happen every time any back end page is checked.)
-$.getJSON('/external_data_sources/');
+$.post('/external_data_sources/');
 
 // focus on username input box when 'login' clicked.
 $('#user_login_button').click(function(){
@@ -58,3 +58,27 @@ $('#user_login_button').click(function(){
         $('input[name="username"]').focus();
     }, 500);
 });
+
+// hide expired posts, unless cookie says don't.
+
+if ($.cookie('show_past_posts')) {
+    $('.time_past').show();
+    $('#show_past_posts').addClass('active');
+} else {
+    $('.time_past').hide();
+}
+
+$('#show_past_posts').click(function() {
+    $('.time_past').toggle();
+    $(this).toggleClass('active');
+    $.cookie('show_past_posts', $.cookie('show_past_posts') === true? false:true,
+             {"path": "/"});
+});
+
+// and run any js which was inserted by a template, which needs jQuery.
+
+while (jLater.length) {
+    jLater.pop()($);
+}
+
+

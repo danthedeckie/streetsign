@@ -1,0 +1,46 @@
+
+<div class="form-group">
+  <label class="control-label" for="url">Feed url:</label>
+  <input class="form-control" name="url" type="text" value="{{url}}"/>
+</div>
+
+<div class="form-group">
+  <label class="control-label" for="url">How should each entry be displayed?</label>
+  <input class="form-control" name="display_template" type="text" value="{{display_template|escape }}"/>
+</div>
+
+<div class="cf"></div>
+<hr/>
+<!-- And the advanced stuff... -->
+
+<button type="button" class="btn btn-danger" data-toggle="collapse" data-target="#advanced_rss">Advanced</button> <button id="test_btn_relay" type="button" class="btn btn-success">Test</button>
+<div id="advanced_rss" class="collapse">
+  <div class="panel panel-danger">
+    <div class="panel-body">
+
+ <div class="form-group">
+  <label class="control-label" for="url">Current Posts: <i>(automatically updated)</i></label>
+    <textarea class="form-control" name="current_posts" >{{current_posts|tojson if current_posts else '[]'}}</textarea>
+</div>
+
+ <div class="form-group">
+  <label class="control-label" for="url">Allowed HTML Tags: (<i>comma,separated,list</i>)</label>
+    <input class="form-control" name="allowed_tags" type="text" value="{{allowed_tags if allowed_tags else default_tags}}"/>
+</div>
+    </div>
+  </div>
+</div>
+
+<script>
+jLater.push(function($) {
+    var do_test = function() { $('#test_btn').click(); };
+
+    $('input[name="url"]').blur(do_test);
+    $('input[name="display_template"]').blur(do_test).keyup(do_test);
+    $('#test_btn_relay').click(do_test);
+
+    if ($('input[name="url"]').val()) {
+        do_test();
+    }
+});
+</script>

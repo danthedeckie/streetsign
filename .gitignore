@@ -5,4 +5,4 @@
 *.swp
 config.py
 database.db
-app/static/user_files
+streetsign_server/static/user_files

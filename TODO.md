@@ -8,7 +8,6 @@
 # Bugs:
 
 - Single message on side-scrolling zone display doesn't go on for ever (some kind of timeout/race condition?)
-- rss 'run now' button should return somewhere sensible (preferably run as ajax...)
 
 ## Urgent:
 
@@ -34,6 +33,8 @@
 - HTML page importer (maybe uses md5? or last-changed? or something to know if it sould make a new post)
 - Export Screen Data (JSON) and import.
 - Post Types (and External Data Types) should have a 'display name' property.
+- Better Post types API (better error messages, etc.)
+- move post types into their own folders, like external_post_types.
 
 # Good things for the future:
 
@@ -63,7 +64,6 @@
   view, like the external data importer does.
 - post types as their own dir/packages, rather than all being jumbled together.
 - urgent alert post type, takes over whole display
-- move test button in external data (RSS) to a better place.
 - draggable borders of selected zone in the zones editor
 - better docs for post types js callbacks
 - html5 video post type

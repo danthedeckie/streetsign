@@ -9,10 +9,12 @@
 <th>Type</th>
 <th>Content</th>
 <th>Author</th>
-<th>Feeds</th>
+<th>Feed</th>
 <th> 
 {% if user.id %}
 <div class="btn-group">
+  <button type="button" class="btn btn-default" id="show_past_posts">Show Past Posts</button>
+
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
     New Post <span class="caret"></span>
   </button>

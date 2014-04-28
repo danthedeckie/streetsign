@@ -118,7 +118,6 @@ class User(DBModel):
 
     #: the unique name user to log in
     loginname = CharField(unique=True)
-    ''' logINNNNN '''
     #: how the user would like to be displayed
     displayname = CharField(null=True)
     #: how to contact the user:
@@ -302,9 +301,14 @@ class Feed(DBModel):
     def __repr__(self):
         return '<Feed:' + self.name + '>'
 
-    def post_count(self):
+    def post_count(self, published=True, expired=False):
         ''' how many posts in this feed? '''
-        return self.posts.count()
+        q = self.posts
+        if published:
+            q = q.where(Post.published==True)
+        if not expired:
+            q = q.where(Post.active_end > datetime.now())
+        return q.count()
 
     def post_types_as_list(self):
         ''' return a list of post types, from the single field '''
@@ -637,6 +641,9 @@ class ExternalSource(DBModel):
     lifetime_start = CharField(default="NOW")
     #: Lifetime end of new posts (formula)
     lifetime_end = CharField(default="NOW + 1 WEEK")
+
+    #: how long should each post be displayed for?
+    display_time = IntegerField(default=8)
 
     def current_lifetime_start(self):
         ''' given the equation in the lifetime_start field, what should
