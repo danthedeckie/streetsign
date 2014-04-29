@@ -24,6 +24,10 @@ plain text post type.
 
 """
 
+__NAME__ = 'Plain Text'
+__DESC__ = 'Plain text, formatting etc.' \
+           ' inherited from the zone it\'s displayed in'
+
 from flask import render_template_string, escape
 
 from streetsign_server.post_types import my
@@ -31,7 +35,7 @@ from streetsign_server.post_types import my
 def form(data):
     ''' return the html for editing a text post '''
     # pylint: disable=star-args
-    return render_template_string(my('.form.html'), **data)
+    return render_template_string(my('form.html'), **data)
 
 def receive(data):
     ''' recieve the data from the form, and return the dict to save in the
@@ -44,4 +48,4 @@ def display(data):
 
 def screen_js():
     ''' the js needed to display a post correctly. '''
-    return my('.screen.js')
+    return my('screen.js')

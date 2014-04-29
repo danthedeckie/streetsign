@@ -20,58 +20,35 @@
 streetsign_server.post_types.html
 ---------------------------------
 
-HTML / rich text post type.
+Display an External Web Page embedded in a screen.
 
 """
 
+__NAME__ = 'External Web Page'
+__DESC__ = 'Display an External web page as a post'
+
 from flask import render_template_string
-import re
-import bleach
 
 from streetsign_server.post_types import my
 
 def form(data):
     ''' the form for editing this type of post '''
     # pylint: disable=star-args
-    return render_template_string(my('.form.html'), **data)
-
-def safehtml(text):
-    ''' used by 'recieve' to clean html,
-        and not allow scripts and other nasties. '''
-
-    return bleach.clean(text, strip=True,
-        tags=["div", "span", "b", "i", "u",
-              "em", "ul","li","ol", "a","br",
-              "code", "blockquote", "strong",
-              "small", "big", "img", "table",
-              "tr", "td", "th", "thead",
-              "tfoot","h1","h2","h3","h4","h5","h6","p"],
-        attributes=['class','href','alt','src'])
-
-def safecolor(text, default="#fff"):
-    ''' check that a color string is actually a html hex-type color... '''
-    if not text:
-        return default
-    try:
-        return re.search("#[0-9a-fA-F]+", text).group()
-    except AttributeError:
-        return default
+    return render_template_string(my('form.html'), **data)
 
 def receive(data):
     ''' turn the contents posted back to us from the form into
         a dict which can be JSON'd by the system, and dumped as
         text into the database. '''
-    #############
-    # TODO: sanify color input.
 
-    return {'type': 'html',
-            'color': safecolor(data.get('color', False)),
-            'content': safehtml(data.get('content',''))}
+    return {'type': 'external_webpage',
+            'content': data.get('url', ''),
+            'url': data.get('url', '')}
 
 def display(data):
     ''' return the data ready for the display js to do stuff with. '''
-    return data['content']
+    return data['url']
 
 def screen_js():
     ''' return the js needed to display this content. '''
-    return my('.screen.js')
+    return my('screen.js')
