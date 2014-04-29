@@ -48,7 +48,7 @@ DB = SqliteDatabase(None, threadlocals=True)
 __all__ = ['DB', 'user_login', 'user_logout', 'get_logged_in_user',
            'User', 'Group', 'Post', 'Feed', 'FeedPermission', 'UserGroup',
            'ConfigVar', 'Screen',
-           'create_all', 'by_id']
+           'init', 'create_all', 'by_id']
 
 
 '''
@@ -62,7 +62,7 @@ def safe_json_load(text, default):
     ''' either parse a string from JSON into python or else return default. '''
     try:
         return json.loads(text)
-    except:
+    except:  # pylint: disable=bare-except
         return default
 
 def eval_datetime_formula(string):
@@ -81,10 +81,14 @@ def eval_datetime_formula(string):
 
     return simple_eval(string, names={'NOW': time()})
 
+def init():
+    ''' initialize the database connection '''
+    DB.init(app.config.get('DATABASE_FILE'))
+
 def create_all():
     ''' initialises the database, creates all needed tables. '''
 
-    DB.init(app.config.get('DATABASE_FILE'))
+    init()
 
     [t.create_table(True) for t in
         (User, UserSession, Group, UserGroup, Post, Feed,
