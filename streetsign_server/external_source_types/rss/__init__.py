@@ -21,6 +21,8 @@
 
 '''
 
+__NAME__ = 'RSS/XML/ATOM Feed'
+
 __MODULE__ = 'rss'
 
 from flask import render_template_string, json

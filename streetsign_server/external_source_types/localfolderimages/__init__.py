@@ -21,6 +21,7 @@
 
 '''
 
+__NAME__ = 'Local Folder (images)'
 __MODULE__ = 'localfolderimages'
 
 from flask import render_template_string, json
