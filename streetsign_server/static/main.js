@@ -61,7 +61,7 @@ $('#user_login_button').click(function(){
 
 // hide expired posts, unless cookie says don't.
 
-if ($.cookie('show_past_posts')) {
+if ($.cookie('show_past_posts') === "true") {
     $('.time_past').show();
     $('#show_past_posts').addClass('active');
 } else {
@@ -71,7 +71,7 @@ if ($.cookie('show_past_posts')) {
 $('#show_past_posts').click(function() {
     $('.time_past').toggle();
     $(this).toggleClass('active');
-    $.cookie('show_past_posts', $.cookie('show_past_posts') === true? false:true,
+    $.cookie('show_past_posts', $.cookie('show_past_posts') === "true" ? "false" : "true",
              {"path": "/"});
 });
 
