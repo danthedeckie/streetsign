@@ -28,11 +28,9 @@
 - Better uploaded files editor.
 - Direction for scroller
 - abilty to have full-screen URGENT messages.
-- A bunch of good default background images.
 - RSS post count limiter
 - HTML page importer (maybe uses md5? or last-changed? or something to know if it sould make a new post)
 - Export Screen Data (JSON) and import.
-- Post Types (and External Data Types) should have a 'display name' property.
 - Better Post types API (better error messages, etc.)
 - move post types into their own folders, like external_post_types.
 
