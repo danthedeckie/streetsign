@@ -60,14 +60,14 @@ function background_from_value(text) {
 
 function Zone(container, initial_data) {
     "use strict";
-
-    var csspairs = cssPairs(initial_data.css), i, that = this;
-
-    var update = function (name) {
-        if (initial_data.hasOwnProperty(name)) {
-            that[name] = initial_data[name];
-        }
-        };
+    var i,
+        that = this,
+        csspairs = cssPairs(initial_data.css),
+        update = function (name) {
+            if (initial_data.hasOwnProperty(name)) {
+                that[name] = initial_data[name];
+            }
+            };
 
     // default "mutable type" properties:
     this.posts = [];
@@ -96,6 +96,7 @@ function Zone(container, initial_data) {
     for (i = 0; i < csspairs.length; i += 1) {
         $(this.el).css(csspairs[i][0], csspairs[i][1]);
     }
+    $(this.el).css('color', that['color']);
 
 }
 
