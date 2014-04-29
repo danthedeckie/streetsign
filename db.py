@@ -5,17 +5,20 @@ A set of useful database bits and pieces for StreetSign.
 To be merged with run.py into a simple manage.py (django-style) script.
 
 '''
+#pylint: disable=wildcard-import, no-member, unused-wildcard-import, unused-import
 
 import streetsign_server
 
 from streetsign_server.models import *
 
 def make():
+    ''' make the default first users, etc. '''
     create_all()
     ############################
     # 3 basic users:
     def user_exists(name):
-        return User.select().where(User.loginname==name).exists()
+        ''' test if a user exists '''
+        return User.select().where(User.loginname == name).exists()
 
     if not user_exists('admin'):
         user = User(loginname='admin', displayname='Admin',
@@ -24,7 +27,7 @@ def make():
 
         user.save()
 
-        group = Group(name='admins', display='Admins').save()
+        group = Group(name='admins', display='Admins').save() # pylint: disable=unused-variable
 
     if not user_exists('jim'):
         user = User(loginname='jim', displayname='James Hacker MP',
@@ -48,10 +51,15 @@ def make():
 
     news.save()
 
-    Post(type='html', feed=news, author=User(id=1), content='{"content":"First Post"}').save()
+    Post(type='html',
+         feed=news,
+         author=User(id=1),
+         content='{"content":"First Post"}').save()
 
     Screen(urlname='Default').save()
 
 if __name__ == '__main__':
     print 'welcome to the database shell.'
     print 'type:  make() to make default data'
+    print 'or init() to connect to the database for interative work.'
+    print 'dir() will show you the available functions and models'
