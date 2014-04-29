@@ -82,3 +82,20 @@ while (jLater.length) {
 }
 
 
+////////////////////////////////
+
+$(document).on('click', '.item_ajax_toggle', function() {
+    var toggle_class = $(this).data('ajaxtoggle'),
+        item = $(this).parents('.item').first().toggleClass(toggle_class),
+        data = {};
+
+    data[$(this).data('name')] = $(this).data('value');
+
+    $.ajax($(this).parents('[data-uri]').data('uri'),
+           { type: $(this).data('ajaxtype'),
+             data: data,
+             error: function() {
+                item.toggleClass(toggle_class);
+                alert('failed to delete!');
+                }})
+});

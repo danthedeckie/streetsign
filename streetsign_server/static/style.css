@@ -123,6 +123,13 @@ input.third { max-width: 28%;}
     opacity: 0.6;
 }
 
+.published .onlyunpublished {
+    display: none;
+}
+.unpublished .onlypublished {
+    display: none;
+}
+
 .time_future, .time_future a {
     color: #349;
 }

@@ -15,27 +15,31 @@
 </thead>
 <tbody>
 {% for post in feed.posts|sort(attribute="active_end") %}
-    <tr class="time_{{- post.active_status() }} {{ 'un' if not post.published}}published" >
+    <tr class="item time_{{- post.active_status() }} {{ 'un' if not post.published}}published"
+     data-uri="{{ url_for('postpage', postid=post.id) }}">
         <td>{{ linkmacros.post(post) }}</td>
         <td>{{ linkmacros.user(post.author) }}</td>
         <td><b>Written:</b> {{ post.write_date.date() }}<br/>
             <b>Lifetime:</b> {{ post.active_status() }}</td>
         <td>{{ 'Published' if post.published }}
             {% if feed.user_can_publish(user) %}
-                <form method="POST" action="{{ url_for('postpage',postid=post.id) }}" >
-                    <input type="hidden" name="action" value="
-                        {{- 'unpublish' if post.published else 'publish' }}">
-                    <input class="btn btn-default" type="submit" value="
-                        {{- 'Unpublish' if post.published else 'Publish' }}">
-                </form>
+            <span class="onlyunpublished">
+                <button class="btn btn-default item_ajax_toggle"
+                        data-ajaxtype="POST"
+                        data-ajaxtoggle="published unpublished" data-name="action" data-value="publish">Publish</button>
+            </span>
+            <span class="onlypublished">
+                <button class="btn btn-default item_ajax_toggle"
+                        data-ajaxtype="POST"
+                        data-ajaxtoggle="published unpublished" data-name="action" data-value="unpublish">UnPublish</button>
+            </span>
             {% endif %}
         </td>
         <td>{% if (post.published and feed.user_can_publish(user)) or
                   ((not post.published) and feed.user_can_write(user)) %}
-            <form method="POST" action="{{ url_for('postpage',postid=post.id) }}" >
-            <input type="hidden" name="action" value="delete" />
-            <input class="delbutton confirm_delete" type="submit" value="&times;" /></form>
-            {% endif %}</td>
+            <button data-ajaxtype="POST" data-ajaxtoggle="hidden" data-name="action" data-value="delete"
+                    class="item_ajax_toggle btn delbutton">&times;</button>
+           {% endif %}</td>
     </tr>
 {% endfor %}
 </tbody>
