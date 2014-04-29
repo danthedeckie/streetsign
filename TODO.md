@@ -14,7 +14,6 @@
 - make sure user uploaded files have the right place to go etc for new projects,
 - make lack of thumbnail generator not an exception, but fall back happily.
 - remove to archive and finally deletion of old posts & related files/content.
-- HTML posts color css classes
 
 ## Needed, but copeable for alpha version.
 

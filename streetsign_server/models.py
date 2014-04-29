@@ -300,7 +300,7 @@ class Feed(DBModel):
     name = CharField(default='New Feed')
 
     #: which types of posts are allowed in this feed (comma,separated)?
-    post_types = CharField(default='')
+    post_types = CharField(default='text,html,image')
 
     def __repr__(self):
         return '<Feed:' + self.name + '>'

@@ -68,6 +68,7 @@ def receive(data):
     # TODO: sanify color input.
 
     return {'type': 'html',
+            'owntextcolor': data.get('owntextcolor', False),
             'color': safecolor(data.get('color', False)),
             'content': safehtml(data.get('content', ''))}
 

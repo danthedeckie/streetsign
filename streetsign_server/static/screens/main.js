@@ -138,7 +138,7 @@ Zone.prototype = {
                     console.log("replacing content in live post");
                     post.el.remove();
                     post.el = post_types[post.type].render(that.el, post)[0];
-                    post.el.transition({'opacity': old_opacity}, 200);
+                    $(post.el).transition({'opacity': old_opacity}, 200);
                     });
             } else {
                 console.log("replacing content in post:" + post.id);
