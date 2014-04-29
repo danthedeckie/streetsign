@@ -32,25 +32,26 @@ import inspect
 
 PATH = dirname(__file__)
 
-_editors = {}
+_EDITORS = {}
 
 def path_to_module(path):
     ''' given a path (/var/blah/x/__init__.py) return the name of x for
         importing (just x) '''
     return basename(dirname(path))
 
-def my(filename, level=1):
-    ''' if this function is called from /x/y/z/blah.py, with filename='potato.html',
-        it will return the contents of /x/y/z/potato.html. '''
+def my(filename, level=1):  # pylint: disable=invalid-name
+    ''' if this function is called from /x/y/z/blah.py,
+        with filename='potato.html', it will return the contents of
+        /x/y/z/potato.html. '''
+    # pylint: disable=protected-access
     pathname = dirname(abspath(inspect.getfile(sys._getframe(level))))
-
-    with open(pathjoin(pathname, filename),'r') as f:
+    with open(pathjoin(pathname, filename), 'r') as f:
         return f.read()
 
 def modules():
     ''' a list of all post types modules which can be used/imported '''
 
-    all_list = [ path_to_module(p) for p in glob(PATH + '/*/__init__.py') ]
+    all_list = [path_to_module(p) for p in glob(PATH + '/*/__init__.py')]
     return all_list
 
 def module_dict(name):
@@ -60,25 +61,30 @@ def module_dict(name):
 
     return {'id': name, 'name': name}
 
+_TYPES = []
 def types():
     ''' return a list of dicts of all post types. '''
-    # TODO: find a way to cache this.
+    global _TYPES # pylint: disable=global-statement
 
-    return [ module_dict(m) for m in modules() ]
+    if _TYPES:
+        return _TYPES
+    else:
+        _TYPES = [module_dict(m) for m in modules()]
+        return _TYPES
 
 def load(type_name):
     ''' load a module, and return it. (caches in this module) '''
 
-    if type_name in _editors:
-        return _editors[type_name]
+    if type_name in _EDITORS:
+        return _EDITORS[type_name]
 
     #if isfile(PATH + '/' + type_name):
-    e = import_module( 'streetsign_server.external_source_types.' +  type_name )
-    _editors[type_name] = e
-    return(e)
+    e = import_module('streetsign_server.external_source_types.' + type_name)
+    _EDITORS[type_name] = e
+    return e
 
 def receive(posttype, form):
     ''' hand a form object from a request on to the appropriate handler '''
 
     editor = load(posttype)
-    return(editor.receive(form))
+    return editor.receive(form)
