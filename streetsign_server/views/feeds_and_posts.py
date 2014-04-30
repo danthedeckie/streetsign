@@ -49,7 +49,7 @@ import streetsign_server.external_source_types as external_source_types
 ####################################################################
 # Feeds & Posts:
 
-@app.route('/feeds', methods=['GET', 'POST'])
+@app.route('/feeds/', methods=['GET', 'POST'])
 def feeds():
     ''' the back end list of feeds. '''
 
@@ -104,7 +104,6 @@ def feedpage(feedid):
         if action == 'edit':
             feed.name = request.form.get('title', feed.name).strip()
 
-
             inlist = request.form.getlist
 
             feed.post_types = ', '.join(inlist('post_types'))
@@ -140,7 +139,7 @@ def feedpage(feedid):
 # Posts:
 
 
-@app.route('/posts')
+@app.route('/posts/')
 def posts():
     ''' (HTML) list of ALL posts. (also deletes broken posts, if error) '''
 
@@ -150,7 +149,12 @@ def posts():
         user = User()
 
     try:
-        return render_template('posts.html', posts=Post.select(), user=user)
+        if user.is_admin:
+            return render_template('posts.html', posts=Post.select(), user=user)
+        else:
+            return render_template('posts.html',
+                                   posts=Post.select() \
+                                             .where(Post.status==0), user=user)
     except Feed.DoesNotExist as e:
         # Ah. Database inconsistancy! Not good, lah.
         ps = Post.raw('select post.id from post'
@@ -160,7 +164,12 @@ def posts():
             p.delete_instance()
         flash('Cleaned up old posts...')
 
-    return render_template('posts.html', posts=Post.select(), user=user)
+    if user.is_admin:
+        return render_template('posts.html', posts=Post.select(), user=user)
+    else:
+        return render_template('posts.html',
+                               posts=Post.select()\
+                                         .where(Post.status == 0), user=user)
 
 @app.route('/posts/new/<int:feed_id>', methods=['GET', 'POST'])
 def post_new(feed_id):

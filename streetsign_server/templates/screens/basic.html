@@ -32,13 +32,12 @@
 
   POSTS_URL = "{{ url_for('screens_posts_from_feeds', json_feeds_list='-1') }}";
 
-  //var screen_data = $.extend({}, DEFAULTSCREEN, SCREEN);
-  //screen_data.defaults = $.extend({}, DEFAULTSCREEN.defaults, screen_data.defaults);
-
-  //init_screen(screen_data, '#zones')
-  //setTimeout(start_zones_scrolling, 2000);
   window.SCREEN = new StreetScreen($('#zones'), SCREEN_DATA);
   setTimeout(function(){window.SCREEN.start_zones();}, 2000);
+
+  // automatic housekeeping
+
+  $.post("{{ url_for('posts_housekeeping') }}", {} );
 
   </script>
 {% endblock %}

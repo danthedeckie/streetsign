@@ -48,7 +48,14 @@
             Not Published!
         {% endif %}
     </td>
-    <td>{% if post.active %}Active{% endif %}</td>
+    <td>{% if post.active_status()=="now" %}Active
+        {% elif post.active_status()=="future" %}Display later
+        {% elif post.active_status()=="past" %}
+            {% if post.status == 0 %}Finished display lifetime
+            {% else %}Archived
+            {% endif %}
+        {% endif %}
+    </td>
     </tr>
 {% endfor %}
 </tbody>
