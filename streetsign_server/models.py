@@ -47,7 +47,7 @@ DB = SqliteDatabase(None, threadlocals=True)
 
 __all__ = ['DB', 'user_login', 'user_logout', 'get_logged_in_user',
            'User', 'Group', 'Post', 'Feed', 'FeedPermission', 'UserGroup',
-           'ConfigVar', 'Screen',
+           'ConfigVar', 'Screen', 'config_var',
            'init', 'create_all', 'by_id']
 
 
@@ -718,5 +718,19 @@ Misc
 class ConfigVar(DBModel):
     ''' place to store site-wide front-end-editable settings. '''
     id = CharField(primary_key=True)
-    value = CharField(null=True)
+    value = CharField(null=True) # as JSON!
     description = CharField(default="Setting")
+
+def config_var(key, default_value):
+    ''' a 'get_or_create' type function for retrieving database ConfigVar
+        values, or the default value it it hasn't been set.
+        NOTE: returns the *value*, and NOT the database record!
+        '''
+    try:
+        return json.loads(ConfigVar.get(id=key).value)
+    except ConfigVar.DoesNotExist:
+        try:
+            return default_value
+        except peewee.IntegrityError:
+            # ha! we have a race! and you lose...
+            return json.loads(ConfigVar.get(id=key).value)

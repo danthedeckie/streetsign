@@ -75,11 +75,23 @@ $('#show_past_posts').click(function() {
              {"path": "/"});
 });
 
+$('#run_housekeeping').click(function() {
+    $.post('/posts/housekeeping', {}, function(data) {
+        alert("Housekeeping Done! \n" +
+              data.archived + " posts archived. \n" +
+              data.deleted + " posts deleted");
+        }, 'json');
+
+});
+
+
 // and run any js which was inserted by a template, which needs jQuery.
 
 while (jLater.length) {
     jLater.pop()($);
 }
+
+
 
 
 ////////////////////////////////
@@ -99,3 +111,4 @@ $(document).on('click', '.item_ajax_toggle', function() {
                 alert('failed to delete!');
                 }})
 });
+

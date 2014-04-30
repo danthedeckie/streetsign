@@ -10,9 +10,12 @@
 <th>Content</th>
 <th>Author</th>
 <th>Feed</th>
-<th> 
+<th>
 {% if user.id %}
-<div class="btn-group">
+  <div class="btn-group">
+  <button type="button" class="btn btn-default" id="run_housekeeping"
+          title="Archive old posts, delete really old posts">
+    <span class="glyphicon glyphicon-compressed"></span>Do Housekeeping</button>
   <button type="button" class="btn btn-default" id="show_past_posts">Show Past Posts</button>
 
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -20,8 +23,8 @@
   </button>
   <ul class="dropdown-menu" role="menu">
      {% for feed in user.writeable_feeds() %}
-        <li><a href="{{ url_for('post_new', feed_id=feed.id) }}">{{feed.name }}</a></li>
-      {% endfor %}
+        <li><a href="{{ url_for('post_new', feed_id=feed.id) }}">{{ feed.name }}</a></li>
+     {% endfor %}
   </ul>
   </div>
 {% endif %}
@@ -53,9 +56,9 @@
 
 <!-- careful of changing this next line, as unit tests require it. -->
 {% if posts.count() == 0 %}
-<span class="post_count">No Posts at all!</span>
+    <span class="post_count">No Posts at all!</span>
 {% else %}
-<span class="post_count">{{ posts.count() }} posts</span>
+    <span class="post_count">{{ posts.count() }} posts</span>
 {% endif %}
 
 {% endblock %}

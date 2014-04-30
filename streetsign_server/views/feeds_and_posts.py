@@ -27,7 +27,7 @@
 
 
 from flask import render_template, url_for, request, redirect, \
-                  flash, json
+                  flash, json, jsonify
 import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
 import peewee
@@ -42,7 +42,7 @@ from streetsign_server.logic.feeds_and_posts import try_to_set_feed, \
 
 from streetsign_server import app
 from streetsign_server.models import User, Group, Feed, Post, ExternalSource, \
-                                     by_id
+                                     by_id, config_var
 
 import streetsign_server.external_source_types as external_source_types
 
@@ -330,6 +330,47 @@ def postedit_type(typeid):
                            form_content=post_type_module.form(request.form))
 
 
+@app.route('/posts/housekeeping', methods=['POST'])
+def posts_housekeeping():
+    ''' goes through all posts, move 'old' posts to archive status,
+        delete reeeeealy old posts. '''
+
+    # TODO: how about admin users see archived posts, other users don't?  that
+    # seems reasonable?  And a 'Archive' section to 'All Posts', which then
+    # has a 'restore' button for each post (which also sets the active_end date
+    # to a good default)
+
+    now = datetime.now()
+    archive_time = now - timedelta(days=config_var('posts.archive_after_days', 7))
+    delete_time = now - timedelta(days=config_var('posts.delete_after_days', 30))
+
+    # first delete really old posts:
+
+    delete_count = 0
+    archive_count = 0
+
+    if config_var('posts.delete_when_old', True):
+        for post in Post.select().where(Post.active_end < delete_time):
+            delete_post_and_run_callback(post, post_types.load(post.type))
+            delete_count += 1
+
+    # next set old-ish posts to archived:
+
+    if config_var('posts.archive_when_old', True):
+        archive_count = Post.update(status=2) \
+                            .where((Post.active_end < archive_time) &
+                                   (Post.status != 2)) \
+                            .execute()
+
+    # And done.
+
+    return jsonify({"deleted": delete_count,
+                    "archived": archive_count,
+                    "delete_before": delete_time,
+                    "archive_before": archive_time,
+                    "now": now})
+
+
 ###############################################################
 
 @app.route('/external_data_sources/NEW', defaults={'source_id': None},
@@ -488,3 +529,4 @@ def external_data_sources_update_all():
     ''' update all external data sources. '''
     sources = [x[0] for x in ExternalSource.select(ExternalSource.id).tuples()]
     return json.dumps([(external_source_run(s), s) for s in sources])
+
