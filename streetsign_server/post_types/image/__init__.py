@@ -32,7 +32,7 @@ from flask import render_template_string, request, g, flash
 from werkzeug import secure_filename # pylint: disable=no-name-in-module
 from os.path import splitext, join as pathjoin, isdir, abspath, dirname
 from subprocess import check_call
-from os import makedirs
+from os import makedirs, remove
 
 from streetsign_server.post_types import my
 
@@ -142,3 +142,7 @@ def display(data):
 def screen_js():
     ''' return the javascript for displaying these images correctly '''
     return my('screen.js')
+
+def delete(data):
+    ''' when a post is deleted, this is called first, so we can clean up. '''
+    remove(pathjoin(image_path(), secure_filename(data['filename'])))

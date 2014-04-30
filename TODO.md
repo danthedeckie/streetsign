@@ -17,7 +17,6 @@
 
 ## Needed, but copeable for alpha version.
 
-- delete posts and publish/unpublish should be faster, using ajax.
 - there should be a 'show old posts' toggle (with cookie)
 - Dropdown select box for font for screen zones (easy)
 - Better 'CSS' editing for zones and whole-screen.

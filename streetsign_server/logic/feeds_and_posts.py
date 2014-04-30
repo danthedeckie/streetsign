@@ -143,3 +143,14 @@ def post_form_intake(post, form, editor):
     post.time_restrictions = form.get('time_restrictions_json','[]')
     post.display_time = min(100, max(2, int(form.get('displaytime', 8))))
 
+def delete_post_and_run_callback(post, typemodule):
+    ''' before a post is actually deleted, check if there is a 'pre-delete'
+        callback on this post type, and run that first.  This way, for uploaded
+        images (for instance), the file can be deleted as well. '''
+
+    try:
+        typemodule.delete(json.loads(post.content))
+    except AttributeError as excp:
+        flash("No Delete callback for this post type.")
+
+    return post.delete_instance()

@@ -37,7 +37,8 @@ from streetsign_server.views.utils import PleaseRedirect, getint, getbool, getst
 from streetsign_server.logic.feeds_and_posts import try_to_set_feed, \
                                       if_i_cant_write_then_i_quit, \
                                       can_user_write_and_publish, \
-                                      post_form_intake
+                                      post_form_intake, \
+                                      delete_post_and_run_callback
 
 from streetsign_server import app
 from streetsign_server.models import User, Group, Feed, Post, ExternalSource, \
@@ -116,6 +117,11 @@ def feedpage(feedid):
             feed.save()
             flash('Saved')
         elif action == 'delete':
+
+            for post in feed.posts:
+                post_type_module = post_types.load(post.type)
+                delete_post_and_run_callback(post, post_type_module)
+
             feed.delete_instance(True, True) # cascade/recursive delete.
             flash('Deleted')
             return redirect(url_for('feeds'))
@@ -202,7 +208,7 @@ def post_new(feed_id):
     else: # POST. new post!
         post_type = request.form.get('post_type')
         try:
-            editor = post_types.load(post_type)
+            post_type_module = post_types.load(post_type)
         except:
             flash('Sorry! invalid post type.')
             return redirect(request.referrer)
@@ -218,7 +224,7 @@ def post_new(feed_id):
 
             if_i_cant_write_then_i_quit(post, user)
 
-            post_form_intake(post, request.form, editor)
+            post_form_intake(post, request.form, post_type_module)
 
         except PleaseRedirect as e:
             flash(str(e.msg))
@@ -239,7 +245,7 @@ def postpage(postid):
 
     try:
         post = Post.get(Post.id == postid)
-        editor = post_types.load(post.type)
+        post_type_module = post_types.load(post.type)
         user = user_session.get_user()
 
     except Post.DoesNotExist:
@@ -265,7 +271,8 @@ def postpage(postid):
         # if it's a publish or delete request, handle that instead:
         DO = request.form.get('action', 'edit')
         if DO == 'delete':
-            post.delete_instance()
+            #post.delete_instance()
+            delete_post_and_run_callback(post, post_type_module)
             flash('Deleted')
             return redirect(request.referrer)
         elif DO == 'publish':
@@ -293,7 +300,7 @@ def postpage(postid):
 
         # finally get around to editing the content of the post...
         try:
-            post_form_intake(post, request.form, editor)
+            post_form_intake(post, request.form, post_type_module)
 
             post.save()
             flash('Updated.')
@@ -310,17 +317,17 @@ def postpage(postid):
                            current_feed=post.feed.id,
                            feedlist=user.writeable_feeds(),
                            user=user,
-                           form_content=editor.form(json.loads(post.content)))
+                           form_content=post_type_module.form(json.loads(post.content)))
 
 @app.route('/posts/edittype/<typeid>')
 def postedit_type(typeid):
     ''' returns an editor page, of type typeid '''
 
-    editor = post_types.load(typeid)
+    post_type_module = post_types.load(typeid)
 
     return render_template('post_type_container.html',
                            post_type=typeid,
-                           form_content=editor.form(request.form))
+                           form_content=post_type_module.form(request.form))
 
 
 ###############################################################
@@ -451,10 +458,10 @@ def external_source_run(source_id):
         for fresh_data in new_posts:
             post = Post(type=fresh_data.get('type', 'html'), \
                         author=source.post_as_user)
-            editor = post_types.load(fresh_data.get('type', 'html'))
+            post_type_module = post_types.load(fresh_data.get('type', 'html'))
 
             post.feed = source.feed
-            post_form_intake(post, fresh_data, editor)
+            post_form_intake(post, fresh_data, post_type_module)
             post.active_start = source.current_lifetime_start()
             post.active_end = source.current_lifetime_end()
             post.display_time = source.display_time
