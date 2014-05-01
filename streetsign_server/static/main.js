@@ -1,10 +1,9 @@
 ////////////////////////////////////////////////
 // Flashed notices:
-$('#flashed_notices li').click(function(){
+$('#flashed_notices').children('li').click(function(){
     $(this).fadeOut();
 });
-
-$('#flashed_notices > li').delay(15000).fadeOut('slow');
+setTimeout( function () { $('#flashed_notices > li').fadeOut('slow'); }, 15000);
 
 function flash(text) {
     $('#flashed_notices').append($('<li>' + text + ' </li>').click(function(){$(this).fadeOut();}));

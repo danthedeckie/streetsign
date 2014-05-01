@@ -6,9 +6,10 @@ body {
     padding-top: 70px;
     height: 100%;
 }
+
 #flashed_notices {
     position: absolute;
-    top: 2em;
+    top: 50px;
     right: 0;
     padding: 1em;
 }
