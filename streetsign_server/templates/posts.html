@@ -18,6 +18,7 @@
     <span class="glyphicon glyphicon-compressed"></span>Do Housekeeping</button>
   <button type="button" class="btn btn-default" id="show_past_posts">Show Past Posts</button>
 
+  {% if user.writeable_feeds() %}
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
     New Post <span class="caret"></span>
   </button>
@@ -26,6 +27,7 @@
         <li><a href="{{ url_for('post_new', feed_id=feed.id) }}">{{ feed.name }}</a></li>
      {% endfor %}
   </ul>
+  {% endif %}
   </div>
 {% endif %}
 </th>

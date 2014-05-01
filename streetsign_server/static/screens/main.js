@@ -435,9 +435,6 @@ StreetScreen.prototype = {
 
         $.getJSON('/screens/json/' +  that.id + '/' + that.md5, update);
 
-        // And for now, since there isn't really anywhere better, lets also
-        // tell all external sources to update if they need to.
-        $.post('/external_data_sources/');
     },
 
     start_zones: function () {

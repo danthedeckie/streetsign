@@ -79,11 +79,11 @@ so on as well.
 Feeds
 `````
 
-Posts are grouped into 'Feeds'.  A specific post can only be in one feed.  
-This might sound limiting, but don't worry.  You can create as many feeds 
+Posts are grouped into 'Feeds'.  A specific post can only be in one feed.
+This might sound limiting, but don't worry.  You can create as many feeds
 as you want, and assign them specific permissions if you need to.
 
-You can have a "latest photos from the campus" feed, a "URGENT" feed, a 
+You can have a "latest photos from the campus" feed, a "URGENT" feed, a
 "today's joke" feed, a 'urgent things to do' feed, a 'world news from BBC'
 feed, or whatever.
 

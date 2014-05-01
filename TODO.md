@@ -12,12 +12,9 @@
 ## Urgent:
 
 - make sure user uploaded files have the right place to go etc for new projects,
-- make lack of thumbnail generator not an exception, but fall back happily.
-- remove to archive and finally deletion of old posts & related files/content.
 
 ## Needed, but copeable for alpha version.
 
-- there should be a 'show old posts' toggle (with cookie)
 - Dropdown select box for font for screen zones (easy)
 - Better 'CSS' editing for zones and whole-screen.
 - Smarter 'live' Screen info updating, w/o reloading the whole page.
@@ -40,7 +37,6 @@
   and keeps it running locally happily until it can connect again.
 - favicon & other 'sundries' (404, 301 etc pages)
 - replace db.py & run.py with a single manage.py type script
-- Internationalisation / multilingual stuff.
 - basic password strength checking
 - login attempts counting/stopping
 - disallow until attempts \*\* attempts seconds since last attempt?  Then UI does auto-wait after fail (so it doesn't appear to fail, but simply take a long time).
@@ -70,6 +66,7 @@
 - CSS better on zones.
 - sub-zones post type, either horizontal or vertical mode, which adds two more zones to the fray, which are faded in and out due to this zone's timing.
 - post types add a repr field, also a UUID field, which can be used or set by the external data importes.
+- all feeds available as RSS feeds themselves, so streetsign can be a whole news management system.
 
 # Random ideas:
 
@@ -77,3 +74,8 @@
   (even black) so that it can be embedded easier inside another post?  This would
   allow the "sublayouts" concept (although I imagine performance being an issue).
   Better for sublayouts would be a post type which added new zones to the regular zones list, but had that post div as the parent...
+
+
+# Things for streetsign 2.0:
+
+- translation & internationalisation/gettext of everything.

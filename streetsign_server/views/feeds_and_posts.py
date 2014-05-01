@@ -24,14 +24,13 @@
 
 """
 
-
-
 from flask import render_template, url_for, request, redirect, \
                   flash, json, jsonify
-import streetsign_server.user_session as user_session
-import streetsign_server.post_types as post_types
 import peewee
 from datetime import datetime, timedelta
+
+import streetsign_server.user_session as user_session
+import streetsign_server.post_types as post_types
 from streetsign_server.views.utils import PleaseRedirect, getint, getbool, getstr
 
 from streetsign_server.logic.feeds_and_posts import try_to_set_feed, \
@@ -529,9 +528,6 @@ def external_source_run(source_id):
 
     return 'Done!'
 
-
-# NOTE! This address is HARD CODED into some of the screen and back end .js
-# files.  If you change here, change there! (This isn't ideal, of course)
 
 @app.route('/external_data_sources/', methods=['POST'])
 def external_data_sources_update_all():

@@ -72,3 +72,33 @@ NEVER be stored in a repository, or shared outside deployment.)
 What this means is that if you move a database.db file from one installation
 to anonther, you will also need to bring the same config.py (or, at least, copy
 the SECRET from there.)
+
+Housekeeping & removing old content
+-----------------------------------
+
+By default, streetsign will tag content that has a lifetime which ended over a week
+ago as "archived".  This means it no longer shows up on the interface for anyone
+except admin users.  After a month, it will be deleted, including any uploaded images.
+
+This "housekeeping" should take milliseconds to run as long as it's run regularly,
+so each screen view will fire a request to the server to do it once an hour or so.
+It and can also be triggered through the interface by hitting the "housekeeping"
+button on the "All Posts" page, or on the front page (Dashboard).
+
+If you want to ensure that this runs every hour or so, you can use standard unix cron,
+or any other task scheduling program.
+
+- ``HTTP POST`` to ``/posts/housekeeping``
+
+so if you're using cron::
+
+    0 * * * * nobody curl -d "" 'http://streetsign_url/posts/housekeeping' > /dev/null
+
+should do it.
+
+For automatically updating content from external feeds, again, screen views will
+automatically do this once a minute, but you can also trigger it manually (or via cron)
+with a
+
+- ``HTTP POST`` to ``/external_data_sources/``
+
