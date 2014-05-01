@@ -43,7 +43,8 @@ class TestSetup(StreetSignTestCase):
         assert 'Dashboard' in request.data # it is the front page
         assert 'Login' in request.data # not logged in
 
-        request = self.app.get('/posts')
+        request = self.app.get('/posts/')
+        print request.data
         assert '<span class="post_count">No Posts at all!' in request.data
 
 class TestHTML(StreetSignTestCase):
@@ -60,7 +61,7 @@ class TestHTML(StreetSignTestCase):
         ''' test HTML validity of all non-logged-in pages '''
 
         self.validate('/')
-        self.validate('/posts')
+        self.validate('/posts/')
 
 if __name__ == '__main__':
     unittest.main()
