@@ -18,10 +18,10 @@
   {{ linkmacros.static_js('screens/basic.js') }}
   {{ linkmacros.static_js('screens/main.js') }}
   <script type="text/javascript" src="{{ url_for('post_types_js') }}"></script>
-
   <script type="text/javascript">
 
-    var SCREEN_DATA={{screen.to_dict() | tojson }};
+    var LOCALOPTS={{ request.args | tojson }},
+        SCREEN_DATA={{screen.to_dict() | tojson }};
     SCREEN_DATA.md5 = "{{screen.md5()}}";
 
     {% if screen.background %}

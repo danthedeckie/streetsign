@@ -43,7 +43,13 @@ function post_fadeout(post, fadetime, andthen) {
 
     fadetime = 1 * fadetime;
 
-    if ((fadetime === undefined)||(isNaN(fadetime))) { fadetime = 0; }
+    if (window.LOCALOPTS.fadetime === undefined) {
+        if ((fadetime === undefined)||(isNaN(fadetime))) {
+            fadetime = 0;
+        }
+    } else {
+        fadetime = parseInt(window.LOCALOPTS.fadetime, 10);
+    }
 
     if (post.zone.type == 'scroll') {
         // do scroll stuff.
@@ -84,7 +90,15 @@ function post_fadein(post, fadetime, andthen) {
 
     } else {
         fadetime = 1 * fadetime;
-        if ((fadetime === undefined)||(isNaN(fadetime))) { fadetime = 0; }
+
+        if (window.LOCALOPTS.fadetime === undefined) {
+            if ((fadetime === undefined)||(isNaN(fadetime))) {
+                fadetime = 0;
+            }
+        } else {
+            fadetime = parseInt(window.LOCALOPTS.fadetime, 10);
+        }
+
         $(post.el).transition({'opacity':1.0}, fadetime, andthen);
     }
 }
