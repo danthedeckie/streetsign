@@ -41,7 +41,7 @@ from streetsign_server.logic.feeds_and_posts import try_to_set_feed, \
 
 from streetsign_server import app
 from streetsign_server.models import User, Group, Feed, Post, ExternalSource, \
-                                     by_id, config_var
+                                     by_id, config_var, PermissionDenied
 
 import streetsign_server.external_source_types as external_source_types
 
@@ -262,63 +262,60 @@ def postpage(postid):
 
     if request.method == 'POST':
         try:
-            # if the user is allowed to set the feed to what they've
-            # requested, then do it.
-
-            post.feed = try_to_set_feed(post, request.form, user)
-
             # check for write permission, and if the post is
             # already published, publish permission.
 
             if_i_cant_write_then_i_quit(post, user)
+
+            # if the user is allowed to set the feed to what they've
+            # requested, then do it.
+
+            post.feed = try_to_set_feed(post,
+                                        request.form.get('post_feed', False),
+                                        user)
 
         except PleaseRedirect as e:
             flash(str(e.msg))
             redirect(e.url)
 
         # if it's a publish or delete request, handle that instead:
-        DO = request.form.get('action', 'edit')
-        if DO == 'delete':
-            #post.delete_instance()
+        action = request.form.get('action', 'edit')
+
+        if action == 'delete':
+            # don't need extra guards, as if_i_cant... deals with it above
             delete_post_and_run_callback(post, post_type_module)
             flash('Deleted')
-            return redirect(request.referrer)
-        elif DO == 'publish':
-            if post.feed.user_can_publish(user):
-                post.published = True
-                post.publisher = user
-                post.publish_date = datetime.now()
-                post.save()
-                flash('Published')
-            else:
-                flash('Sorry, You do NOT have publish' \
-                       ' permissions on this feed.')
-            return redirect(request.referrer)
-        elif DO == 'unpublish':
-            if post.feed.user_can_publish(user):
-                post.published = False
-                post.publisher = None
-                post.publish_date = None
-                post.save()
-                flash('Unpublished!')
-            else:
+        elif action == 'publish':
+            try:
+                post.publish(user)
+                flash("Published")
+            except PermissionDenied:
+                flash("Sorry, you don't have permission to publish"
+                      " posts in this feed.")
+        elif action == 'unpublish':
+            try:
+                post.publish(user, False)
+                flash("Published!")
+            except PermissionDenied:
                 flash('Sorry, you do NOT have permission' \
                        ' to unpublish on this feed.')
+
+        if action not in ('edit', 'update'):
             return redirect(request.referrer)
 
         # finally get around to editing the content of the post...
         try:
             post_form_intake(post, request.form, post_type_module)
-
             post.save()
             flash('Updated.')
-        except:
+        except Exception as e:
             flash('invalid content for this data type!')
+            flash(str(e))
 
     # Should we bother displaying 'Post' button, and editable controls
     # if the user can't write to this post anyway?
 
-    can_write, can_publish = can_user_write_and_publish(user, post)
+    #can_write, can_publish = can_user_write_and_publish(user, post)
 
     return render_template('post_editor.html',
                            post=post,
@@ -342,11 +339,6 @@ def postedit_type(typeid):
 def posts_housekeeping():
     ''' goes through all posts, move 'old' posts to archive status,
         delete reeeeealy old posts. '''
-
-    # TODO: how about admin users see archived posts, other users don't?  that
-    # seems reasonable?  And a 'Archive' section to 'All Posts', which then
-    # has a 'restore' button for each post (which also sets the active_end date
-    # to a good default)
 
     now = datetime.now()
     archive_time = now - timedelta(days=config_var('posts.archive_after_days', 7))

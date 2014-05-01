@@ -22,11 +22,11 @@
     <div class="col-md-6">
     <label>Start:</label>
         <div class="form-group">
-            <div class="input-group date" id="datetimestart">
+            <div class="input-group date" id="datetimestart" data-date-format="YYYY-MM-DD HH:mm:ss">
                 <input type="text" name="active_start" id="active_start"
                        class="form-control" {{ enabled_if(post.feed.user_can_write(user)) }}
                        value="{{ post.active_start }}"
-                       data-format="YYYY-MM-DD HH:mm:ss" />
+                       />
                 <span class="input-group-addon">
                 <span class="glyphicon glyphicon-calendar"></span></span>
             </div>
@@ -36,11 +36,11 @@
     <div class="col-md-6">
     <label>End:</label>
         <div class="form-group">
-            <div class="input-group date" id="datetimeend">
+            <div class="input-group date" id="datetimeend" data-date-format="YYYY-MM-DD hh:mm:ss" >
                 <input type="text" name="active_end" id="active_end"
                        class="form-control" {{ enabled_if(post.feed.user_can_write(user)) }}
                        value="{{ post.active_end }}"
-                       data-format="YYYY-MM-DD hh:mm:ss" />
+                       />
                 <span class="input-group-addon">
                 <span class="glyphicon glyphicon-calendar"></span></span>
             </div>

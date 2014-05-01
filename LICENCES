@@ -13,22 +13,20 @@ knockout.js: (for much easier complex UI elements in the admin interface)
 knockout.mapping: (for turning JSON from the server into ko objects)
  - MIT Licence. (http://opensource.org/licences/mit-licence.php)
 
-jQuery.anytime: (for converting dates and times sensibly)
- - Creative Commons Attribution-Noncommercial-Share Alike 3.0 Unported Licence
-   (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-
-jQuery.timePicker: (for nice time-select ui widgets)
- - MIT & GPL
-
 jsoneditor: (for editing json data)
  - Apache 2.0 Licence
 
 wysihtml5: (simple html5 wysiwyg editor for posts)
  - MIT Licence
 
- bootstrap3-wysihtml5: (wysihtml5 with bootstrap awesomeness)
+bootstrap3-wysihtml5: (wysihtml5 with bootstrap awesomeness)
  - https://github.com/Waxolunist/bootstrap3-wysihtml5-bower
  - MIT Licence
+
+
+bootstrap-datetimepicker: (nice looking date & time pickers)
+- MIT Licence (c) 2014 Jonathan Peterson
+- https://github.com/Eonasdan/bootstrap-datetimepicker
 
 chosen: (even sweeter multiselect widget)
  - MIT Licence

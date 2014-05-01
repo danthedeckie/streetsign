@@ -35,7 +35,9 @@
 - HTML page importer (maybe uses md5? or last-changed? or something to know if it sould make a new post)
 - Export Screen Data (JSON) and import.
 - Better Post types API (better error messages, etc.)
-- move post types into their own folders, like external_post_types.
+- way to move posts between feeds
+- Templating & defaults for posts?
+- 'unarchive' posts.
 
 # Good things for the future:
 
@@ -88,3 +90,5 @@
 - Better "output" / "client" management:
   - Output screens status, tracking which addresses are requesting info,
     alert when one goes down, etc.
+- Separate out admin & theme designer roles? or is
+  this pointless?

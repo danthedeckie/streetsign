@@ -3,19 +3,21 @@
 
 {% block body %}
 <h2>All Posts</h2>
+<div class="pull-right">
+  <button type="button" class="btn btn-default" id="run_housekeeping"
+          title="Archive old posts, delete really old posts">
+    <span class="glyphicon glyphicon-compressed"></span>Do Housekeeping</button>
+</div>
+
 <table class="table table-striped">
 <thead>
 <tr>
-<th>Type</th>
 <th>Content</th>
 <th>Author</th>
 <th>Feed</th>
 <th>
 {% if user.id %}
   <div class="btn-group">
-  <button type="button" class="btn btn-default" id="run_housekeeping"
-          title="Archive old posts, delete really old posts">
-    <span class="glyphicon glyphicon-compressed"></span>Do Housekeeping</button>
   <button type="button" class="btn btn-default" id="show_past_posts">Show Past Posts</button>
 
   {% if user.writeable_feeds() %}
@@ -35,8 +37,8 @@
 </thead>
 <tbody>
 {% for post in posts|sort(attribute="active_end") %}
-    <tr class="time_{{- post.active_status() }}">
-    <td>{{ post.type }}</td>
+    <tr class="time_{{- post.active_status() }} item {{ 'un' if not post.published}}published"
+        data-uri="{{ url_for('postpage', postid=post.id) }}" >
     <td>{{ linkmacros.post(post) }}</td>
     <td>{% if post.author %}
             {{linkmacros.user(post.author)}} (on {{ post.write_date.date() }})
@@ -57,6 +59,28 @@
             {% else %}Archived
             {% endif %}
         {% endif %}
+
+        {# publish & delete buttons #}
+
+        {% if post.feed.user_can_publish(user) %}
+        <span class="onlyunpublished">
+            <button class="btn btn-default item_ajax_toggle"
+                    data-ajaxtype="POST"
+                    data-ajaxtoggle="published unpublished" data-name="action" data-value="publish">Publish</button>
+        </span>
+        <span class="onlypublished">
+            <button class="btn btn-default item_ajax_toggle"
+                    data-ajaxtype="POST"
+                    data-ajaxtoggle="published unpublished" data-name="action" data-value="unpublish">UnPublish</button>
+        </span>
+        {% endif %}
+        {% if (post.published and post.feed.user_can_publish(user)) or
+              ((not post.published) and post.feed.user_can_write(user)) %}
+        <button data-ajaxtype="POST" data-ajaxtoggle="hidden" data-name="action" data-value="delete"
+                class="item_ajax_toggle btn delbutton confirm_delete">&times;</button>
+       {% endif %}</td>
+
+
     </td>
     </tr>
 {% endfor %}

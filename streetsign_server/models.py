@@ -111,6 +111,10 @@ class DBModel(Model):
         ''' store DB info '''
         database = DB
 
+class PermissionDenied(Exception):
+    ''' for when an unauthorized user tries to do something. '''
+    pass
+
 '''
 --------------------------------------------------------------------------------
 Users & Groups
@@ -609,6 +613,20 @@ class Post(DBModel):
             return 'past'
         else:
             return 'now'
+
+    def publish(self, user, state=True):
+        ''' set the published status, published & date of this post.
+            use state=False to unpublish '''
+        if self.feed.user_can_publish(user):
+            self.published = state
+            self.publisher = user if state else None
+            self.publish_date = datetime.now() if state else None
+            self.save()
+            return True
+        else:
+            raise PermissionDenied("You don't have permission to publish"
+                                   " posts on this feed.")
+
 
 
 class ExternalSource(DBModel):
