@@ -21,11 +21,15 @@ Zones
 
 Each 'zone' is a block in your Screen which can display Posts from multiple Feeds.
 
-The reason for this is so that you can separate your data "semantically".  You
+The usual layout is a scrolling "headlines" zone at the bottom, a "date and time" zone
+at the top, and a textual news zone on one side, and pictures on the other.
+
+The reason that each zone can show multiple feeds is so that you can separate
+your data "semantically".  You
 can have a "Campus News" feed, a "Staff-only" feed, a "World News" feed, a
 "daily photos" feed, and so on.  Then in your staff room(s), the screen can
-show posts from all of those, but in the public cafeteria not show all of them
-except the staff news, and so on.
+show posts from all of those, but in the public cafeteria not show the staff only
+feeds, and so on.
 
 Types of Zone Animation
 ~~~~~~~~~~~~~~~~~~~~~~~
