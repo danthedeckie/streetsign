@@ -380,7 +380,13 @@ Zone.prototype = {
 
 function StreetScreen(element, initial_data) {
     "use strict";
-    var i, that = this;
+    var i,
+        that = this,
+        // vars for aspect ratio setting on load:
+        forceaspect = window.LOCALOPTS.forceaspect,
+        windowheight = $('#zones').height(),
+        newheight = document.body.scrollWidth / forceaspect,
+        newtop = parseInt(window.LOCALOPTS.forcetop, 10);
 
     // default mutable type properties:
     this.zones = [];
@@ -391,6 +397,19 @@ function StreetScreen(element, initial_data) {
     // set bg:
     $(element).css('background-image',
                    background_from_value(initial_data.background));
+
+    // set screen size & aspect ratio over-rides:
+
+    if (forceaspect !== undefined) {
+        forceaspect = parseFloat(forceaspect);
+        if (forceaspect) {
+            $('#zones').height(newheight);
+            if (isNaN(newtop)) {
+                newtop = ((windowheight - newheight)/2);
+            }
+            $('#zones').css('top', newtop + 'px');
+        }
+    }
 
     // load values from initial data:
     this.id = initial_data.id;

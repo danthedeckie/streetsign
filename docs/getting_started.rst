@@ -122,6 +122,8 @@ after approval.
 Screens
 ```````
 
+Full Reference: :doc:`screen_options`
+
 You can design screens, that is, specially taylored output formats for each
 display, on the 'screens' area of the web interface.  Each screen will
 resize and stretch to try and fit whichever size physical screen you open it
@@ -130,6 +132,7 @@ and a 4:3 point of sales screen) you will want to design different layouts.
 
 You can set up specific screens for certain areas, say a dining room screen,
 a lounge area screen, a welcome desk one, and so on.
+
 
 Screen Zones
 ````````````

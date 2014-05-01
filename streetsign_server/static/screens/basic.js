@@ -72,19 +72,18 @@ function post_fadein(post, fadetime, andthen) {
 
     if (post.zone.type == 'scroll') {
         distance = $(post.el).width() + $(post.zone.el).width() + 20;
+        post.display_time = distance * Math.max((parseFloat(window.LOCALOPTS.scrollspeed) || 17), 1);
 
         // This is odd..
         //$(post.el).fadeIn(0, andthen);
         //$(post.el).css('left', $(post.zone.el).width() + 10);
-        
+
         $(post.el).css({'left': $(post.zone.el).width() + 10,
                         'opacity': 1.0});
 
         $(post.el).animate({'left': 0 - ($(post.el).width() + 10)},
-                              distance * 17,
+                              post.display_time,
                               'linear');
-
-        post.display_time = distance * 17;
 
         andthen();
 

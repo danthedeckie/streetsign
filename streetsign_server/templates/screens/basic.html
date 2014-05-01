@@ -20,19 +20,14 @@
   <script type="text/javascript" src="{{ url_for('post_types_js') }}"></script>
   <script type="text/javascript">
 
-    var LOCALOPTS={{ request.args | tojson }},
-        SCREEN_DATA={{screen.to_dict() | tojson }};
+    var LOCALOPTS={{ request.args | tojson|safe }},
+        SCREEN_DATA={{screen.to_dict() | tojson|safe }},
+        POSTS_URL = "{{ url_for('screens_posts_from_feeds', json_feeds_list='-1') }}";
+
     SCREEN_DATA.md5 = "{{screen.md5()}}";
 
-    {% if screen.background %}
-    BG="url({{url_for('static', filename='user_files/' + screen.background)}})";
-    {% else %}
-    BG="black";
-    {% endif %}
-
-    POSTS_URL = "{{ url_for('screens_posts_from_feeds', json_feeds_list='-1') }}";
-
     window.SCREEN = new StreetScreen($('#zones'), SCREEN_DATA);
+
     setTimeout(function(){window.SCREEN.start_zones();}, 2000);
 
     // automatic housekeeping:
