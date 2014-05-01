@@ -102,3 +102,8 @@ with a
 
 - ``HTTP POST`` to ``/external_data_sources/``
 
+If you are on a public network, and worry about DOS issues, then realistically, you should
+be running behind a revese proxy such as nginx.  With nginx you can add restrictions on
+what URLS are accessble by any IP address, so you can limit these addresses to only be
+accessed by the machine with cron, for instance.
+

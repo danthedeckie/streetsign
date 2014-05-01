@@ -12,6 +12,14 @@
 ## Urgent:
 
 - make sure user uploaded files have the right place to go etc for new projects,
+- should uploaded post images still have their old names?? better that they get given
+  `postid-imagename` isn't it?  then there's less chance of confict and over-writing.
+- screen restarting every 6 hours or so
+- a configvar editor for admins.
+- a basic 'temporary' auto-screen router which sends different mac addressed or ip addressed
+  clients to different actual screens.  This could simply be using a ConfigVar for now, and
+  then be part of a proper client management system for 2.0
+- float left/right for images in rich text posts??
 
 ## Needed, but copeable for alpha version.
 
@@ -32,9 +40,9 @@
 # Good things for the future:
 
 - non-session auth as well for API, makes scripting easier.
-- Output screens status, tracking which addresses are requesting info, alert when one goes down, etc.
-- Local machine mini-proxy which gets the latest info from the master server, but otherwise caches everything
-  and keeps it running locally happily until it can connect again.
+- Local machine mini-proxy which gets the latest info from the master server,
+  but otherwise caches everything and keeps it running locally happily until
+  it can connect again.
 - favicon & other 'sundries' (404, 301 etc pages)
 - replace db.py & run.py with a single manage.py type script
 - basic password strength checking
@@ -44,17 +52,15 @@
 - try/catch enable-able blocks for screens, so that no matter what goes wrong
   with javascript, it somehow notices and reloads the screen, or tells the
   admin, or something.
-- image thumbnails for 'uploaded files' & posts.
+- better image thumbnails for 'uploaded files' & posts.
   (possibly an auto-cache api, as part of the uploaded files section, which
   then the images `post_type` (plugin) & the display reference?)
   `{{ url_for('thumbnail', filename=...) }}` or something...
-
 - we need some nice default themes
 - default screen when the database is first initiated
 - default posts when the database is first initiated
 - remove old new-post view complexity with choosing types, etc.  It should be done as a single
   view, like the external data importer does.
-- post types as their own dir/packages, rather than all being jumbled together.
 - urgent alert post type, takes over whole display
 - draggable borders of selected zone in the zones editor
 - better docs for post types js callbacks
@@ -65,7 +71,7 @@
 - font select on zones.
 - CSS better on zones.
 - sub-zones post type, either horizontal or vertical mode, which adds two more zones to the fray, which are faded in and out due to this zone's timing.
-- post types add a repr field, also a UUID field, which can be used or set by the external data importes.
+- post types add a repr field, also a UUID field, which can be used or set by the external data importers.
 - all feeds available as RSS feeds themselves, so streetsign can be a whole news management system.
 
 # Random ideas:
@@ -79,3 +85,6 @@
 # Things for streetsign 2.0:
 
 - translation & internationalisation/gettext of everything.
+- Better "output" / "client" management:
+  - Output screens status, tracking which addresses are requesting info,
+    alert when one goes down, etc.
