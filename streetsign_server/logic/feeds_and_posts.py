@@ -124,11 +124,12 @@ def post_form_intake(post, form, editor):
     post.content = json.dumps(editor.receive(form))
 
     try:
-        post.active_start = clean_date(form.get('active_start',''))
+        post.active_start = clean_date(form.get('active_start', ''))
     except ValueError:
+        flash(form.get('active_start', '') + '!')
         flash('Problem with start date.')
     try:
-        post.active_end = clean_date(form.get('active_end',''))
+        post.active_end = clean_date(form.get('active_end', ''))
     except ValueError as e:
         flash('Problem with end date.')
 

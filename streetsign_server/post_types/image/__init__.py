@@ -30,9 +30,10 @@ __DESC__ = 'An image file, stored locally on the streetsign server'
 
 from flask import render_template_string, request, g, flash
 from werkzeug import secure_filename # pylint: disable=no-name-in-module
-from os.path import splitext, join as pathjoin, isdir, abspath, dirname
+from os.path import splitext, join as pathjoin, isdir, abspath, dirname, basename
 from subprocess import check_call
 from os import makedirs, remove
+from uuid import uuid4
 
 from streetsign_server.post_types import my
 
@@ -91,8 +92,7 @@ def receive(data):
 
         f = request.files['image_file']
         if f and allow_filetype(f.filename):
-            filename = secure_filename(f.filename)
-            # TODO: check for '' returned from secure_filename???
+            filename = secure_filename(str(uuid4()) + basename(f.filename))
 
             full_path = pathjoin(image_path(), filename)
             f.save(full_path)
@@ -103,20 +103,19 @@ def receive(data):
     elif 'url' in data:
         # Download an image file from an external URL.
 
-        filename = secure_filename(data['url'])
+        filename = secure_filename(str(uuid4()) + basename(data['url']))
         if filename and allow_filetype(filename):
             full_path = pathjoin(image_path(), filename)
 
-            #try:
-            if True:
+            try:
                 print data['url']
                 run_local_script('getexternalimage.sh',
                                  data['url'],
                                  full_path)
                 flash('image Downloaded')
-            #except :
-            #    flash('tried to download image. Failed')
-            #    raise IOError('Unable to download image! (%s)' % full_path)
+            except:
+                flash('tried to download image. Failed')
+                raise IOError('Unable to download image! (%s)' % full_path)
 
             resize_image(full_path)
         else:
