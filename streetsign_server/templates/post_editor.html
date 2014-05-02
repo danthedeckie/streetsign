@@ -3,16 +3,16 @@
 
 {% block htmlhead %}
 {{ super() }}
-{{ linkmacros.static_css('lib/jquery.timePicker/timePicker.css') }}
-{{ linkmacros.static_css('lib/jquery.anytime/anytime.css') }}
+{# {{ linkmacros.static_css('lib/jquery.timePicker/timePicker.css') }} #}
+{# {{ linkmacros.static_css('lib/jquery.anytime/anytime.css') }} #}
 {{ linkmacros.static_css('lib/colorpicker/bgrins-spectrum-2c2010c/spectrum.css') }}
 {{ linkmacros.static_css('lib/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css') }}
 {{ linkmacros.static_css('lib/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css') }}
 {% endblock %}
 
 {% block body %}
-  <h1> Edit Post (in <a href="{{ url_for('feedpage', feedid=post.feed.id) }}">{{ post.feed.name }}</a>)</h1>
- 
+<h1> Edit Post (in <a href="{{ url_for('feedpage', feedid=post.feed.id) }}">{{ post.feed.name }}</a>)</h1>
+
  <form action="{{ form_action }}" method="POST" enctype="multipart/form-data">
   <input type="hidden" name="action" value="update" />
   {% include "post_editor_form.html" %}
@@ -25,10 +25,8 @@
 {{ linkmacros.static_js('lib/bootstrap-datetimepicker/moment.js') }}
 {{ linkmacros.static_js('lib/bootstrap-datetimepicker/bootstrap-datetimepicker.js') }}
 
-<!--
-{{ linkmacros.static_js('lib/jquery.timePicker/timePicker.js') }}
-{{ linkmacros.static_js('lib/jquery.anytime/anytime.js') }}
--->
+{# {{ linkmacros.static_js('lib/jquery.timePicker/timePicker.js') }}
+{{ linkmacros.static_js('lib/jquery.anytime/anytime.js') }} #}
 
 {{ linkmacros.static_js('lib/colorpicker/bgrins-spectrum-2c2010c/spectrum.js') }}
 {{ linkmacros.static_js('lib/bootstrap-wysihtml5/wysihtml5-0.3.0.js') }}
@@ -36,9 +34,9 @@
 
 {{ linkmacros.static_js('post_times_editor.js') }}
 {% block page_specific_js %}}
-<script type="text/javascript">
-var TIME_RESTRICTIONS={{ post.time_restrictions |safe }};
-</script>
+    <script type="text/javascript">
+        var TIME_RESTRICTIONS={{ post.time_restrictions |safe }};
+    </script>
 {% endblock %}
 <script type="text/javascript">
 var viewTimesModel = new TimesModel(TIME_RESTRICTIONS);

@@ -37,7 +37,7 @@ function post_fadeout(post, fadetime, andthen=function(){}) {
 
 function post_fadein(post, fadetime, andthen=function(){}) {
     $(post._el).fadeIn(fadetime, andthen);
-    
+
     $(post._el).css({'border':'2px solid red', 'opacity':'100%'});
     andthen();
 }

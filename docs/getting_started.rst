@@ -79,11 +79,11 @@ so on as well.
 Feeds
 `````
 
-Posts are grouped into 'Feeds'.  A specific post can only be in one feed.  
-This might sound limiting, but don't worry.  You can create as many feeds 
+Posts are grouped into 'Feeds'.  A specific post can only be in one feed.
+This might sound limiting, but don't worry.  You can create as many feeds
 as you want, and assign them specific permissions if you need to.
 
-You can have a "latest photos from the campus" feed, a "URGENT" feed, a 
+You can have a "latest photos from the campus" feed, a "URGENT" feed, a
 "today's joke" feed, a 'urgent things to do' feed, a 'world news from BBC'
 feed, or whatever.
 
@@ -122,6 +122,8 @@ after approval.
 Screens
 ```````
 
+Full Reference: :doc:`screen_options`
+
 You can design screens, that is, specially taylored output formats for each
 display, on the 'screens' area of the web interface.  Each screen will
 resize and stretch to try and fit whichever size physical screen you open it
@@ -130,6 +132,7 @@ and a 4:3 point of sales screen) you will want to design different layouts.
 
 You can set up specific screens for certain areas, say a dining room screen,
 a lounge area screen, a welcome desk one, and so on.
+
 
 Screen Zones
 ````````````

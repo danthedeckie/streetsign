@@ -59,7 +59,7 @@ def module_dict(name):
 
     # a bit of a stupid function for now.  I'm sure it'll be more useful later.
 
-    return {'id': name, 'name': name}
+    return {'id': name, 'name': load(name).__NAME__}
 
 _TYPES = []
 def types():

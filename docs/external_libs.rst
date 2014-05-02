@@ -40,17 +40,6 @@ Also these jQuery plugins:
 
 Use CSS transitions for faster smoother animation.
 
-`jQuery.anytime`_
-~~~~~~~~~~~~~~~~~
-
-Converting dates and times nicely
-
-`jQuery.timePicker`_
-~~~~~~~~~~~~~~~~~~~~
-
-Seriously, why haven't browsers got this stuff built in? Oh well, this makes it
-easy!
-
 `chosen`_
 ~~~~~~~~~
 
@@ -73,6 +62,17 @@ Twitter `Bootstrap`_
 
 I'm not a front-end CSS wizard, and this helps the admin interface look clean and
 professional with so little work from me.  It really does wonders.
+
+bootstrap-wysihtml5 & wysihtml5
+-------------------------------
+
+Very nice, simple HTML5 rich text editor, with bootstrap integration
+
+bootstrap-datetimepicker
+------------------------
+
+Nice looking reasonably easy to use date & time picker controls.  Really, browsers
+should have this stuff built-in already.
 
 `Pylint`_
 ---------

@@ -24,12 +24,16 @@ uploaded image post type.
 
 """
 
+__NAME__ = 'Image'
+__DESC__ = 'An image file, stored locally on the streetsign server'
+
 
 from flask import render_template_string, request, g, flash
 from werkzeug import secure_filename # pylint: disable=no-name-in-module
-from os.path import splitext, join as pathjoin, isdir, abspath
+from os.path import splitext, join as pathjoin, isdir, abspath, dirname, basename
 from subprocess import check_call
-from os import makedirs
+from os import makedirs, remove
+from uuid import uuid4
 
 from streetsign_server.post_types import my
 
@@ -39,17 +43,18 @@ from streetsign_server.post_types import my
 #
 
 def run_local_script(scriptname, *vargs):
-    ''' run an image.<scriptname> script, with <*vargs> '''
-    return check_call([splitext(abspath(__file__))[0] + scriptname] + list(vargs))
+    ''' run an local ("my") <scriptname> script, with <*vargs> '''
+    return check_call([pathjoin(dirname(abspath(__file__)), scriptname)] \
+        + list(vargs))
 
 def resize_image(filename):
     ''' try to resize an image in place on the system. if fail,
         just flash a message, don't actually freak out '''
     try:
-        run_local_script('.makesmall.sh', filename)
+        run_local_script('makesmall.sh', filename)
         flash('image imported and resized')
     except:
-        flash('tried to resize... oh well.')
+        flash('tried to resize, but failed... oh well.')
 
 def image_path():
     ''' return the path to save images to, creating the folder if
@@ -76,7 +81,7 @@ def allow_filetype(filename):
 def form(data):
     ''' return the html form for editing an image post '''
     # pylint: disable=star-args
-    return render_template_string(my('.form.html'), **data)
+    return render_template_string(my('form.html'), **data)
 
 def receive(data):
     ''' revieve the form data, including the uploaded file, and put it
@@ -87,8 +92,7 @@ def receive(data):
 
         f = request.files['image_file']
         if f and allow_filetype(f.filename):
-            filename = secure_filename(f.filename)
-            # TODO: check for '' returned from secure_filename???
+            filename = secure_filename(str(uuid4()) + basename(f.filename))
 
             full_path = pathjoin(image_path(), filename)
             f.save(full_path)
@@ -99,20 +103,19 @@ def receive(data):
     elif 'url' in data:
         # Download an image file from an external URL.
 
-        filename = secure_filename(data['url'])
+        filename = secure_filename(str(uuid4()) + basename(data['url']))
         if filename and allow_filetype(filename):
             full_path = pathjoin(image_path(), filename)
 
-            #try:
-            if True:
+            try:
                 print data['url']
-                run_local_script('.getexternalimage.sh',
+                run_local_script('getexternalimage.sh',
                                  data['url'],
                                  full_path)
                 flash('image Downloaded')
-            #except :
-            #    flash('tried to download image. Failed')
-            #    raise IOError('Unable to download image! (%s)' % full_path)
+            except:
+                flash('tried to download image. Failed')
+                raise IOError('Unable to download image! (%s)' % full_path)
 
             resize_image(full_path)
         else:
@@ -137,4 +140,8 @@ def display(data):
 
 def screen_js():
     ''' return the javascript for displaying these images correctly '''
-    return my('.screen.js')
+    return my('screen.js')
+
+def delete(data):
+    ''' when a post is deleted, this is called first, so we can clean up. '''
+    remove(pathjoin(image_path(), secure_filename(data['filename'])))

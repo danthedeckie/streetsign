@@ -22,9 +22,9 @@
         reduce_font_size_to_fit(newhtml.children('.post_inner'), $(zone));
 
         // Set font color:
-
-        try{newhtml.css('color',data.content.color);}catch(e){};
-
+        if (data.content.owntextcolor) {
+            try{newhtml.css('color',data.content.color);}catch(e){};
+        }
         // Return the HTML object, hiding it along the way.
 
         return newhtml;

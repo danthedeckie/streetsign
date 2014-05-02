@@ -68,7 +68,7 @@ To run a git commit *without* using this, use:
 
 ## Other notes
 
-_(to be part of full documentation, later on)_
+See the [main documentation](http://streetsign.readthedocs.org/en/latest)
 
 ### Magic Vars in posts:
 

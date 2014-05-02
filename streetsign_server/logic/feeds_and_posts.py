@@ -27,10 +27,10 @@ logic for feeds_and_posts views, separated out for clarity.
 
 from flask import flash, url_for, json
 from streetsign_server.views.utils import PleaseRedirect
-from streetsign_server.models import Feed
+from streetsign_server.models import Feed, safe_json_load
 from datetime import datetime
 
-def try_to_set_feed(post, form, user):
+def try_to_set_feed(post, new_feed_id, user):
     ''' Is this user actually allowed to set the feed of this post to what
         the form is saying they want to?  If so, cool. Return that feed. '''
 
@@ -42,10 +42,10 @@ def try_to_set_feed(post, form, user):
     except:
         oldfeedid = False
 
-    if form.get('post_feed', oldfeedid) != oldfeedid:
+    if new_feed_id and new_feed_id != oldfeedid:
         # new or changed feed.
         try:
-            feed = Feed.get(Feed.id==form.get('post_feed'))
+            feed = Feed.get(Feed.id==new_feed_id)
         except Feed.DoesNotExist:
             raise PleaseRedirect(None,
                   "Odd. You somehow tried to post "
@@ -109,6 +109,10 @@ def can_user_write_and_publish(user, post):
     # default is secure:
     return False, False
 
+def clean_date(in_text):
+    ''' take some input text, and return a datetime, if possible. '''
+    return datetime.strptime(in_text.split('.')[0], "%Y-%m-%d %H:%M:%S")
+
 def post_form_intake(post, form, editor):
     ''' takes the values from 'form', passes the post contents to
         the editor 'receive' function, and adds all the values into
@@ -119,28 +123,38 @@ def post_form_intake(post, form, editor):
 
     post.content = json.dumps(editor.receive(form))
 
-    '''
-    TODO:
-
     try:
-        post.active_start = datetime.strptime(form.get("active_start"),
-                                              '%Y-%m-%d %H:%M')
-    except:
+        post.active_start = clean_date(form.get('active_start', ''))
+    except ValueError:
+        flash(form.get('active_start', '') + '!')
         flash('Problem with start date.')
     try:
-        post.active_end = datetime.strptime(form.get("active_end"),
-                                            '%Y-%m-%d %H:%M')
-    except:
+        post.active_end = clean_date(form.get('active_end', ''))
+    except ValueError as e:
         flash('Problem with end date.')
-    '''
 
-    post.active_start = form.get('active_start')
-    post.active_end = form.get('active_end')
+    post.status = 0 # any time a post is edited, remove it from archive.
 
     post.time_restrictions_show = (form.get('times_mode', \
                 'do_not_show') \
             == 'only_show')
-    post.time_restrictions = form.get('time_restrictions_json','[]')
+    post.time_restrictions = form.get('time_restrictions_json', '[]')
     post.display_time = min(100, max(2, int(form.get('displaytime', 8))))
     post.write_date = datetime.now()
 
+def delete_post_and_run_callback(post, typemodule):
+    ''' before a post is actually deleted, check if there is a 'pre-delete'
+        callback on this post type, and run that first.  This way, for uploaded
+        images (for instance), the file can be deleted as well. '''
+
+    try:
+        typemodule.delete(json.loads(post.content))
+    except AttributeError as excp:
+        pass
+        # There's no callback for this posttype, which is fine.
+        # most post types will store no external data, and so don't need
+        # to do anything.
+    except Exception as excp:
+        flash(str(excp))
+
+    return post.delete_instance()

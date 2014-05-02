@@ -2,6 +2,7 @@
 
 {% block htmlhead %}
     {{ super() }}
+    {{ linkmacros.static_css('lib/colorpicker/bgrins-spectrum-2c2010c/spectrum.css') }}
 {% endblock %}
 {% block title %}Edit Screen:{{ screen.id }}{% endblock %}
 {% block body %}
@@ -40,7 +41,7 @@
       </div>
       <!-- where the actual saved data happens -->
       <input type="hidden" name="zones" data-bind="value: ko.mapping.toJSON(zones)"/>
-    </div> <!-- panel-body -->  
+    </div> <!-- panel-body -->
   </div>
 </form>
 
@@ -88,7 +89,7 @@
 
         <div class="col-md-6">
           <label>Default Text Color:</label>
-            <input type="color" data-bind="value: color" class="form-control" />
+            <input type="color" data-bind="spectrum: color" class="form-control" />
           <br/>
           <label>Other CSS:</label>
             <textarea name="css" data-bind="value: css" class="form-control"></textarea>
@@ -102,7 +103,7 @@
           </div>
         </div>
 
-      </div> <!-- (zone) /panel-body --> 
+      </div> <!-- (zone) /panel-body -->
     </div> <!-- (zone) /panel -->
   <!-- /ko -->
   </div> <!-- (zones-container) /panel-body -->
@@ -137,6 +138,10 @@
 {% block end_of_page_javascript %}
 {{ super() }}
 {{ linkmacros.static_js('lib/knockout.mapping-latest.js') }}
+{{ linkmacros.static_js('lib/colorpicker/bgrins-spectrum-2c2010c/spectrum.js') }}
+<script>
+//$.fn.spectrum.load=false;
+</script>
 {{ linkmacros.static_js('model_zones.js') }}
 <script type="text/javascript">
 // server specified values:

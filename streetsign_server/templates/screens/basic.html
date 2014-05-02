@@ -4,6 +4,7 @@
 <head>
   <title>Screen</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='screens/main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/bootstrap-wysihtml5/default-styles.css') }}" />
 </head>
 <body>
 <div id="zones" style="position:absolute;top:0;bottom:0;right:0;left:0;background-size:cover;"></div>
@@ -17,27 +18,35 @@
   {{ linkmacros.static_js('screens/basic.js') }}
   {{ linkmacros.static_js('screens/main.js') }}
   <script type="text/javascript" src="{{ url_for('post_types_js') }}"></script>
-
   <script type="text/javascript">
 
-  var SCREEN_DATA={{screen.to_dict() | tojson }};
-  SCREEN_DATA.md5 = "{{screen.md5()}}";
+    var LOCALOPTS={{ request.args | tojson|safe }},
+        SCREEN_DATA={{screen.to_dict() | tojson|safe }},
+        POSTS_URL = "{{ url_for('screens_posts_from_feeds', json_feeds_list='-1') }}";
 
-  {% if screen.background %}
-      BG="url({{url_for('static', filename='user_files/' + screen.background)}})"
-  {% else %}
-      BG="black"
-  {% endif %}
+    SCREEN_DATA.md5 = "{{screen.md5()}}";
 
-  POSTS_URL = "{{ url_for('screens_posts_from_feeds', json_feeds_list='-1') }}";
+    window.SCREEN = new StreetScreen($('#zones'), SCREEN_DATA);
 
-  //var screen_data = $.extend({}, DEFAULTSCREEN, SCREEN);
-  //screen_data.defaults = $.extend({}, DEFAULTSCREEN.defaults, screen_data.defaults);
+    setTimeout(function(){window.SCREEN.start_zones();}, 2000);
 
-  //init_screen(screen_data, '#zones')
-  //setTimeout(start_zones_scrolling, 2000);
-  window.SCREEN = new StreetScreen($('#zones'), SCREEN_DATA);
-  setTimeout(function(){window.SCREEN.start_zones();}, 2000);
+    // automatic housekeeping:
+
+    (function() {
+         function housekeeping() {
+             $.post("{{ url_for('posts_housekeeping') }}");
+         }
+
+         function update_external_sources() {
+             $.post(" {{ url_for('external_data_sources_update_all') }}");
+         }
+
+         housekeeping();
+         update_external_sources();
+
+         setInterval(housekeeping, 3600000); // every hour
+         setInterval(update_external_sources, 60000); // every minute
+     })();
 
   </script>
 {% endblock %}

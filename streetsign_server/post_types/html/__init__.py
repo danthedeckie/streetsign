@@ -24,6 +24,9 @@ HTML / rich text post type.
 
 """
 
+__NAME__ = 'Rich Text'
+__DESC__ = 'HTML / Rich Text Post'
+
 from flask import render_template_string
 import re
 import bleach
@@ -33,7 +36,7 @@ from streetsign_server.post_types import my
 def form(data):
     ''' the form for editing this type of post '''
     # pylint: disable=star-args
-    return render_template_string(my('.form.html'), **data)
+    return render_template_string(my('form.html'), **data)
 
 def safehtml(text):
     ''' used by 'recieve' to clean html,
@@ -41,12 +44,12 @@ def safehtml(text):
 
     return bleach.clean(text, strip=True,
         tags=["div", "span", "b", "i", "u",
-              "em", "ul","li","ol", "a","br",
+              "em", "ul", "li", "ol", "a", "br",
               "code", "blockquote", "strong",
               "small", "big", "img", "table",
               "tr", "td", "th", "thead",
-              "tfoot","h1","h2","h3","h4","h5","h6","p"],
-        attributes=['class','href','alt','src'])
+              "tfoot", "h1", "h2", "h3", "h4", "h5", "h6", "p"],
+        attributes=['class', 'href', 'alt', 'src'])
 
 def safecolor(text, default="#fff"):
     ''' check that a color string is actually a html hex-type color... '''
@@ -65,8 +68,9 @@ def receive(data):
     # TODO: sanify color input.
 
     return {'type': 'html',
+            'owntextcolor': data.get('owntextcolor', False),
             'color': safecolor(data.get('color', False)),
-            'content': safehtml(data.get('content',''))}
+            'content': safehtml(data.get('content', ''))}
 
 def display(data):
     ''' return the data ready for the display js to do stuff with. '''
@@ -74,4 +78,4 @@ def display(data):
 
 def screen_js():
     ''' return the js needed to display this content. '''
-    return my('.screen.js')
+    return my('screen.js')

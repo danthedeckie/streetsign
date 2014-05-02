@@ -24,7 +24,8 @@ Main methods for working with multiple post_types.
 
 '''
 
-from os.path import dirname, basename, splitext, isfile, abspath
+from os.path import dirname, basename, splitext, isfile, abspath, \
+                    join as pathjoin
 from importlib import import_module
 from glob import glob
 import sys
@@ -32,64 +33,64 @@ import inspect
 
 PATH = dirname(__file__)
 
-_editors = {}
+_EDITORS = {}
 
 def path_to_module(path):
     ''' given a path (/var/blah/x.py) return the name of x.py for
         importing (just x) '''
 
-    return splitext(basename(path))[0]
+    #return splitext(basename(path))[0]
+    return basename(dirname(path))
 
-def my(ending, level=1):
-    ''' given '.html', returns (if this is the foobar module)
-        the contents of: /where/this/file/is/foobar.html '''
-
-    with open(splitext(abspath(inspect.getfile(sys._getframe(level))))[0] \
-              + ending,'r') as f:
+def my(filename, level=1): #pylint: disable=invalid-name
+    ''' given a filename, returns the contents of that file in the *same*
+        *directory* as the file which has the 'my' call in it. '''
+    # pylint: disable=protected-access
+    with open(pathjoin(dirname(abspath(inspect.getfile(sys._getframe(level)))) \
+              , filename), 'r') as f:
         return f.read()
 
 def modules():
     ''' a list of all post types modules which can be used/imported '''
 
-    all_list = [ path_to_module(p) for p in glob(PATH + '/*.py') ]
-    all_list.remove('__init__')
+    all_list = [path_to_module(p) for p in glob(PATH + '/*/__init__.py')]
     return all_list
 
 def module_dict(name):
     ''' turns a name (string) into a dict ready for use in importing, '''
 
-    # a bit of a stupid function for now.  I'm sure it'll be more useful later.
+    return {'id': name, 'name': load(name).__NAME__}
 
-    return {'id': name, 'name': name}
-
+_TYPES = []
 def types():
-    ''' return a list of dicts of all post types.
-        TODO: find a way to cache this. '''
-
-    return [ module_dict(m) for m in modules() ]
+    ''' return a list of dicts of all post types.  '''
+    global _TYPES
+    if not _TYPES:
+        _TYPES = [module_dict(m) for m in modules()]
+    return _TYPES
 
 def load(type_name):
     ''' load a module, and return it. (caches in this module) '''
 
-    if type_name in _editors:
-        return _editors[type_name]
+    if type_name in _EDITORS:
+        return _EDITORS[type_name]
 
     #if isfile(PATH + '/' + type_name):
-    e = import_module( 'streetsign_server.post_types.' +  type_name )
-    _editors[type_name] = e
-    return(e)
+    e = import_module('streetsign_server.post_types.' +  type_name)
+    _EDITORS[type_name] = e
+    return e
 
 def receive(posttype, form):
     ''' hand a form object from a request on to the appropriate handler '''
 
     editor = load(posttype)
-    return(editor.receive(form))
+    return editor.receive(form)
 
 def renderer_js(posttype):
     ''' return the javascript for rendering a module's data '''
 
     editor = load(posttype)
-    return(editor.renderer_js())
+    return editor.renderer_js()
 
 def renderers():
     ''' return the javascript for ALL post_types to be rendered. (as a list

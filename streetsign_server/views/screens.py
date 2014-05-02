@@ -32,7 +32,7 @@ from flask import render_template, url_for, request, session, redirect, \
 
 import sqlite3
 from glob import glob
-from os.path import basename
+from os.path import basename, splitext
 import urllib
 from datetime import datetime
 
@@ -40,6 +40,7 @@ import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
 from streetsign_server import app
 from streetsign_server.models import Feed, Post, Screen, by_id
+from streetsign_server.post_types.image import allow_filetype
 
 
 def form_json(name, default):
@@ -77,7 +78,8 @@ def screenedit(screenid):
             screen = Screen().get(Screen.id==int(screenid))
 
         backgrounds = [basename(x) for x in \
-                       glob(app.config['SITE_VARS']['user_dir']+ '*')]
+                       glob(app.config['SITE_VARS']['user_dir']+ '*')
+                       if allow_filetype(x)]
 
     except Screen.DoesNotExist:
         flash('Invalid Screen ID! Screen does NOT exist!')

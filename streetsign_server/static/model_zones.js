@@ -46,6 +46,26 @@ ko.bindingHandlers.chosen = {
     }
 }
 
+// "spectrum" color picker knockout binding:
+
+ko.bindingHandlers.spectrum = {
+    init: function(element, valueAccessor) {
+        var value = valueAccessor(), $el = $(element);
+        $el.val(ko.utils.unwrapObservable(value));
+        $el.spectrum({
+            clickoutFiresChange: true,
+            showInitial: true,
+            showButtons: false,
+            showInput: true,
+            showPalette: true
+            });
+        $el.change(function() { value(this.value); });
+    },
+    update: function(element, valueAccessor) {
+        $(element).val(ko.utils.unwrapObservable(valueAccessor()));
+    }
+}
+
 
 var ScreenModel = function(background, other_settings, css, zones, color, type) {
     var self = this;

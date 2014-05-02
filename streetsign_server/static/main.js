@@ -1,10 +1,9 @@
 ////////////////////////////////////////////////
 // Flashed notices:
-$('#flashed_notices li').click(function(){
+$('#flashed_notices').children('li').click(function(){
     $(this).fadeOut();
 });
-
-$('#flashed_notices > li').delay(15000).fadeOut('slow');
+setTimeout( function () { $('#flashed_notices > li').fadeOut('slow'); }, 15000);
 
 function flash(text) {
     $('#flashed_notices').append($('<li>' + text + ' </li>').click(function(){$(this).fadeOut();}));
@@ -48,10 +47,6 @@ $('a.confirm_ajax_delete').click(function(evt) {
 
 });
 
-// And why not, lets also check if new data needs to be got (which
-// will then happen every time any back end page is checked.)
-$.post('/external_data_sources/');
-
 // focus on username input box when 'login' clicked.
 $('#user_login_button').click(function(){
     setTimeout( function() {
@@ -61,7 +56,7 @@ $('#user_login_button').click(function(){
 
 // hide expired posts, unless cookie says don't.
 
-if ($.cookie('show_past_posts')) {
+if ($.cookie('show_past_posts') === "true") {
     $('.time_past').show();
     $('#show_past_posts').addClass('active');
 } else {
@@ -71,9 +66,19 @@ if ($.cookie('show_past_posts')) {
 $('#show_past_posts').click(function() {
     $('.time_past').toggle();
     $(this).toggleClass('active');
-    $.cookie('show_past_posts', $.cookie('show_past_posts') === true? false:true,
+    $.cookie('show_past_posts', $.cookie('show_past_posts') === "true" ? "false" : "true",
              {"path": "/"});
 });
+
+$('#run_housekeeping').click(function() {
+    $.post(window.HOUSEKEEPING_URL, {}, function(data) {
+        alert("Housekeeping Done! \n" +
+              data.archived + " posts archived. \n" +
+              data.deleted + " posts deleted");
+        }, 'json');
+
+});
+
 
 // and run any js which was inserted by a template, which needs jQuery.
 
@@ -81,4 +86,24 @@ while (jLater.length) {
     jLater.pop()($);
 }
 
+
+
+
+////////////////////////////////
+
+$(document).on('click', '.item_ajax_toggle', function() {
+    var toggle_class = $(this).data('ajaxtoggle'),
+        item = $(this).parents('.item').first().toggleClass(toggle_class),
+        data = {};
+
+    data[$(this).data('name')] = $(this).data('value');
+
+    $.ajax($(this).parents('[data-uri]').data('uri'),
+           { type: $(this).data('ajaxtype'),
+             data: data,
+             error: function() {
+                item.toggleClass(toggle_class);
+                alert('failed to delete!');
+                }})
+});
 

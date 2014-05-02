@@ -76,7 +76,7 @@
           <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown">New <span class="caret"></span></button>
           <ul class="dropdown-menu" role="menu">
           {% for data_type in source_types %}
-            <li><a href="{{ url_for('external_data_source_edit', type=data_type.name) }}">{{ data_type.name}}</a></li>
+            <li><a href="{{ url_for('external_data_source_edit', type=data_type.id) }}">{{ data_type.name}}</a></li>
           {% endfor %}
           </ul>
           </div>

@@ -4,22 +4,25 @@
     presentation to actually control other machines or processes.
 '''
 
+__NAME__ = 'Web hook'
+__DESC__ = 'Rather than display data, call an external HTTP hook. (Advanced) '''
+
 from flask import render_template_string
 
 from streetsign_server.post_types import my
 
 def form(data):
     ''' the form for editing this type of post '''
-    return render_template_string(my('.form.html'), **data) #pylint: disable=star-args
+    return render_template_string(my('form.html'), **data) #pylint: disable=star-args
 
 def receive(data):
     ''' When the data comes in from the form, what parts do we actually want
         to save? '''
 
     return {'type':'ajax_hit',
-            'render_url': data.get('render_url',''),
-            'display_url': data.get('display_url',''),
-            'hide_url': data.get('hide_url',''),
+            'render_url': data.get('render_url', ''),
+            'display_url': data.get('display_url', ''),
+            'hide_url': data.get('hide_url', ''),
             'content':'none'
             }
 
@@ -29,4 +32,4 @@ def display(data): #pylint: disable=unused-argument
 
 def screen_js():
     ''' return the javascript for doing the dirty work. '''
-    return my('.screen.js')
+    return my('screen.js')

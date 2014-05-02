@@ -47,7 +47,7 @@ DB = SqliteDatabase(None, threadlocals=True)
 
 __all__ = ['DB', 'user_login', 'user_logout', 'get_logged_in_user',
            'User', 'Group', 'Post', 'Feed', 'FeedPermission', 'UserGroup',
-           'ConfigVar', 'Screen',
+           'ConfigVar', 'Screen', 'config_var',
            'init', 'create_all', 'by_id']
 
 
@@ -110,6 +110,10 @@ class DBModel(Model):
     class Meta(object):
         ''' store DB info '''
         database = DB
+
+class PermissionDenied(Exception):
+    ''' for when an unauthorized user tries to do something. '''
+    pass
 
 '''
 --------------------------------------------------------------------------------
@@ -300,7 +304,7 @@ class Feed(DBModel):
     name = CharField(default='New Feed')
 
     #: which types of posts are allowed in this feed (comma,separated)?
-    post_types = CharField(default='')
+    post_types = CharField(default='text,html,image')
 
     def __repr__(self):
         return '<Feed:' + self.name + '>'
@@ -611,6 +615,20 @@ class Post(DBModel):
         else:
             return 'now'
 
+    def publish(self, user, state=True):
+        ''' set the published status, published & date of this post.
+            use state=False to unpublish '''
+        if self.feed.user_can_publish(user):
+            self.published = state
+            self.publisher = user if state else None
+            self.publish_date = datetime.now() if state else None
+            self.save()
+            return True
+        else:
+            raise PermissionDenied("You don't have permission to publish"
+                                   " posts on this feed.")
+
+
 
 class ExternalSource(DBModel):
     ''' How do we pull data in from external sources? '''
@@ -719,5 +737,19 @@ Misc
 class ConfigVar(DBModel):
     ''' place to store site-wide front-end-editable settings. '''
     id = CharField(primary_key=True)
-    value = CharField(null=True)
+    value = CharField(null=True) # as JSON!
     description = CharField(default="Setting")
+
+def config_var(key, default_value):
+    ''' a 'get_or_create' type function for retrieving database ConfigVar
+        values, or the default value it it hasn't been set.
+        NOTE: returns the *value*, and NOT the database record!
+        '''
+    try:
+        return json.loads(ConfigVar.get(id=key).value)
+    except ConfigVar.DoesNotExist:
+        try:
+            return default_value
+        except peewee.IntegrityError:
+            # ha! we have a race! and you lose...
+            return json.loads(ConfigVar.get(id=key).value)

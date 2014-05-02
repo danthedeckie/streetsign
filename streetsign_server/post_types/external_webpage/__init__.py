@@ -24,6 +24,9 @@ Display an External Web Page embedded in a screen.
 
 """
 
+__NAME__ = 'External Web Page'
+__DESC__ = 'Display an External web page as a post'
+
 from flask import render_template_string
 
 from streetsign_server.post_types import my
@@ -31,18 +34,16 @@ from streetsign_server.post_types import my
 def form(data):
     ''' the form for editing this type of post '''
     # pylint: disable=star-args
-    return render_template_string(my('.form.html'), **data)
+    return render_template_string(my('form.html'), **data)
 
 def receive(data):
     ''' turn the contents posted back to us from the form into
         a dict which can be JSON'd by the system, and dumped as
         text into the database. '''
-    #############
-    # TODO: sanify color input.
 
     return {'type': 'external_webpage',
-            'content': data.get('url',''),
-            'url': data.get('url','')}
+            'content': data.get('url', ''),
+            'url': data.get('url', '')}
 
 def display(data):
     ''' return the data ready for the display js to do stuff with. '''
@@ -50,4 +51,4 @@ def display(data):
 
 def screen_js():
     ''' return the js needed to display this content. '''
-    return my('.screen.js')
+    return my('screen.js')

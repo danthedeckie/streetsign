@@ -6,9 +6,10 @@ body {
     padding-top: 70px;
     height: 100%;
 }
+
 #flashed_notices {
     position: absolute;
-    top: 2em;
+    top: 50px;
     right: 0;
     padding: 1em;
 }
@@ -123,6 +124,13 @@ input.third { max-width: 28%;}
     opacity: 0.6;
 }
 
+.published .onlyunpublished {
+    display: none;
+}
+.unpublished .onlypublished {
+    display: none;
+}
+
 .time_future, .time_future a {
     color: #349;
 }
@@ -185,4 +193,7 @@ ul.optionrow > li:last-of-type {
 
 .chzn-container input {
     min-height: 2em;
+}
+h1, h2, h3 {
+    display: inline; /* allows buttons next to titles... */
 }

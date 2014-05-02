@@ -1,7 +1,7 @@
 <div class="cf"></div>
 <label>Contents: (rich text/HTML) </label><br/>
-<label>Default Color:<input type="color" name="color" value="{{color}}"/></label>
-
+<label>Custom Text Color:<input type="checkbox" name="owntextcolor" value="1" {{ 'checked' if owntextcolor }}></label>
+<label id="color_input" class="{{ 'hidden' if not owntextcolor }}">Color:<input type="color" name="color" value="{{color}}"/></label>
 <div id="content-toolbar" style="display:none;" class="btn-group">
   <a data-wysihtml5-command="bold" class="btn btn-default"><b>B</b></a>
   <a data-wysihtml5-command="italic" class="btn btn-default"><i>i</i></a>
@@ -12,10 +12,15 @@
 
 $( function() {
     $('input[type=color]').spectrum({
-       clickoutFiresChange: true
+       clickoutFiresChange: true,
+       showInput: true,
+       showPalette: true,
+       showInitial: true,
+       showButtons: false
     });
 
     $("#contenttextarea").wysihtml5({
+        "stylesheets": [ '/static/lib/bootstrap-wysihtml5/default-styles.css' ],
         //"font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
         "emphasis": true, //Italics, bold, etc. Default true
         "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
@@ -23,6 +28,10 @@ $( function() {
         "image": true, //Button to insert an image. Default true,
         "color": true //Button to change color of font  
     });
+
+    $('input[name=owntextcolor]').change(function(){
+        $('#color_input').toggleClass('hidden');
+        });
 
 });
 </script>

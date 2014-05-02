@@ -60,13 +60,11 @@ var zone_types = {
         },
         stop: function (post, cb){
             "use strict";
-
             post.el.style.opacity = 0;
             setTimeout( function () {
                 //post.el.style.display = 'none';
                 cb && cb();
             }, post.zone.fadetime);
-
         }
     },
    scroll: {
@@ -78,7 +76,7 @@ var zone_types = {
             var css;
 
             // create a new stylesheet with the @keyframes defined for
-            // movement the keyframes animation is named 
+            // movement the keyframes animation is named
             // 'slide_<zoneid>_<postid>'
             // TODO   ^^^^^^^^
 
@@ -103,7 +101,7 @@ var zone_types = {
                                + " translateX("+ post.zone.width + "px)"
                     + " } to { "+prefix+"transform:"
                                + " translateX(-"+ post.width + "px)}}"));
-                               
+
                 console.log('new keyframe anim('+post.id+'):' + post.zone.width
                             + ' => -' + post.width);
 
@@ -127,7 +125,7 @@ var zone_types = {
             // give it a fraction of a second to stablilse the DOM,
             // then start the animation.
 
-            //setTimeout( function () { 
+            //setTimeout( function () {
                 post.el.style.opacity = "1.0";
 
                 css = (("slide_" + post.id + " ")
@@ -153,7 +151,7 @@ var zone_types = {
                 post.el.style.webkitAnimation = "";
                 post.el.style.mozAnimation = "";
                 post.el.style.animation = "";
-                
+
                 post.el.style.opacity = 0;
                 //post.scroll_stylesheet.remove()
                 //delete post.scroll_stylesheet;

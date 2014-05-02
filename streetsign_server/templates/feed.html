@@ -15,91 +15,102 @@
 </thead>
 <tbody>
 {% for post in feed.posts|sort(attribute="active_end") %}
-    <tr class="time_{{- post.active_status() }} {{ 'un' if not post.published}}published" >
+    <tr class="item time_{{- post.active_status() }} {{ 'un' if not post.published}}published"
+     data-uri="{{ url_for('postpage', postid=post.id) }}">
         <td>{{ linkmacros.post(post) }}</td>
         <td>{{ linkmacros.user(post.author) }}</td>
         <td><b>Written:</b> {{ post.write_date.date() }}<br/>
             <b>Lifetime:</b> {{ post.active_status() }}</td>
         <td>{{ 'Published' if post.published }}
             {% if feed.user_can_publish(user) %}
-                <form method="POST" action="{{ url_for('postpage',postid=post.id) }}" >
-                    <input type="hidden" name="action" value="
-                        {{- 'unpublish' if post.published else 'publish' }}">
-                    <input class="btn btn-default" type="submit" value="
-                        {{- 'Unpublish' if post.published else 'Publish' }}">
-                </form>
+            <span class="onlyunpublished">
+                <button class="btn btn-default item_ajax_toggle"
+                        data-ajaxtype="POST"
+                        data-ajaxtoggle="published unpublished" data-name="action" data-value="publish">Publish</button>
+            </span>
+            <span class="onlypublished">
+                <button class="btn btn-default item_ajax_toggle"
+                        data-ajaxtype="POST"
+                        data-ajaxtoggle="published unpublished" data-name="action" data-value="unpublish">UnPublish</button>
+            </span>
             {% endif %}
         </td>
         <td>{% if (post.published and feed.user_can_publish(user)) or
                   ((not post.published) and feed.user_can_write(user)) %}
-            <form method="POST" action="{{ url_for('postpage',postid=post.id) }}" >
-            <input type="hidden" name="action" value="delete" />
-            <input class="delbutton confirm_delete" type="submit" value="&times;" /></form>
-            {% endif %}</td>
+            <button data-ajaxtype="POST" data-ajaxtoggle="hidden" data-name="action" data-value="delete"
+                    class="item_ajax_toggle btn delbutton confirm_delete">&times;</button>
+           {% endif %}</td>
     </tr>
 {% endfor %}
 </tbody>
 </table>
 {% if user.is_admin %}
-<form method="POST" id="users_and_groups" class="form">
-<label for="post_types">What kind of new posts are allowed here?</label><br/>
-<select multiple autocomplete="off" data-placeholder="blank means all types" class="chosen" name="post_types">
-  {% for type in all_posttypes %}
-    <option {{ "selected" if type.id in feed.post_types_as_list() }} value="{{type.id}}">{{type.name}}</option>
-  {% endfor %}
-</select>
-<hr/>
+    <form method="POST" id="users_and_groups" class="form">
+    <label for="post_types">What kind of new posts are allowed here?</label><br/>
+    <select multiple autocomplete="off" data-placeholder="blank means all types" class="chosen" name="post_types">
+      {% for type in all_posttypes %}
+        <option {{ "selected" if type.id in feed.post_types_as_list() }} value="{{type.id}}">{{type.name}}</option>
+      {% endfor %}
+    </select>
+    <hr/>
 
-<input type="hidden" name="action" value="edit" />
-<div class="autowidth">
-<h2>Permissions for this feed.</h2>
-<div class="col-md-3"><div class="panel panel-default">
-    <div class="panel-heading"><h3 class="panel-title">Author Users:</h3>
-</div>
-<div class="panel-body">
-    {{ widgets.userselect("authors", allusers, feed.authors()) }}
-</div>
-</div></div>
-<div class="col-md-3"><div class="panel panel-default">
-    <div class="panel-heading"><h3 class="panel-title">Publisher Users:</h3>
-</div>
-<div class="panel-body">
-    {{ widgets.userselect("publishers", allusers, feed.publishers()) }}
-</div>
+    <input type="hidden" name="action" value="edit" />
+    <div class="autowidth">
+    <h2>Permissions for this feed.</h2>
+    <div class="col-md-3"><div class="panel panel-default">
+        <div class="panel-heading"><h3 class="panel-title">Author Users:</h3>
+    </div>
+    <div class="panel-body">
+        {{ widgets.userselect("authors", allusers, feed.authors()) }}
+    </div>
+    </div></div>
+    <div class="col-md-3"><div class="panel panel-default">
+        <div class="panel-heading"><h3 class="panel-title">Publisher Users:</h3>
+    </div>
+    <div class="panel-body">
+        {{ widgets.userselect("publishers", allusers, feed.publishers()) }}
+    </div>
 
-</div></div>
-<div class="col-md-3"><div class="panel panel-default">
-    <div class="panel-heading"><h3 class="panel-title">Author Groups:</h3>
-</div>
-<div class="panel-body">
-    {{ widgets.groupselect("author_groups", allgroups, feed.author_groups()) }}
-</div>
-</div></div>
-<div class="col-md-3"><div class="panel panel-default">
-    <div class="panel-heading"><h3 class="panel-title">Publisher Groups:</h3>
-</div>
-<div class="panel-body">
-    {{ widgets.groupselect("publisher_groups", allgroups, feed.publisher_groups()) }}
-</div>
-</div></div>
-<input type="submit" value="Save" class="btn btn-primary"/>
-</form>
+    </div></div>
+    <div class="col-md-3"><div class="panel panel-default">
+        <div class="panel-heading"><h3 class="panel-title">Author Groups:</h3>
+    </div>
+    <div class="panel-body">
+        {{ widgets.groupselect("author_groups", allgroups, feed.author_groups()) }}
+    </div>
+    </div></div>
+    <div class="col-md-3"><div class="panel panel-default">
+        <div class="panel-heading"><h3 class="panel-title">Publisher Groups:</h3>
+    </div>
+    <div class="panel-body">
+        {{ widgets.groupselect("publisher_groups", allgroups, feed.publisher_groups()) }}
+    </div>
+    </div></div>
+    <input type="submit" value="Save" class="btn btn-primary"/>
+    </form>
+
 {% else %}
-<div class="leftside">
-<h3>Authors who can post here:</h3>
-{% for u in feed.authors() %}
-<ul class="list">
-  <li>{{ linkmacros.user(u) }}</li>
-{% endfor %}
-</div>
-<div class="rightside">
-<h3>Publishers</h3>
-<ul class="list">
-{% for u in feed.publishers() %}
-  <li>{{ linkmacros.user(u) }}</li>
-{% endfor %}
-</ul>
-</div>
+
+    <div class="leftside">
+
+        <h3>Authors who can post here:</h3>
+        <ul class="list">
+        {% for u in feed.authors() %}
+          <li>{{ linkmacros.user(u) }}</li>
+        {% endfor %}
+        </ul>
+
+    </div>
+    <div class="rightside">
+
+        <h3>Publishers</h3>
+        <ul class="list">
+        {% for u in feed.publishers() %}
+          <li>{{ linkmacros.user(u) }}</li>
+        {% endfor %}
+        </ul>
+
+    </div>
 {% endif %}
 <div class="cf"></div>
 </div>

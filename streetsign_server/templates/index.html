@@ -34,7 +34,7 @@
       </button>
       <a class="navbar-brand" href="{{ url_for('index') }}">{{ g.site_vars.site_title }}:{{ display_title }}</a>
     </div> <!-- header... -->
-    
+
   <div class="collapse navbar-collapse">
     {% block nav %}
     <ul class="nav navbar-nav">
@@ -96,20 +96,19 @@
 <h2>Log In</h2>
 </div>
 <div class="modal-body form-horizontal" role="form">
-<!-- <a style="padding:0.2em;color:white;float:left"href="#" id="login_box_close" class="delbutton">X</a>-->
-<div class="form-group">
-<label class="col-sm-2 control-label" for="username">Name:</label>
-    <div class="col-sm-10">
-    <input name="username" placeholder="Your user name..." class="form-control" />
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="username">Name:</label>
+        <div class="col-sm-10">
+            <input name="username" placeholder="Your user name..." class="form-control" />
+        </div>
     </div>
-</div>
-<div class="form-group">
-  <label class="col-sm-2 control-label" for="password">Password:</label>
-  <div class="col-sm-10">
-    <input name="password" type="password" placeholder="password" class="form-control" /><br />
-    <input type="hidden" name="from" value="{{ request.endpoint }}" />
-  </div>
-</div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="password">Password:</label>
+        <div class="col-sm-10">
+            <input name="password" type="password" placeholder="password" class="form-control" /><br />
+            <input type="hidden" name="from" value="{{ request.endpoint }}" />
+        </div>
+    </div>
 </div>
 <div class="modal-footer">
     <input class="btn btn-primary" type="submit" value="Log in" />
@@ -118,7 +117,7 @@
 </div> </div> </div>
 <footer>
 StreetSign BETA<br/>
-&copy; 2013. an <a href="http://omnivision.om.org/">OMNIvision</a> Project.<br/>
+&copy; 2013-2014. an <a href="http://omnivision.om.org/">OMNIvision</a> Project.<br/>
 This project released under the <a href="https://www.gnu.org/licenses/gpl.html">GPL</a>.<br/>
 <a href="https://bitbucket.org/dfairhead/streetsign-server/overview">Currently still in development/TESTING!</a><br/>
 Documentation is at <a href="http://streetsign.readthedocs.org">streetsign.readthedocs.org</a>.<br/>
@@ -129,6 +128,12 @@ Documentation is at <a href="http://streetsign.readthedocs.org">streetsign.readt
   {{ linkmacros.static_js('lib/knockout-2.2.1.js') }}
   {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
   {{ linkmacros.static_js('lib/jquery.cookie.js') }}
+  <script type="text/javascript">
+  {# Trying to keep hardcoded URLS out of javascript files,
+     so these are here, rather than in main.js. #}
+  window.HOUSEKEEPING_URL="{{ url_for('posts_housekeeping') }}";
+  $.post("{{ url_for('external_data_sources_update_all') }}");
+  </script>
   {{ linkmacros.static_js('main.js') }}
 {% endblock %}
 </body>

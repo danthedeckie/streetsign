@@ -100,7 +100,7 @@ function any_relevent_restrictions(post) {
         if (restriction_relevant(now, post.time_restrictions[i])) {
             if (!thispost.time_restrictions_show) {
                 return true;
-            } 
+            }
         }
     }
     return post.time_restrictions_show;
@@ -123,8 +123,8 @@ function reduce_font_size_to_fit(inner, outer) {
     var i = 100;
     var height = inner.height();
 
-    if ( height > zone_height ) {
-        while(i>1){ 
+    if (height > zone_height) {
+        while(i > 1){
             height = inner.height();
             i = i / 2;
             if (height < zone_height) {

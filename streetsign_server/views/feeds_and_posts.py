@@ -24,31 +24,31 @@
 
 """
 
-
-
 from flask import render_template, url_for, request, redirect, \
                   flash, json, jsonify
-import streetsign_server.user_session as user_session
-import streetsign_server.post_types as post_types
 import peewee
 from datetime import datetime, timedelta
+
+import streetsign_server.user_session as user_session
+import streetsign_server.post_types as post_types
 from streetsign_server.views.utils import PleaseRedirect, getint, getbool, getstr
 
 from streetsign_server.logic.feeds_and_posts import try_to_set_feed, \
                                       if_i_cant_write_then_i_quit, \
                                       can_user_write_and_publish, \
-                                      post_form_intake
+                                      post_form_intake, \
+                                      delete_post_and_run_callback
 
 from streetsign_server import app
 from streetsign_server.models import User, Group, Feed, Post, ExternalSource, \
-                                     by_id
+                                     by_id, config_var, PermissionDenied
 
 import streetsign_server.external_source_types as external_source_types
 
 ####################################################################
 # Feeds & Posts:
 
-@app.route('/feeds', methods=['GET', 'POST'])
+@app.route('/feeds/', methods=['GET', 'POST'])
 def feeds():
     ''' the back end list of feeds. '''
 
@@ -103,7 +103,6 @@ def feedpage(feedid):
         if action == 'edit':
             feed.name = request.form.get('title', feed.name).strip()
 
-
             inlist = request.form.getlist
 
             feed.post_types = ', '.join(inlist('post_types'))
@@ -116,6 +115,11 @@ def feedpage(feedid):
             feed.save()
             flash('Saved')
         elif action == 'delete':
+
+            for post in feed.posts:
+                post_type_module = post_types.load(post.type)
+                delete_post_and_run_callback(post, post_type_module)
+
             feed.delete_instance(True, True) # cascade/recursive delete.
             flash('Deleted')
             return redirect(url_for('feeds'))
@@ -134,7 +138,7 @@ def feedpage(feedid):
 # Posts:
 
 
-@app.route('/posts')
+@app.route('/posts/')
 def posts():
     ''' (HTML) list of ALL posts. (also deletes broken posts, if error) '''
 
@@ -144,7 +148,12 @@ def posts():
         user = User()
 
     try:
-        return render_template('posts.html', posts=Post.select(), user=user)
+        if user.is_admin:
+            return render_template('posts.html', posts=Post.select(), user=user)
+        else:
+            return render_template('posts.html',
+                                   posts=Post.select() \
+                                             .where(Post.status==0), user=user)
     except Feed.DoesNotExist as e:
         # Ah. Database inconsistancy! Not good, lah.
         ps = Post.raw('select post.id from post'
@@ -154,7 +163,12 @@ def posts():
             p.delete_instance()
         flash('Cleaned up old posts...')
 
-    return render_template('posts.html', posts=Post.select(), user=user)
+    if user.is_admin:
+        return render_template('posts.html', posts=Post.select(), user=user)
+    else:
+        return render_template('posts.html',
+                               posts=Post.select()\
+                                         .where(Post.status == 0), user=user)
 
 @app.route('/posts/new/<int:feed_id>', methods=['GET', 'POST'])
 def post_new(feed_id):
@@ -202,7 +216,7 @@ def post_new(feed_id):
     else: # POST. new post!
         post_type = request.form.get('post_type')
         try:
-            editor = post_types.load(post_type)
+            post_type_module = post_types.load(post_type)
         except:
             flash('Sorry! invalid post type.')
             return redirect(request.referrer)
@@ -218,7 +232,7 @@ def post_new(feed_id):
 
             if_i_cant_write_then_i_quit(post, user)
 
-            post_form_intake(post, request.form, editor)
+            post_form_intake(post, request.form, post_type_module)
 
         except PleaseRedirect as e:
             flash(str(e.msg))
@@ -239,7 +253,7 @@ def postpage(postid):
 
     try:
         post = Post.get(Post.id == postid)
-        editor = post_types.load(post.type)
+        post_type_module = post_types.load(post.type)
         user = user_session.get_user()
 
     except Post.DoesNotExist:
@@ -248,79 +262,113 @@ def postpage(postid):
 
     if request.method == 'POST':
         try:
-            # if the user is allowed to set the feed to what they've
-            # requested, then do it.
-
-            post.feed = try_to_set_feed(post, request.form, user)
-
             # check for write permission, and if the post is
             # already published, publish permission.
 
             if_i_cant_write_then_i_quit(post, user)
+
+            # if the user is allowed to set the feed to what they've
+            # requested, then do it.
+
+            post.feed = try_to_set_feed(post,
+                                        request.form.get('post_feed', False),
+                                        user)
 
         except PleaseRedirect as e:
             flash(str(e.msg))
             redirect(e.url)
 
         # if it's a publish or delete request, handle that instead:
-        DO = request.form.get('action', 'edit')
-        if DO == 'delete':
-            post.delete_instance()
+        action = request.form.get('action', 'edit')
+
+        if action == 'delete':
+            # don't need extra guards, as if_i_cant... deals with it above
+            delete_post_and_run_callback(post, post_type_module)
             flash('Deleted')
-            return redirect(request.referrer)
-        elif DO == 'publish':
-            if post.feed.user_can_publish(user):
-                post.published = True
-                post.publisher = user
-                post.publish_date = datetime.now()
-                post.save()
-                flash('Published')
-            else:
-                flash('Sorry, You do NOT have publish' \
-                       ' permissions on this feed.')
-            return redirect(request.referrer)
-        elif DO == 'unpublish':
-            if post.feed.user_can_publish(user):
-                post.published = False
-                post.publisher = None
-                post.publish_date = None
-                post.save()
-                flash('Unpublished!')
-            else:
+        elif action == 'publish':
+            try:
+                post.publish(user)
+                flash("Published")
+            except PermissionDenied:
+                flash("Sorry, you don't have permission to publish"
+                      " posts in this feed.")
+        elif action == 'unpublish':
+            try:
+                post.publish(user, False)
+                flash("Published!")
+            except PermissionDenied:
                 flash('Sorry, you do NOT have permission' \
                        ' to unpublish on this feed.')
+
+        if action not in ('edit', 'update'):
             return redirect(request.referrer)
 
         # finally get around to editing the content of the post...
         try:
-            post_form_intake(post, request.form, editor)
-
+            post_form_intake(post, request.form, post_type_module)
             post.save()
             flash('Updated.')
-        except:
+        except Exception as e:
             flash('invalid content for this data type!')
+            flash(str(e))
 
     # Should we bother displaying 'Post' button, and editable controls
     # if the user can't write to this post anyway?
 
-    can_write, can_publish = can_user_write_and_publish(user, post)
+    #can_write, can_publish = can_user_write_and_publish(user, post)
 
     return render_template('post_editor.html',
                            post=post,
                            current_feed=post.feed.id,
                            feedlist=user.writeable_feeds(),
                            user=user,
-                           form_content=editor.form(json.loads(post.content)))
+                           form_content=post_type_module.form(json.loads(post.content)))
 
 @app.route('/posts/edittype/<typeid>')
 def postedit_type(typeid):
     ''' returns an editor page, of type typeid '''
 
-    editor = post_types.load(typeid)
+    post_type_module = post_types.load(typeid)
 
     return render_template('post_type_container.html',
                            post_type=typeid,
-                           form_content=editor.form(request.form))
+                           form_content=post_type_module.form(request.form))
+
+
+@app.route('/posts/housekeeping', methods=['POST'])
+def posts_housekeeping():
+    ''' goes through all posts, move 'old' posts to archive status,
+        delete reeeeealy old posts. '''
+
+    now = datetime.now()
+    archive_time = now - timedelta(days=config_var('posts.archive_after_days', 7))
+    delete_time = now - timedelta(days=config_var('posts.delete_after_days', 30))
+
+    # first delete really old posts:
+
+    delete_count = 0
+    archive_count = 0
+
+    if config_var('posts.delete_when_old', True):
+        for post in Post.select().where(Post.active_end < delete_time):
+            delete_post_and_run_callback(post, post_types.load(post.type))
+            delete_count += 1
+
+    # next set old-ish posts to archived:
+
+    if config_var('posts.archive_when_old', True):
+        archive_count = Post.update(status=2) \
+                            .where((Post.active_end < archive_time) &
+                                   (Post.status != 2)) \
+                            .execute()
+
+    # And done.
+
+    return jsonify({"deleted": delete_count,
+                    "archived": archive_count,
+                    "delete_before": delete_time,
+                    "archive_before": archive_time,
+                    "now": now})
 
 ###############################################################
 
@@ -460,10 +508,10 @@ def external_source_run(source_id):
         for fresh_data in new_posts:
             post = Post(type=fresh_data.get('type', 'html'), \
                         author=source.post_as_user)
-            editor = post_types.load(fresh_data.get('type', 'html'))
+            post_type_module = post_types.load(fresh_data.get('type', 'html'))
 
             post.feed = source.feed
-            post_form_intake(post, fresh_data, editor)
+            post_form_intake(post, fresh_data, post_type_module)
             post.active_start = source.current_lifetime_start()
             post.active_end = source.current_lifetime_end()
             post.display_time = source.display_time
@@ -482,11 +530,9 @@ def external_source_run(source_id):
     return 'Done!'
 
 
-# NOTE! This address is HARD CODED into some of the screen and back end .js
-# files.  If you change here, change there! (This isn't ideal, of course)
-
 @app.route('/external_data_sources/', methods=['POST'])
 def external_data_sources_update_all():
     ''' update all external data sources. '''
     sources = [x[0] for x in ExternalSource.select(ExternalSource.id).tuples()]
     return json.dumps([(external_source_run(s), s) for s in sources])
+
