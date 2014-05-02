@@ -24,6 +24,10 @@ Each 'zone' is a block in your Screen which can display Posts from multiple Feed
 The usual layout is a scrolling "headlines" zone at the bottom, a "date and time" zone
 at the top, and a textual news zone on one side, and pictures on the other.
 
+.. image:: images/normal-feed-layout.png
+   :width: 40%
+   :alt: Example of screen layout
+
 The reason that each zone can show multiple feeds is so that you can separate
 your data "semantically".  You
 can have a "Campus News" feed, a "Staff-only" feed, a "World News" feed, a
@@ -71,6 +75,13 @@ Here are all the options, and how to use them:
 Aspect Ratio
 ~~~~~~~~~~~~
 
+By default each screen will display at 'full screen', stretching all the zones out to fill
+the screen.  This is usually what you want, but not always.
+
+.. image:: images/normal-feed-layout-live.png
+   :width: 40%
+   :alt: Example of screen layout, actually live
+
 ``forceaspect`` lets you force the aspect ratio of the screen.  This will usually end up
 letterboxing on the screen.  This is really useful when you are using the same Screen
 on 4:3 projectors as well as 16:9 displays, or when you are testing / designing a view
@@ -79,6 +90,10 @@ for one aspect ratio while using a screen with a different one ::
     http://streetsign-server/screens/basic/Default?forceaspect=1.7777
 
 for instance will force the aspect ratio to 1.7777 - which is 16:9.
+
+.. image:: images/normal-feed-layout-live-169.png
+   :width: 40%
+   :alt: Example of screen layout, forced to 16:9 aspect ratio
 
 By default, the picture will then be centered vertically inside the browser window.
 
