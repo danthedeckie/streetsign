@@ -114,22 +114,33 @@ function reload_page() {
 
 function reduce_font_size_to_fit(inner, outer) {
     'use strict';
-    // reduce fontsize until inner.height() < outer.height()...
+    // reduce fontsize until the inner fits within outer.
+    // if it's a scrolling zone, then assume almost infinite width...
 
     var height = 0;
+    var width = 0;
     var zone_height = $(outer).height();
+    var zone_width = $(outer).width();
     var i = 100;
 
-    height = inner.height();
+    if (outer[0].className.contains("scroll")) {
+        zone_width = 900000;
+    }
 
-    if ( height > zone_height ) {
-        for (i=100; i>10;i-=3){
+    height = inner.height();
+    width = inner.width();
+
+    if ((height > zone_height) || (width > zone_width)) {
+        for (i=100; i>10; i-=3){
 
             height = inner.height();
-            if (height <= zone_height) {
+            width = inner.width();
+
+            if ((height <= zone_height) && (width <= zone_width)) {
                 console.log ('reducing font size to ' + i + '%');
                 break;
             }
+            console.log(i);
             inner.css('font-size', i + '%');
         }
     }
