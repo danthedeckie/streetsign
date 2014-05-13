@@ -4,6 +4,7 @@
 - API and other 'public' documentation.
 - Unit tests
 - reworking animation in screens display to use CSS3 keyframe animations, and much less 'janky' callbacks, etc. (dev branch)
+- RSS "output" of feeds, so mobiles(etc) can subscribe.
 
 # Bugs:
 

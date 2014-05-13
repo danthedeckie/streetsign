@@ -25,9 +25,11 @@
 """
 
 from flask import render_template, url_for, request, redirect, \
-                  flash, json, jsonify
+                  flash, json, jsonify, make_response
 import peewee
 from datetime import datetime, timedelta
+from feedformatter import Feed as RSSFeed
+import bleach
 
 import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
@@ -131,6 +133,63 @@ def feedpage(feedid):
                            allusers=User.select(),
                            allgroups=Group.select()
                           )
+
+
+@app.route('/feeds/rss/<ids_raw>')
+def feedsrss(ids_raw):
+    ''' get a bunch of feeds posts as an RSS stream '''
+
+    ids = []
+    feed_names = []
+
+    for i in ids_raw.split(','):
+        try:
+            feedid = int(i)
+            if feedid in ids:
+                continue
+
+            feed = Feed.get(id=feedid)
+            ids.append(feedid)
+            feed_names.append(feed.name)
+        except ValueError:
+            continue
+        except Feed.DoesNotExist:
+            continue
+
+    time_now = datetime.now()
+    posts = [p for p in \
+             Post.select().join(Feed)
+             .where((Feed.id << ids)
+                   &(Post.status == 0)
+                   &(Post.active_start < time_now)
+                   &(Post.active_end > time_now)
+                   &(Post.published)
+                   )]
+
+    feed = RSSFeed()
+
+    feed.feed["title"] = ",".join(feed_names)
+    feed.feed["link"] = url_for('feeds')
+    feed.feed["description"] = "Posts from " + (','.join(feed_names))
+
+    for post in posts:
+        contents = json.loads(post.content)
+        cleantext = bleach.clean(contents["content"], tags=[], strip=True)
+        if len(cleantext) > 20:
+            cleantext = cleantext[0:20] + "..."
+
+        item = {
+            "title": cleantext,
+            "description": contents["content"],
+            "guid": str(post.id),
+
+            }
+        feed.items.append(item)
+
+    resp = make_response(feed.format_rss2_string())
+    resp.headers["Content-Type"] = "application/xml"
+
+    return resp
 
 
 

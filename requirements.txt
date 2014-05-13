@@ -5,6 +5,7 @@ peewee
 flask-peewee
 
 feedparser
+feedformatter
 bleach
 
 # for passwords:
