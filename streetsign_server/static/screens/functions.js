@@ -123,7 +123,7 @@ function reduce_font_size_to_fit(inner, outer) {
     var zone_width = $(outer).width();
     var i = 100;
 
-    if (outer[0].className.contains("scroll")) {
+    if (outer[0].className.indexOf("scroll")!==-1) {
         zone_width = 900000;
     }
 
