@@ -126,7 +126,7 @@ function reduce_font_size_to_fit(inner, outer) {
     var i = 100;
     var height = inner.height();
     var width = inner.width();
-    var scrolling = outer[0].className.contains("scroll");
+    var scrolling = (outer[0].className.indexOf("scroll") !== -1);
 
     if (scrolling) {
         zone_width = 900000;
