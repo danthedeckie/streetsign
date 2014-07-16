@@ -74,6 +74,8 @@ var zone_types = {
             var stylesheet,
                 prefix = "",
                 css,
+                post_width = post.el.scrollWidth,
+                total_distance = post.zone.width + post_width,
                 current_left = post.zone.width,
                 end_left = 0 - post.width,
                 start_time = null,
@@ -84,13 +86,15 @@ var zone_types = {
                     progress = (timestamp - start_time);
 
                     if (current_left > end_left) {
-                        new_left = ((post.zone.width + post.width ) / post.display_time) * (post.display_time - progress) - post.width;
+                        new_left = (total_distance / post.display_time) * (post.display_time - progress) - post_width;
                         if (new_left < current_left -1) {
                             current_left = new_left;
                         } else if (new_left > current_left) {
                             return;
                         }
                         post.el.style.left = current_left + 'px';
+                        //requestAnimationFrame(mover);
+                        //setTimeout(function(){requestAnimationFrame(mover)},1000);
                         requestAnimationFrame(mover);
                     }
                 });
@@ -100,6 +104,7 @@ var zone_types = {
             // gets an incorrect value...
 
             post.width = post.el.scrollWidth;
+
             requestAnimationFrame(mover);
 
             post.el.style.display = 'block';
@@ -114,10 +119,10 @@ var zone_types = {
         stop: function (post, cb) {
             "use strict";
 
-            post.zone.el.style.opacity = 0;
+            //post.zone.el.style.opacity = 0;
 
             setTimeout( function () {
-                post.el.style.display = 'none';
+                //post.el.style.display = 'none';
 
                 post.el.style.webkitAnimation = "";
                 post.el.style.mozAnimation = "";
