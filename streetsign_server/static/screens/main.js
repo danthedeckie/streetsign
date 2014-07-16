@@ -181,10 +181,10 @@ Zone.prototype = {
 
         if (post.id === this.current_post.id) {
             // same post!
-            console.log('only this post is available');
+            console.log(this.name + ' | only this post is available');
 
             if (this.type == 'scroll') {
-                post_fadein(post, this.fadetime, after_cb);
+                post_fadeout(post, function() {post_fadein(post, this.fadetime, after_cb);});
             } else {
                 after_cb();
             }

@@ -51,12 +51,13 @@ function post_fadeout(post, fadetime, andthen) {
         fadetime = parseInt(window.LOCALOPTS.fadetime, 10);
     }
 
+    console.log(post.zone.type);
     if (post.zone.type == 'scroll') {
         // do scroll stuff.
         $(post.zone.el).transition({'opacity': 0}, 500, function() {
             $(post.el).css('opacity', 0);
             $(post.zone.el).css('opacity', 1.0);
-            andthen()
+            andthen();
             });
         //andthen();
     } else {
