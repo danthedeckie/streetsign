@@ -21,6 +21,20 @@
 
 *************************************************************/
 
+function nicemap(objects, func) {
+    'use strict';
+    // a 'map' function which splits each iteration over a new frame,
+    // hopefully reducing jank.
+    var i=objects.length,
+        runner = (function(){
+            if (i--) {
+                func(objects[i]);
+                requestAnimationFrame(runner);
+            }
+        });
+    requestAnimationFrame(runner);
+}
+
 function magic_vars(text) {
     'use strict';
     // replaces %%TIME%% and %%DATE%% magic vars in a string with appropriate
