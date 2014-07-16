@@ -1,52 +1,53 @@
 {%- import "link-macros.html" as linkmacros -%}
-{%- import "common_widgets.html"  as widgets -%}
 <!doctype html>
 <html>
 <head>
   <title>Screen</title>
-  <!--<link rel="stylesheet" href="{{ url_for('static', filename='screens/main.css') }}" />-->
-  <style>
-  .post { height: 100px; }
-  </style>
+<!--  <link rel="stylesheet" href="{{ url_for('static', filename='screens/main.css') }}" />-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/bootstrap-wysihtml5/default-styles.css') }}" />
 </head>
-<body>
+<body style="background:#222">
 <div id="zones" style="position:absolute;top:0;bottom:0;right:0;left:0;background-size:cover;"></div>
 <!--<div id="graphics" class="zone" style="left: 10%; right: 50%; top: 10%; bottom: 10%;">
 </div>-->
 {% block end_of_page_javascript %}
   {{ linkmacros.static_js('lib/jquery.js') }}
-  {{ linkmacros.static_js('lib/chosen/chosen.jquery.min.js') }}
+  {{ linkmacros.static_js('lib/jquery.transit.min.js') }}
   {{ linkmacros.static_js('screens/globals.js') }}
   {{ linkmacros.static_js('screens/functions.js') }}
   {{ linkmacros.static_js('screens/overview.js') }}
   {{ linkmacros.static_js('screens/main.js') }}
   <script type="text/javascript" src="{{ url_for('post_types_js') }}"></script>
-
   <script type="text/javascript">
 
-  ZONES={{ screendata.zones|safe }};
-  {% if screendata.background %}
-      BG="url({{url_for('static',filename='user_files/' + screendata.background)}})"
-  {% else %}
-      BG="black"
-  {% endif %}
+    var LOCALOPTS={{ request.args | tojson|safe }},
+        SCREEN_DATA={{screen.to_dict() | tojson|safe }},
+        POSTS_URL = "{{ url_for('screens_posts_from_feeds', json_feeds_list='-1') }}";
 
-  POSTS_URL = "{{ url_for('screens_posts_from_feeds',json_feeds_list='-1') }}";
-  // TODO: load this from a screens json thingy.
-  var screen_data = {
-        background: BG,
-        css:'',
-        defaults: {'no_posts_wait': 10000,
-                   'update_zones_timer': 96000,
-                   'post_time': 4000,
-                   'classes':'text_dropshadow',
-                   'css':{}},
+    SCREEN_DATA.md5 = "{{screen.md5()}}";
 
-        zones: ZONES
-                };
+    window.SCREEN = new StreetScreen($('#zones'), SCREEN_DATA);
 
-init_screen(screen_data, '#zones')
-setTimeout(start_zones_scrolling, 2000);
+    setTimeout(function(){window.SCREEN.start_zones();}, 2000);
+
+    // automatic housekeeping:
+
+    (function() {
+         function housekeeping() {
+             $.post("{{ url_for('posts_housekeeping') }}");
+         }
+
+         function update_external_sources() {
+             $.post(" {{ url_for('external_data_sources_update_all') }}");
+         }
+
+         housekeeping();
+         update_external_sources();
+
+         setInterval(housekeeping, 3600000); // every hour
+         setInterval(update_external_sources, 60000); // every minute
+     })();
+
   </script>
 {% endblock %}
 </body>

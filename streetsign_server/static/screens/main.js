@@ -138,13 +138,13 @@ Zone.prototype = {
                 $(post.el).transition({'opacity':0}, 200, function () {
                     console.log("replacing content in live post");
                     post.el.remove();
-                    post.el = post_types[post.type].render(that.el, post)[0];
+                    post.el = post_render(post, that);
                     $(post.el).transition({'opacity': old_opacity}, 200);
                     });
             } else {
                 console.log("replacing content in post:" + post.id);
                 post.el.remove();
-                post.el = post_types[post.type].render(this.el, post)[0];
+                post.el = post_render(post, that);
             }
 
         }
@@ -172,12 +172,9 @@ Zone.prototype = {
             post_fadein(this.current_post, this.fadetime, after_cb);
 
             // posttype 'display' callback:
-            if (post_types[post.type].hasOwnProperty('display')) {
-                post_types[post.type].display(post);
-            }
+            post_display(post);
 
             return;
-
         }
 
         // if this post is *already* the current post:
@@ -200,9 +197,7 @@ Zone.prototype = {
             // callback *after* the previous post has faded out:
 
             // posttype 'hide' callback:
-            if (post_types[that.current_post.type].hasOwnProperty('hide')) {
-                post_types[that.current_post.type].hide(that.current_post);
-            }
+            post_hide(that.current_post);
 
             // set current post, and fade it in:
 
@@ -210,10 +205,7 @@ Zone.prototype = {
             post_fadein(that.current_post, that.fadetime, after_cb);
 
             // posttype 'display' callback:
-            if (post_types[post.type].hasOwnProperty('display')) {
-                post_types[post.type].display(post);
-            }
-
+            post_display(post);
         });
 
         // My work here is done.
@@ -346,10 +338,7 @@ Zone.prototype = {
                 }
 
                 // posttype 'hide' callback:
-                if (post_types[that.current_post.type].hasOwnProperty('hide')) {
-                    post_types[that.current_post.type].hide(that.current_post);
-                }
-
+                post_hide(post);
             });
 
         }
@@ -546,8 +535,8 @@ function make_updater(z) {
             if (current_post_ids.indexOf(new_data.id) === -1) {
                 // add the new post to zone.posts, and get the array index:
                 new_data.zone = zone;
-                new_data.el =
-                    post_types[new_data.type].render(zone.el, new_data)[0];
+
+                new_data.el = post_render(new_data, zone);
 
                 zone.posts.push(new_data);
 
