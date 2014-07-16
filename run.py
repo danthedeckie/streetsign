@@ -12,6 +12,9 @@
         (starts the server running with the waitress production server)
 '''
 
+from __future__ import print_function
+
+
 # Configuration Options:
 
 __HOST__ = u'0.0.0.0'
@@ -31,10 +34,17 @@ from streetsign_server import app
 # And start the correct server
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2 and sys.argv[1] == 'waitress':
-        print("'Production' Server with Waitress.")
-        from waitress import serve
-        serve(app, host=__HOST__, port=__PORT__, threads=__THREADS__)
+    if len(sys.argv) == 2:
+        if sys.argv[1] == 'waitress':
+            print("'Production' Server with Waitress.")
+            from waitress import serve
+            serve(app, host=__HOST__, port=__PORT__, threads=__THREADS__)
+        elif sys.argv[1] == 'profiler':
+            print("Loading dev server with profiling on.")
+            from werkzeug.contrib.profiler import ProfilerMiddleware
+            app.config['PROFILE'] = True
+            app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[20])
+            app.run(debug=True)
     else:
         print("Starting Development Server...")
         app.run(host=__HOST__, port=__PORT__, debug = True)

@@ -24,21 +24,37 @@
 // Returns the HTML for a zone area
 // TODO: This should really be templated out.
 function zone_html(id, top, left, bottom, right) {
-    return ('<div id="_zone_'+id+'" class="zone" style="display:inline; width: 40%;min-height: 40%;float:left"></div>');
+    return ('<div id="_zone_' + id + '" class="zone" style="display:block;width=100%;height:5em"></div>');
 }
 
 /***************************************************************************/
 
-function post_fadeout(post, fadetime, andthen=function(){}) {
+function post_fadeout(post, fadetime, andthen) {
+
+    if (!andthen) { andthen = function() {}; }
+
     /*$(post._el).fadeOut(fadetime, andthen);*/
-    $(post._el).css({'border': '2px solid black', 'opacity':'80%'});
+    $(post.el).css({'border': '2px solid black', 'opacity':'80%'});
     andthen()
 }
 
-function post_fadein(post, fadetime, andthen=function(){}) {
-    $(post._el).fadeIn(fadetime, andthen);
+function post_fadein(post, fadetime, andthen) {
 
-    $(post._el).css({'border':'2px solid red', 'opacity':'100%'});
+    if (!andthen) { andthen = function() {}; }
+
+    $(post.el).fadeIn(fadetime, andthen);
+    $(post.el).css({'border':'2px solid red', 'opacity':'100%'});
+    if (! post.display_time ) {
+        post.display_time = 1000;
+        console.log('...');
+    }
+    console.log(post.display_time);
     andthen();
 }
 
+function post_display() {}
+function post_hide() {}
+function post_render(post_data, zone) {
+    "use strict";
+    return post_types[post_data.type].render(zone.el, post_data).css('opacity',1)[0];
+}

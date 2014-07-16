@@ -3,7 +3,7 @@
 {% endmacro %}
 
 {% if post.feed.user_can_write(user) %}
-        <input type="submit" value="Post!" class="btn btn-primary pull-right"/>
+        <input type="submit" value="{{ 'Post!' if not post.id else 'Save' }}" class="btn btn-primary pull-right"/>
 {% endif %}
 
 <div id="postcontentblock" class="well">
@@ -112,5 +112,5 @@
 </div>
 
 {% if post.feed.user_can_write(user) %}
-        <input class="btn btn-primary" type="submit" value="Post!" />
+        <input class="btn btn-primary" type="submit" value="{{ 'Post!' if not post.id else 'Save' }}" />
 {% endif %}

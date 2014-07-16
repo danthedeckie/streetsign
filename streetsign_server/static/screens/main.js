@@ -191,16 +191,18 @@ Zone.prototype = {
                 setTimeout( function () {
                     console.log("replacing content in live post");
                     post.el.remove();
-                    post.el = post_types[post.type].render(that.el, post)[0];
+                    post.el = post_render(post, that);
                     post.width = post.el.scrollWidth;
                     post.height = post.el.offsetHeight;
                     //$(that.el).css('opacity', 1.0);
+                    $(post.el).transition({'opacity': old_opacity}, 200);
+
                     that.el.style.opacity = 1.0;
                     }, 1000);
             } else {
                 console.log("replacing content in post:" + post.id);
                 post.el.remove();
-                post.el = post_types[post.type].render(this.el, post)[0];
+                post.el = post_render(post, that);
             }
 
         }
@@ -228,22 +230,19 @@ Zone.prototype = {
             post_fadein(this.current_post, after_cb);
 
             // posttype 'display' callback:
-            if (post_types[post.type].hasOwnProperty('display')) {
-                post_types[post.type].display(post);
-            }
+            post_display(post);
 
             return;
-
         }
 
         // if this post is *already* the current post:
 
         if (post.id === this.current_post.id) {
             // same post!
-            console.log('only this post is available');
+            console.log(this.name + '| only this post is available');
 
             if (this.type == 'scroll') {
-                post_fadein(post, after_cb);
+                post_fadeout(post, function() { post_fadein(post, after_cb); } );
             } else {
                 // leave the post up, but run the specified 'after fadein' callback
                 after_cb();
@@ -256,21 +255,16 @@ Zone.prototype = {
         post_fadeout(this.current_post, function () {
             // callback *after* the previous post has faded out:
 
-            // call posttype 'hide' callback:
-            if (post_types[that.current_post.type].hasOwnProperty('hide')) {
-                post_types[that.current_post.type].hide(that.current_post);
-            }
+            // posttype 'hide' callback:
+            post_hide(that.current_post);
 
             // set current post, and fade it in:
 
             that.current_post = post;
             post_fadein(that.current_post, after_cb);
 
-            // call posttype 'display' callback:
-            if (post_types[post.type].hasOwnProperty('display')) {
-                post_types[post.type].display(post);
-            }
-
+            // posttype 'display' callback:
+            post_display(post);
         });
 
         // My work here is done.
@@ -396,10 +390,7 @@ Zone.prototype = {
                 }
 
                 // posttype 'hide' callback:
-                if (post_types[that.current_post.type].hasOwnProperty('hide')) {
-                    post_types[that.current_post.type].hide(that.current_post);
-                }
-
+                post_hide(post);
             });
 
         }
@@ -622,6 +613,8 @@ function make_updater(zone) {
 
         // add new posts to the list!
         for (i=0; i<data.posts.length; i += 1) {
+            new_data = data.posts[i];
+
             if (current_post_ids.indexOf(data.posts[i].id) === -1) {
                 getJSON(data.posts[i].uri, function (x) { zone.addPost(x); });
             }

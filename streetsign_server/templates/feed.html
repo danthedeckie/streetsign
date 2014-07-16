@@ -46,6 +46,7 @@
 </table>
 {% if user.is_admin %}
     <form method="POST" id="users_and_groups" class="form">
+    <input type="submit" value="Save" class="btn btn-primary" style="float:right"/>
     <label for="post_types">What kind of new posts are allowed here?</label><br/>
     <select multiple autocomplete="off" data-placeholder="blank means all types" class="chosen" name="post_types">
       {% for type in all_posttypes %}
@@ -55,8 +56,8 @@
     <hr/>
 
     <input type="hidden" name="action" value="edit" />
-    <div class="autowidth">
     <h2>Permissions for this feed.</h2>
+    <div class="autowidth">
     <div class="col-md-3"><div class="panel panel-default">
         <div class="panel-heading"><h3 class="panel-title">Author Users:</h3>
     </div>

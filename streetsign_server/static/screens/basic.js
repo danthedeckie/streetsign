@@ -175,3 +175,21 @@ function post_fadeout(post, cb) {
 
     return (zone_types[post.zone.type]||zone_types.fade).stop(post, cb);
 }
+function post_display(post) {
+    "use strict";
+    if (post_types[post.type].hasOwnProperty('display')) {
+        post_types[post.type].display(post);
+    }
+}
+
+function post_hide(post) {
+    "use strict";
+    if (post_types[post.type].hasOwnProperty('hide')) {
+        post_types[post.type].hide(post);
+    }
+}
+
+function post_render(post_data, zone) {
+    "use strict";
+    return post_types[post_data.type].render(zone.el, post_data)[0];
+}

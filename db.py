@@ -8,6 +8,7 @@ To be merged with run.py into a simple manage.py (django-style) script.
 #pylint: disable=wildcard-import, no-member, unused-wildcard-import, unused-import
 
 import streetsign_server
+from datetime import datetime
 
 from streetsign_server.models import *
 
@@ -54,6 +55,9 @@ def make():
     Post(type='html',
          feed=news,
          author=User(id=1),
+         published=True,
+         publish_date=datetime.now(),
+         publisher=User(id=1),
          content='{"content":"First Post"}').save()
 
     Screen(urlname='Default').save()
