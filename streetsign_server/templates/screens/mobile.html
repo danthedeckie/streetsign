@@ -46,7 +46,7 @@
                 
                 // add zones to zonelist:
                 for (i=0;i<SCREEN_DATA.zones.length;i++) {
-                    $('#zonelist').append('<li><a href="#zone_1">' + SCREEN_DATA.zones[i].name + '</a></li>');
+                    $('#zonelist').append('<li><a href="#zone_'+i+'">' + SCREEN_DATA.zones[i].name + '</a></li>');
                     $.ui.addContentDiv('zone_' + i,
                                         '<ul id="zone_postlist_' + i + '" class="list"></ul>',
                                         SCREEN_DATA.zones[i].name);
