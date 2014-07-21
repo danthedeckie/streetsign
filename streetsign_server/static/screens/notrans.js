@@ -40,7 +40,7 @@ function zone_html(id, top, left, bottom, right, css, type) {
             +'left:' + left
             +';right:' + right
             +';bottom:' + bottom
-            +';top:' + top + '"></div>');
+            +';top:' + top + ';' + css.replace(/"/g,"'") + '"></div>');
 }
 
 /***************************************************************************/
