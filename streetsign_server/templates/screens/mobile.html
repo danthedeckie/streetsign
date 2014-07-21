@@ -46,7 +46,7 @@
                 
                 // add zones to zonelist:
                 for (i=0;i<SCREEN_DATA.zones.length;i++) {
-                    $('#zonelist').append('<li><a href="#zone_1">' + SCREEN_DATA.zones[i].name + '</a></li>');
+                    $('#zonelist').append('<li><a href="#zone_'+i+'">' + SCREEN_DATA.zones[i].name + '</a></li>');
                     $.ui.addContentDiv('zone_' + i,
                                         '<ul id="zone_postlist_' + i + '" class="list"></ul>',
                                         SCREEN_DATA.zones[i].name);
@@ -82,10 +82,21 @@
         </script>
         <link href="/static/mobile/css/icons.css" rel="stylesheet" type="text/css"></link>
         <link href="/static/mobile/css/af.ui.css" rel="stylesheet" type="text/css"></link>
+        <style>
+        #afui, #afui.ios7 .panel, div {
+            background: rgba(0,0,0,0.2);
+        }
+        #afui .list {
+            background: rgba(255,255,255,0.8);
+        }
+        #afui > #navbar, #afui.ios7 #navbar {
+            background: rgba(0,0,0,0.7);
+        }
+        </style>
     </head>
 
-    <body>
-        <div id="afui" class='ios7'>
+    <body style="background:url({{ url_for('static', filename='user_files/' + screen.background) }})">
+        <div id="afui" class='ios7' style="background:none;">
             <div id="header"></div>
             <div id="content" style="">
                 <div data-appbuilder-object="page" selected="selected"

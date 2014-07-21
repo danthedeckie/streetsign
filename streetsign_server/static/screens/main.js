@@ -51,29 +51,6 @@ function background_from_value(text) {
     return 'url(/static/user_files/' + text + ')';
 }
 
-
-function getJSON(url, callback) {
-    "use strict";
-    // simple async JSON request.  Used instead of the jQuery version, which
-    // makes about 15 external function calls, delving deeper into the jQuery
-    // recursive vortex of confusion.  This simply calls the callback with the
-    // JSON data.
-
-    // TODO: failure mode callback, and catch failed JSON parsing callback.
-
-    var xhr = new XMLHttpRequest();
-    if (callback) {
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState == 4) {
-             callback(JSON.parse(xhr.responseText));
-          }
-        }
-    }
-    xhr.open("GET", url, true);
-    xhr.send(null);
-
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Zone object:
@@ -82,16 +59,16 @@ function getJSON(url, callback) {
 function Zone(container, initial_data) {
     "use strict";
 
-    var csspairs = cssPairs(initial_data.css), i, that = this;
-
-    var update = function (name, type) {
-        if (initial_data.hasOwnProperty(name)) {
-            try {
-                that[name] = type(initial_data[name]);
-            } catch (ignore) {
-                that[name] = initial_data[name];
+    var i,
+        that = this,
+        update = function (name, type) {
+            if (initial_data.hasOwnProperty(name)) {
+                try {
+                    that[name] = type(initial_data[name]);
+                } catch (ignore) {
+                    that[name] = initial_data[name];
+                }
             }
-        }
         };
 
     // default "mutable type" properties:
@@ -130,12 +107,6 @@ function Zone(container, initial_data) {
     this.height = this.el.offsetHeight;
     this.width = this.el.scrollWidth;
 
-    // apply new CSS tags:
-
-    for (i = 0; i < csspairs.length; i += 1) {
-        this.el.style[csspairs[i][0]] = csspairs[i][1];
-        //$(this.el).css(csspairs[i][0], csspairs[i][1]);
-    }
     $(this.el).css('color', that['color']);
 
 }
@@ -400,7 +371,6 @@ Zone.prototype = {
         console.log('no posts currently valid in that' + that.name + '!');
         return;
 
-
     },
 
     pollForNewPosts: function (delay) {
@@ -408,12 +378,11 @@ Zone.prototype = {
         // poll the server for new feeds.
         var that=this;
 
-        getJSON(this.feedsurl, this.update_cb);
-
-
-        // schedule myself to run again later...
-        setTimeout(function () { that.pollForNewPosts(); },
-                   delay || this.update_zones_timer);
+        safeGetJSON(this.feedsurl, function (data) {
+            that.update_cb(data);
+            setTimeout(function() { that.pollForNewPosts(); },
+                       delay || that.update_zones_timer);
+            });
     }
 };
 
@@ -483,13 +452,11 @@ StreetScreen.prototype = {
         'use strict';
         // get JSON data from the server, check that the screen hasn't changed
         // too much, and if it has, reload.
-        var that = this;
+        var this_screen = this,
 
-        console.log('getting screen updates...');
-
-        var update = function (data) {
-            if (data.md5 === that.md5) {
-                setTimeout(function () {that.update();}, 50030);
+            update = function (data) {
+            if (data.md5 === this_screen.md5) {
+                setTimeout(function () {this_screen.update();}, 50030);
             } else {
                 // The md5 is different! we should do some updates!
                 // TODO: proper reloading, including pre-downloading background
@@ -498,7 +465,10 @@ StreetScreen.prototype = {
             }
         };
 
-        getJSON('/screens/json/' +  that.id + '/' + that.md5, update);
+        console.log('getting screen updates...');
+
+        safeGetJSON('/screens/json/' +  this_screen.id + '/' + this_screen.md5,
+                update, 50000);
 
     },
 
@@ -522,11 +492,11 @@ function make_updater(zone) {
     // Returns the 'update' closure, a function which is called
     //    when we get new data (posts) from the server, and adds
     //    them into a zone. Captures zone (z) within the closure,
-    //    so it can be passed to the getJSON(...) callback.
+    //    so it can be passed to the safeGetJSON(...) callback.
     var do_next_post = function () { zone.postTimeFinished(); };
 
     var update_post = function (thiszone, post, data) {
-        getJSON(data.uri, function (x) {
+        safeGetJSON(data.uri, function (x) {
             thiszone.updatePost(post, x);
             });
         };
@@ -616,7 +586,7 @@ function make_updater(zone) {
             new_data = data.posts[i];
 
             if (current_post_ids.indexOf(data.posts[i].id) === -1) {
-                getJSON(data.posts[i].uri, function (x) { zone.addPost(x); });
+                safeGetJSON(data.posts[i].uri, function (x) { zone.addPost(x); });
             }
         }
     }; // end of closure...

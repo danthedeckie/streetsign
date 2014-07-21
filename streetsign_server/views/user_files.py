@@ -17,7 +17,7 @@
 #
 #    ---------------------------------
 
-""" 
+"""
     streetsign_server.views.user_files
     ----------------------------------
 
@@ -26,8 +26,8 @@
 """
 
 
-from flask import render_template, request, session, redirect, \
-                  flash, json, g, url_for
+from flask import render_template, request, redirect, \
+                  flash, g, url_for, Response
 import streetsign_server.user_session as user_session
 from glob import glob
 from os.path import basename, dirname, join as pathjoin, splitext, isdir, isfile
@@ -48,10 +48,14 @@ def human_size_str(filename):
         return str(s/1024) + 'kB'
 
 # TODO: move to file upload lib.
+
+
+IMAGE_FORMATS = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.svg']
+ALLOWED_FORMATS = IMAGE_FORMATS + ['.ttf', '.otf']
+
 def allow_filetype(filename):
     ''' is this file-type allowed to be uploaded? '''
-    return splitext(filename)[-1].lower() in \
-        ['.png','.jpg','.jpeg','.gif','.bmp','.svg']
+    return splitext(filename)[-1].lower() in ALLOWED_FORMATS
 
 def make_dirlist(path):
     ''' returns a list of the files and sub-dirs in a directory, ready to be
@@ -63,9 +67,9 @@ def make_dirlist(path):
         name = basename(f)
         if isdir(f):
             return_list.append(
-                { 'name': name + '/',
-                   'url': name + '/',
-                  'size': "{0} items".format(len(glob(pathjoin(f,'*')))) })
+                {'name': name + '/',
+                 'url':  name + '/',
+                 'size': "{0} items".format(len(glob(pathjoin(f, '*'))))})
         else:
             if allow_filetype(name):
                 thumb = '<img src="{0}" alt="{1}" />'.format(
@@ -75,20 +79,20 @@ def make_dirlist(path):
                 thumb = ''
 
             return_list.append(
-                { 'name': name,
+                {'name':  name,
                  'thumb': thumb,
-                   'url': pathjoin(g.site_vars['user_url'],path,name),
-                  'size': human_size_str(f) })
+                 'url':   pathjoin(g.site_vars['user_url'], path, name),
+                 'size':  human_size_str(f)})
     return return_list
 
-@app.route('/user_files/', methods=['GET','POST'])
-@app.route('/user_files/<path:dirname>', methods=['GET','POST'])
-def user_files_list(dirname=""):
+@app.route('/user_files/', methods=['GET', 'POST'])
+@app.route('/user_files/<path:dir_name>', methods=['GET', 'POST'])
+def user_files_list(dir_name=""):
     ''' HTML list of user-uploaded files. '''
 
     user = user_session.get_user()
 
-    full_path = pathjoin(g.site_vars['user_dir'], dirname)
+    full_path = pathjoin(g.site_vars['user_dir'], dir_name)
 
     if not isdir(full_path):
         makedirs(full_path)
@@ -99,22 +103,22 @@ def user_files_list(dirname=""):
             if f and allow_filetype(f.filename):
                 filename = secure_filename(f.filename)
                 f.save(pathjoin(full_path, filename))
-                flash('Uploaded file:'+filename)
+                flash('Uploaded file:' + filename)
             else:
                 flash('Sorry. Invalid Filetype')
         elif request.form.get('action') == 'delete':
             filename = secure_filename(request.form.get('filename'))
             full_filename = pathjoin(full_path, filename)
             remove(full_filename)
-            flash('Deleted '+ filename)
+            flash('Deleted ' + filename)
 
 
-    files = make_dirlist(dirname)
+    files = make_dirlist(dir_name)
 
     return render_template('user_files.html',
-                           full_path = full_path,
-                           file_list = files,
-                           dirname=dirname)
+                           full_path=full_path,
+                           file_list=files,
+                           dirname=dir_name)
 
 @app.route('/thumbnail/<path:filename>')
 def thumbnail(filename):
@@ -123,6 +127,9 @@ def thumbnail(filename):
 
     full_path = pathjoin(g.site_vars['user_dir'], filename)
     thumb_path = pathjoin(g.site_vars['user_dir'], '.thumbnails', filename)
+
+    if splitext(filename)[-1] not in IMAGE_FORMATS:
+        return 'not an image I will not make a thumbnail.'
 
     if isfile(full_path):
         if not isfile(thumb_path):
@@ -137,7 +144,7 @@ def thumbnail(filename):
                 check_call([pathjoin(g.site_vars['site_dir'],
                                      'scripts',
                                      'makethumbnail.sh'),
-                        full_path, thumb_path])
+                           full_path, thumb_path])
             except:
                 return 'Sorry!'
         # either there is a thumbnail, or we just made one.
@@ -145,4 +152,17 @@ def thumbnail(filename):
     else:
         return 'Sorry! not a valid original file!'
 
+@app.route('/user_files/fonts.css')
+def user_fonts_css():
+    ''' return a CSS file with @font-face definitions for each font in the user
+        uploaded fonts directory '''
 
+    fonts = []
+
+    for f in glob(app.config['SITE_VARS']['user_dir']+ 'fonts/*tf'):
+        name = splitext(basename(f))[0]
+        url = url_for('static', filename='user_files/fonts/' + basename(f))
+        fonts.append(
+            '@font-face {font-family: %s; src:url(%s)}' % (name, url)
+            )
+    return Response('\n'.join(fonts), status=200, mimetype='text/css')

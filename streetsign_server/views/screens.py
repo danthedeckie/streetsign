@@ -17,7 +17,7 @@
 #
 #    ---------------------------------
 
-""" 
+"""
     streetsign_server.views.screens
     -------------------------------
 
@@ -27,19 +27,19 @@
 
 
 
-from flask import render_template, url_for, request, session, redirect, \
-                  flash, json, g, jsonify
+from flask import render_template, url_for, request, redirect, \
+                  flash, json, jsonify
 
 import sqlite3
 from glob import glob
-from os.path import basename, splitext
+from os.path import basename
 import urllib
 from datetime import datetime
 
 import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
 from streetsign_server import app
-from streetsign_server.models import Feed, Post, Screen, by_id
+from streetsign_server.models import Feed, Post, Screen
 from streetsign_server.post_types.image import allow_filetype
 
 
@@ -48,7 +48,7 @@ def form_json(name, default):
     try:
         return json.dumps(json.loads(request.form.get(name,
                                                       json.dumps(default))))
-    except:
+    except: # pylint: disable=bare-except
         return json.dumps(default)
 
 
@@ -62,23 +62,23 @@ def form_json(name, default):
 def screens():
     ''' HTML listing of all screens  '''
     return render_template('screens.html',
-        screens=Screen.select())
+                           screens=Screen.select())
 
 
-@app.route('/screens-edit/<screenid>', methods=['GET','POST'])
-@app.route('/screens-edit/<int:screenid>', methods=['GET','POST'])
+@app.route('/screens-edit/<screenid>', methods=['GET', 'POST'])
+@app.route('/screens-edit/<int:screenid>', methods=['GET', 'POST'])
 def screenedit(screenid):
     ''' edit one screen '''
 
     try:
         if int(screenid) == -1:
             flash('New Screen')
-            screen = Screen()
+            screen = Screen() # pylint: disable=no-value-for-parameter
         else:
-            screen = Screen().get(Screen.id==int(screenid))
+            screen = Screen().get(Screen.id == int(screenid)) # pylint: disable=no-value-for-parameter
 
         backgrounds = [basename(x) for x in \
-                       glob(app.config['SITE_VARS']['user_dir']+ '*')
+                       glob(app.config['SITE_VARS']['user_dir']  + '*')
                        if allow_filetype(x)]
 
     except Screen.DoesNotExist:
@@ -119,9 +119,9 @@ def screenedit(screenid):
             return redirect(url_for('screenedit', screenid=screen.id))
 
     return render_template('screen_editor.html',
-                feeds=Feed.select(),
-                backgrounds = backgrounds,
-                screen=screen)
+                           feeds=Feed.select(),
+                           backgrounds=backgrounds,
+                           screen=screen)
 
 
 @app.route('/screens/<template>/<screenname>')
@@ -132,7 +132,7 @@ def screendisplay(template, screenname):
     screen = Screen.get(urlname=screenname)
 
     return render_template('screens/' + template + '.html',
-               screen = screen)
+                           screen=screen)
 
 
 @app.route('/screens/posts_from_feeds/<json_feeds_list>')
@@ -145,16 +145,15 @@ def screens_posts_from_feeds(json_feeds_list):
 
     time_now = datetime.now()
 
-    posts = [ #p.dict_repr() for p in \
-             {"id": p.id,
+    posts = [{"id": p.id,
               "changed": p.write_date,
               "uri": url_for('json_post', postid=p.id)} for p in \
              Post.select().join(Feed)
              .where((Feed.id << feeds_list)
-                   &(Post.status == 0)
-                   &(Post.active_start < time_now)
-                   &(Post.active_end > time_now)
-                   &(Post.published)
+                    &(Post.status == 0)
+                    &(Post.active_start < time_now)
+                    &(Post.active_end > time_now)
+                    &(Post.published)
                    )]
     return jsonify(posts=posts)
 
@@ -165,13 +164,13 @@ def screen_json(screenid, old_md5):
         When you edit a screen, it saves most of the data as JSON.  This
         requests the MD5sum of that data, (and that data).  You can then
         compare against what you're already displaying, and only update
-        if it's changed. If the 
+        if it's changed.
     '''
 
     try:
         screen = Screen.get(id=int(screenid))
     except:
-        screen = Screen()
+        screen = Screen() # pylint: disable=no-value-for-parameter
 
     screen_md5 = screen.md5()
 
