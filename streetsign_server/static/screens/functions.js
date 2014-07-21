@@ -35,6 +35,48 @@ function nicemap(objects, func) {
     requestAnimationFrame(runner);
 }
 
+function safeGetJSON(url, callback, retry_time=60000) {
+    "use strict";
+    // simple async JSON request.  Used instead of the jQuery version, which
+    // makes about 15 external function calls, delving deeper into the jQuery
+    // recursive vortex of confusion.  This simply calls the callback with the
+    // JSON data, and if it fails, keeps trying (after a delay).
+    //
+    // TODO: failure mode callback, and catch failed JSON parsing callback.
+
+    var xhr = new XMLHttpRequest(),
+        responder = (function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    try {
+                        callback(JSON.parse(xhr.responseText));
+                    } catch (e) {
+                        console.log('Failed to parse response from ' + url + '.' +
+                                    'Trying again in ' + (retry_time / 1000) + ' seconds');
+                        console.log(e);
+                        setTimeout(function() {safeGetJSON(url, callback, retry_time);},
+                                   retry_time);
+                    }
+
+                } else {
+                    console.log('Failed to get ' + url + ' successfully. ' +
+                                'Trying again in ' + (retry_time / 1000) + ' seconds.');
+                    setTimeout(function() {safeGetJSON(url, callback, retry_time);},
+                               retry_time);
+                }
+            }
+        });
+
+    if (callback) {
+        xhr.onreadystatechange = responder;
+    }
+
+    xhr.open("GET", url, true);
+    xhr.send(null);
+
+}
+
+
 function magic_vars(text) {
     'use strict';
     // replaces %%TIME%% and %%DATE%% magic vars in a string with appropriate
