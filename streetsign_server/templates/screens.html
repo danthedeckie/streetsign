@@ -2,6 +2,8 @@
 {% block title %} Screens {% endblock %}
 
 {% block body %}
+<h2>Layouts</h2>
+<p>Design different layouts &amp; themes for your screen(s).</p>
 <table class="table table-striped">
 <thead>
   <tr>
@@ -23,5 +25,45 @@
 </tbody>
 </table>
 You can add extra 'query arguments' to the URLs, to force the aspect ratio, etc.  <a href="http://streetsign.readthedocs.org/en/latest/screen_options.html#screen-over-ride-options" target="_blank">More details</a>
+<hr/>
+<h2> Aliases </h2>
+<button data-bind="click: addAlias">Add</button>
+<table class="table table-striped">
+<thead>
+  <tr>
+    <th></th>
+    <th>Key</th>
+    <th>Layout</th>
+    <th>View Type</th>
+    <th>Options</th>
+  </tr>
+</thead>
+<tbody data-bind="foreach: aliases">
+  <tr>
+    <td><button data-bind="click: $root.deleteAlias">&times;</button></td>
+    <td><input data-bind="value: name" /></td>
+    <td><select data-bind="options: SCREEN_NAMES, value:screen_name"></select></td>
+    <td><input data-bind="value: screen_type" /></td>
+    <td>
+      <small>
+      <label>fadetime: <input type="number" data-bind="value: fadetime" /></label>
+      <label>scrollspeed: <input type="number" data-bind="value: scrollspeed" /></label>
+      <label>aspect radio: <input type="number" data-bind="value: forceaspect" /></label>
+      <label>vertical offset: <input type="number" data-bind="value: forcetop" /></label>
+      </small>
+    </td>
+  </tr>
+</tbody>
+</table>
 
+
+{% endblock %}
+
+{% block end_of_page_javascript %}
+{{ super() }}
+{{ linkmacros.static_js('alias_editor.js') }}
+<script>
+SCREEN_NAMES=[{% for s in screens %}"{{ s.urlname}}",{% endfor %}"(unset)"];
+ko.applyBindings(new AliasesView([]));
+</script>
 {% endblock %}
