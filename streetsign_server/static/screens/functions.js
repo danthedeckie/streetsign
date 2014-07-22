@@ -35,6 +35,48 @@ function nicemap(objects, func) {
     requestAnimationFrame(runner);
 }
 
+function safeGetJSON(url, callback, retry_time=60000) {
+    "use strict";
+    // simple async JSON request.  Used instead of the jQuery version, which
+    // makes about 15 external function calls, delving deeper into the jQuery
+    // recursive vortex of confusion.  This simply calls the callback with the
+    // JSON data, and if it fails, keeps trying (after a delay).
+    //
+    // TODO: failure mode callback, and catch failed JSON parsing callback.
+
+    var xhr = new XMLHttpRequest(),
+        responder = (function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    try {
+                        callback(JSON.parse(xhr.responseText));
+                    } catch (e) {
+                        console.log('Failed to parse response from ' + url + '.' +
+                                    'Trying again in ' + (retry_time / 1000) + ' seconds');
+                        console.log(e);
+                        setTimeout(function() {safeGetJSON(url, callback, retry_time);},
+                                   retry_time);
+                    }
+
+                } else {
+                    console.log('Failed to get ' + url + ' successfully. ' +
+                                'Trying again in ' + (retry_time / 1000) + ' seconds.');
+                    setTimeout(function() {safeGetJSON(url, callback, retry_time);},
+                               retry_time);
+                }
+            }
+        });
+
+    if (callback) {
+        xhr.onreadystatechange = responder;
+    }
+
+    xhr.open("GET", url, true);
+    xhr.send(null);
+
+}
+
+
 function magic_vars(text) {
     'use strict';
     // replaces %%TIME%% and %%DATE%% magic vars in a string with appropriate
@@ -109,13 +151,15 @@ function any_relevent_restrictions(post) {
     var now = faketime();
     var i;
 
+
     for (i=0; i< post.time_restrictions.length; i += 1) {
         if (restriction_relevant(now, post.time_restrictions[i])) {
-            return true;
+            if (!thispost.time_restrictions_show) {
+                return true;
+            }
         }
     }
-
-    return false;
+    return post.time_restrictions_show;
 }
 
 function reload_page() {
@@ -131,33 +175,37 @@ function reduce_font_size_to_fit(inner, outer) {
     // reduce fontsize until the inner fits within outer.
     // if it's a scrolling zone, then assume almost infinite width...
 
+    var percent = 100;
     var height = 0;
-    var width = 0;
     var zone_height = $(outer).height();
     var zone_width = $(outer).width();
     var i = 100;
+    var height = inner.height();
+    var width = inner.width();
+    var scrolling = (outer[0].className.indexOf("scroll") !== -1);
 
-    if (outer[0].className.indexOf("scroll")!==-1) {
+    if (scrolling) {
         zone_width = 900000;
     }
 
-    height = inner.height();
-    width = inner.width();
 
-    if ((height > zone_height) || (width > zone_width)) {
-        for (i=100; i>10; i-=3){
-
+   // if ((height > zone_height) || (width > zone_width)) {
+        while(i > 1){
             height = inner.height();
             width = inner.width();
 
-            if ((height <= zone_height) && (width <= zone_width)) {
-                console.log ('reducing font size to ' + i + '%');
-                break;
+            i = i / 2;
+            if ((height < zone_height) || ((!scrolling) && (width < zone_width))) {
+                percent += i;
+
+            } else if ((height > zone_height) || ((!scrolling) && (width > zone_width))) {
+                percent -= i;
             }
-            console.log(i);
-            inner.css('font-size', i + '%');
+            inner.css('font-size', percent + '%');
         }
-    }
+        inner.css('font-size', parseInt(percent) + '%');
+        console.log ('reducing font size to ' + parseInt(percent) + '%');
+    //}
 }
 
 setTimeout(reload_page, REFRESH_PAGE_TIMER);

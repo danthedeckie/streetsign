@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<!--HTML5 doctype-->
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+        <script type="text/javascript" charset="utf-8" src="intelxdk.js"></script>
+
+        <script type="text/javascript" language="javascript">
+            // This event handler is fired once the AppMobi libraries are ready
+            function onDeviceReady() {
+                //use AppMobi viewport to handle device resolution differences if you want
+               
+                //hide splash screen now that our app is ready to run
+                AppMobi.device.hideSplashScreen();
+                setTimeout(function(){
+                    $.ui.launch();
+                },50);
+            }
+
+            //initial event handler to detect when appMobi is ready to roll
+            document.addEventListener("appMobi.device.ready",onDeviceReady,false);
+        </script> 
+
+        <script src="/static/mobile/js/appframework.ui.min.js"></script>
+        <script>
+            $.ui.autoLaunch=true;
+            $.ui.useOSThemes=true;
+            $.ui.blockPageScroll();
+            $(document).ready(function(){
+                // This can be pulled in later as JSON if needed:
+                var SCREEN_DATA = {{ screen.to_dict() | tojson|safe }},
+                    POSTS_URL = "{{ url_for('screens_posts_from_feeds', json_feeds_list='-1') }}";
+
+                // boilerplate:
+                if ($.ui.useOSThemes&&!$.os.ios7&&$("#afui").get(0).className!=="ios7") {
+                    if (!$.os.ipad) {
+                        $("#afui").removeClass("ios7");
+                    } else {
+                        $("#afui").removeClass("ios");
+                    }
+                }
+                
+                // add zones to zonelist:
+                for (i=0;i<SCREEN_DATA.zones.length;i++) {
+                    $('#zonelist').append('<li><a href="#zone_'+i+'">' + SCREEN_DATA.zones[i].name + '</a></li>');
+                    $.ui.addContentDiv('zone_' + i,
+                                        '<ul id="zone_postlist_' + i + '" class="list"></ul>',
+                                        SCREEN_DATA.zones[i].name);
+                    $.getJSON(POSTS_URL.replace('-1', JSON.stringify(SCREEN_DATA.zones[i].feeds)),null,
+                        (function(zone_id){
+                            return (function(posts_list) {
+                                var i, postbox;
+                                for (i=0;i<posts_list.posts.length;i++) {
+                                    postbox = $('<li><h2>loading...</h2>' + JSON.stringify(posts_list.posts[i]) + '</li>');
+                                    $('#zone_postlist_' + zone_id).append(postbox);
+                                       
+                                    (function(listitem){
+                                        $.getJSON(posts_list.posts[i].uri, function (post_info) {
+                                            if ((post_info.type == 'html') || (post_info.type == 'text')) {
+                                                listitem.html(post_info.content.content);
+                                            } else if (post_info.type == 'image') {
+                                                listitem.html('<img src="' + post_info.content.file_url + '">');
+                                            } else {
+                                                listitem.html(JSON.stringify(post_info));
+                                            }
+                                            });
+                                    })(postbox);
+
+
+                                }
+                                //alert(JSON.stringify(result));
+                            });
+                        })(i));
+  //                  alert(SCREEN_DATA.zones[i].feeds);
+                }
+
+            });
+        </script>
+        <link href="/static/mobile/css/icons.css" rel="stylesheet" type="text/css"></link>
+        <link href="/static/mobile/css/af.ui.css" rel="stylesheet" type="text/css"></link>
+        <style>
+        #afui, #afui.ios7 .panel, div {
+            background: rgba(0,0,0,0.2);
+        }
+        #afui .list {
+            background: rgba(255,255,255,0.8);
+        }
+        #afui > #navbar, #afui.ios7 #navbar {
+            background: rgba(0,0,0,0.7);
+        }
+        </style>
+    </head>
+
+    <body style="background:url({{ url_for('static', filename='user_files/' + screen.background) }})">
+        <div id="afui" class='ios7' style="background:none;">
+            <div id="header"></div>
+            <div id="content" style="">
+                <div data-appbuilder-object="page" selected="selected"
+                     style="" id="page_0" class="panel" title="Teenstreet Newsapp" data-nav="nav_0">
+                    <ul id="zonelist" data-position="static"
+                        data-appbuilder-object="list" class="list"></ul>
+                </div>
+                <div data-appbuilder-object="page" style="" id="detail" class="panel"
+                     title="Detail View" data-nav="nav_0">
+                </div>
+            </div>
+            <div id="navbar">
+                <a href="#page_0" class="icon home">Overview</a>
+            </div>
+            <header id="header_0" data-appbuilder-object="header">
+                <a id="backButton" href="#" class="button back" style="visibility: visible; ">Back</a>
+                <h1 id="pageTitle" class="">testpage???</h1>
+            </header>
+            <!--
+            <nav id="nav_0" data-appbuilder-object="nav">
+                <h1>Side Menu</h1>
+            </nav>-->
+        </div>
+    </body>
+</html>

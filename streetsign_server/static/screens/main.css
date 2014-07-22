@@ -16,18 +16,34 @@ div.zone {
     display: table-cell;
     vertical-align: middle;
     background-size: cover;
+    transition: opacity 1s;
+    -webkit-transition: opacity: 1s;
+    // this mad extra forces webkit to give each zone it's own layer,
+    // which makes screen paints faster.  ***bizrre***
+    //-webkit-transform: rotateX(20deg);
+    -webkit-transform: translateZ(0);
 }
 
 .zone_ .post, .zone_fade .post {
     position: absolute;
-    /*top:0;
+    top:0;
     left:0;
     right:0;
-    bottom:0;*/
+    bottom:0;
     width: 100%;
     height: 100%;
     margin: auto;
     display: table;
+    opacity: 0;
+    //border:1px solid red;
+    transition: opacity 1s;
+    -webkit-transition: opacity: 1s;
+}
+
+.post.faded_in {
+    opacity: 1.0;
+    transition: opacity 1s;
+    -webkit-transition: opacity: 1s;
 }
 
 .zone_scroll .post {
@@ -37,6 +53,7 @@ div.zone {
     height: 100%;
     /*display: inline;*/
     white-space: nowrap;
+    opacity: 0;
 }
 
 .zone_ div.post_inner, .zone_fade div.post_inner {

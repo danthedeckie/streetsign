@@ -313,7 +313,7 @@ class Feed(DBModel):
         ''' how many posts in this feed? '''
         q = self.posts
         if published:
-            q = q.where(Post.published==True)
+            q = q.where(Post.published == True)
         if not expired:
             q = q.where(Post.active_end > datetime.now())
         return q.count()
@@ -592,12 +592,13 @@ class Post(DBModel):
     def dict_repr(self):
         ''' must give all info, for use on screens, etc. '''
         return (
-            {'id': self.id,
-             'type': self.type,
-             'content': safe_json_load(self.content, {}),
-             'time_restrictions': safe_json_load(self.time_restrictions, []),
-             'time_restrictions_show': self.time_restrictions_show,
-             'display_time': self.display_time * 1000 # in milliseconds
+            { 'id': self.id,
+              'type': self.type,
+              'content': safe_json_load(self.content, {}),
+              'time_restrictions': safe_json_load(self.time_restrictions, []),
+              'time_restrictions_show': self.time_restrictions_show,
+              'display_time': self.display_time * 1000, # in milliseconds
+              'changed': self.write_date
             })
 
     def active_status(self):

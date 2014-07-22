@@ -40,7 +40,7 @@ function zone_html(id, top, left, bottom, right, css, type) {
             +'left:' + left
             +';right:' + right
             +';bottom:' + bottom
-            +';top:' + top + '"></div>');
+            +';top:' + top + ';' + css.replace(/"/g,"'") + '"></div>');
 }
 
 /***************************************************************************/
@@ -71,81 +71,58 @@ var zone_types = {
         start: function (post, cb) {
             "use strict";
 
-            var stylesheet;
-            var prefix = "";
-            var css;
+            var stylesheet,
+                prefix = "",
+                css,
+                post_width = post.el.scrollWidth,
+                total_distance = post.zone.width + post_width,
+                current_left = post.zone.width,
+                end_left = 0 - post.width,
+                start_time = null,
+                mover = (function(timestamp) {
+                    var progress, new_left;
 
-            // create a new stylesheet with the @keyframes defined for
-            // movement the keyframes animation is named
-            // 'slide_<zoneid>_<postid>'
-            // TODO   ^^^^^^^^
+                    if (start_time === null) start_time = timestamp;
+                    progress = (timestamp - start_time);
 
-            if (!post.scroll_stylesheet) {
+                    if (current_left > end_left) {
+                        new_left = (total_distance / post.display_time) * (post.display_time - progress) - post_width;
+                        if (new_left < current_left -1) {
+                            current_left = new_left;
+                        } else if (new_left > current_left) {
+                            return;
+                        }
+                        post.el.style.left = current_left + 'px';
+                        //requestAnimationFrame(mover);
+                        //setTimeout(function(){requestAnimationFrame(mover)},1000);
+                        requestAnimationFrame(mover);
+                    }
+                });
 
-                // Why does this need to be set here? it seems like the
-                // previous setting in main.js (Zone.prototype.addPost)
-                // gets an incorrect value...
-                post.width = post.el.scrollWidth;
+            // Why does this need to be set here? it seems like the
+            // previous setting in main.js (Zone.prototype.addPost)
+            // gets an incorrect value...
 
-                // if we're on an old webkit browser, add their prefixes
+            post.width = post.el.scrollWidth;
 
-                if (post.el.style.hasOwnProperty('webkitAnimation')){
-                    prefix = '-webkit-';
-                }
-
-                stylesheet = document.createElement('style');
-                stylesheet.appendChild(document.createTextNode(
-                      "@"+prefix+"keyframes slide_" + post.id
-                    + " { from { "+prefix+"transform:"
-                               + " translateX("+ post.zone.width + "px)"
-                    + " } to { "+prefix+"transform:"
-                               + " translateX(-"+ post.width + "px)}}"));
-
-                console.log('new keyframe anim('+post.id+'):' + post.zone.width
-                            + ' => -' + post.width);
-
-                post.scroll_stylesheet = document.head.appendChild(stylesheet);
-            }
-
-            console.log('w:' + post.width + ' real:' + post.el.offsetWidth);
-
-            // set up initial translation position, etc
-
-            //css = "translateX("+ post.zone.width + "px)";
-
-            //post.el.style.webkitTransform = css;
-            //post.el.style.transform = css;
+            requestAnimationFrame(mover);
 
             post.el.style.display = 'block';
-            post.el.style.opacity = 0;
+            post.el.style.opacity = 1;
 
             post.display_time = (post.width + post.zone.width) * 14;
 
-            // give it a fraction of a second to stablilse the DOM,
-            // then start the animation.
-
-            //setTimeout( function () {
-                post.el.style.opacity = "1.0";
-
-                css = (("slide_" + post.id + " ")
-                      + parseInt(post.display_time/1000)
-                      + "s linear 0s 1 both");
-
-                post.el.style.webkitAnimation = css;
-                post.el.style.animation = css;
-
-                // and call the 'after starting' callback:
-                cb && cb();
-            //}, 10);
+            // and call the 'after starting' callback:
+            cb && cb();
 
             },
         stop: function (post, cb) {
             "use strict";
 
-            post.zone.el.style.opacity = 0;
+            //post.zone.el.style.opacity = 0;
 
             setTimeout( function () {
-                post.el.style.display = 'none';
+                //post.el.style.display = 'none';
 
                 post.el.style.webkitAnimation = "";
                 post.el.style.mozAnimation = "";

@@ -1,5 +1,5 @@
 [TYPECHECK]
-generated-members=id,DoesNotExist, permissions, setdefaultencoding
+generated-members=id,DoesNotExist, permissions, setdefaultencoding, select, get, raw
 [FORMAT]
 max-line-length=90
 [BASIC]

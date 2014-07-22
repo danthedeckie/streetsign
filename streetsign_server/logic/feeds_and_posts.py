@@ -27,7 +27,7 @@ logic for feeds_and_posts views, separated out for clarity.
 
 from flask import flash, url_for, json
 from streetsign_server.views.utils import PleaseRedirect
-from streetsign_server.models import Feed, safe_json_load
+from streetsign_server.models import Feed
 from datetime import datetime
 
 def try_to_set_feed(post, new_feed_id, user):
@@ -45,11 +45,11 @@ def try_to_set_feed(post, new_feed_id, user):
     if new_feed_id and new_feed_id != oldfeedid:
         # new or changed feed.
         try:
-            feed = Feed.get(Feed.id==new_feed_id)
+            feed = Feed.get(Feed.id == new_feed_id)
         except Feed.DoesNotExist:
             raise PleaseRedirect(None,
-                  "Odd. You somehow tried to post "
-                  "to a non-existant feed. It didn't work.")
+                                 "Odd. You somehow tried to post "
+                                 "to a non-existant feed. It didn't work.")
 
         if feed.user_can_write(user):
             flash('Posted to ' + feed.name)
@@ -59,7 +59,8 @@ def try_to_set_feed(post, new_feed_id, user):
             # This shouldn't happen very often - so don't worry about
             # losing post data.  If it's an issue, refactor so it's stored
             # but not written to the feed...
-            raise PleaseRedirect(url_for('index'),
+            raise PleaseRedirect(
+                url_for('index'),
                 "Sorry, you don't have permission to write to " + feed.name)
         return feed
 
@@ -76,7 +77,8 @@ def if_i_cant_write_then_i_quit(post, user):
     # if we don't have write permission, then this isn't our post!
     if not post.feed.user_can_write(user):
 
-        raise PleaseRedirect(None,
+        raise PleaseRedirect(
+            None,
             "Sorry, this post is in feed '{0}', which"
             " you don't have permission to post to."
             " Edit cancelled.".format(post.feed.name))
@@ -84,7 +86,8 @@ def if_i_cant_write_then_i_quit(post, user):
     # if this post is already published, be careful about editing it!
     if post.published and not post.feed.user_can_publish(user):
 
-        raise PleaseRedirect(None,
+        raise PleaseRedirect(
+            None,
             'Sorry, this post is published,'
             ' and you do not have permission to'
             ' edit published posts in "{0}".'.format(post.feed.name))
@@ -130,7 +133,7 @@ def post_form_intake(post, form, editor):
         flash('Problem with start date.')
     try:
         post.active_end = clean_date(form.get('active_end', ''))
-    except ValueError as e:
+    except ValueError:
         flash('Problem with end date.')
 
     post.status = 0 # any time a post is edited, remove it from archive.
@@ -140,6 +143,7 @@ def post_form_intake(post, form, editor):
             == 'only_show')
     post.time_restrictions = form.get('time_restrictions_json', '[]')
     post.display_time = min(100, max(2, int(form.get('displaytime', 8))))
+    post.write_date = datetime.now()
 
 def delete_post_and_run_callback(post, typemodule):
     ''' before a post is actually deleted, check if there is a 'pre-delete'

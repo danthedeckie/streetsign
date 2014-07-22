@@ -212,7 +212,7 @@ def posts():
         else:
             return render_template('posts.html',
                                    posts=Post.select() \
-                                             .where(Post.status==0), user=user)
+                                             .where(Post.status == 0), user=user)
     except Feed.DoesNotExist as e:
         # Ah. Database inconsistancy! Not good, lah.
         ps = Post.raw('select post.id from post'
@@ -429,6 +429,14 @@ def posts_housekeeping():
                     "archive_before": archive_time,
                     "now": now})
 
+###############################################################
+
+@app.route('/posts/<int:postid>/json')
+def json_post(postid):
+    try:
+        return jsonify(Post.get(Post.id == postid).dict_repr())
+    except:
+        return jsonify({"error": "Invalid Post ID"})
 
 ###############################################################
 
@@ -495,7 +503,7 @@ def external_data_source_edit(source_id):
             if source_id == None:
                 # new source!
                 return redirect(url_for('external_data_source_edit',
-                                        source_id = source.id))
+                                        source_id=source.id))
             else:
                 flash('Updated.')
         except Feed.DoesNotExist:
@@ -506,6 +514,7 @@ def external_data_source_edit(source_id):
     return render_template("external_source.html", source=source,
             feeds=Feed.select(),
             form=module.form(json.loads(source.settings)))
+
 
 @app.route('/external_data_sources/test')
 def external_source_test():
