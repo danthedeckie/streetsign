@@ -29,6 +29,7 @@
 
 from flask import render_template, url_for, request, redirect, \
                   flash, json, jsonify
+from werkzeug import ImmutableDict
 
 import sqlite3
 from glob import glob
@@ -39,7 +40,7 @@ from datetime import datetime
 import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
 from streetsign_server import app
-from streetsign_server.models import Feed, Post, Screen
+from streetsign_server.models import Feed, Post, Screen, ConfigVar, config_var
 from streetsign_server.post_types.image import allow_filetype
 
 
@@ -62,6 +63,7 @@ def form_json(name, default):
 def screens():
     ''' HTML listing of all screens  '''
     return render_template('screens.html',
+                           aliases=config_var('screens.aliases', []),
                            screens=Screen.select())
 
 
@@ -93,7 +95,7 @@ def screenedit(screenid):
         user = user_session.get_user()
         if not user.is_admin:
             flash('Sorry. You are NOT an admin!')
-            redirect(url_for('index'))
+            return redirect(url_for('index'))
 
         if request.form.get('action', 'update') == 'delete':
             screen.delete_instance()
@@ -191,3 +193,53 @@ def post_types_js():
 
     return (render_template('post_types.js', types=post_types.renderers()),
             200, {'Content-Type': 'application/javascript'})
+
+@app.route('/aliases', methods=['GET', 'POST'])
+def save_aliases():
+    ''' save the current aliases. '''
+    try:
+        user = user_session.get_user()
+    except user_session.NotLoggedIn:
+        flash('Sorry, you need to be logged in!')
+        return redirect(url_for('index'))
+    if not user.is_admin:
+        flash('Sorry. You are NOT an admin!')
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        aliases = form_json('aliases', [])
+
+        try:
+            alias_configvar = ConfigVar.get(ConfigVar.id == 'screens.aliases')
+        except ConfigVar.DoesNotExist:
+            alias_configvar = ConfigVar()
+            alias_configvar.id='screens.aliases'
+            alias_configvar.save(force_insert=True)
+
+        alias_configvar.value = aliases
+
+        alias_configvar.save()
+        print 'id:', alias_configvar.id
+        print 'value:', alias_configvar.value
+        return jsonify(aliases=json.loads(alias_configvar.value))
+
+    return jsonify(aliases=config_var('screens.aliases', []))
+
+@app.route('/client/<alias_name>')
+def client_alias(alias_name):
+    raw_aliases = config_var('screens.aliases', [])
+
+    aliases = {}
+    for alias in raw_aliases:
+        aliases[alias['name']] = alias
+
+    if alias_name in aliases:
+        alias = aliases[alias_name]
+        # TODO:
+        request.args=ImmutableDict(forceaspect=1.777,
+            **request.args)
+
+        return screendisplay(alias['screen_type'], alias['screen_name'])
+
+    else:
+        return 'Screen Alias not found. Sorry...'

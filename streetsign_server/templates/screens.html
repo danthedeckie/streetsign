@@ -9,7 +9,12 @@
   <tr>
     <th>View URL</th>
     <th>Actions</th>
-    <th>{% if session.display_admin_stuff %}<a href="{{ url_for('screenedit', screenid=-1) }}" class="btn btn-primary">New</a>{% endif %}</th>
+    <th>
+      {% if session.display_admin_stuff %}
+        <a href="{{ url_for('screenedit', screenid=-1) }}"
+           class="btn btn-primary">New</a>
+      {% endif %}
+    </th>
   </tr>
 </thead>
 <tbody>
@@ -27,7 +32,8 @@
 You can add extra 'query arguments' to the URLs, to force the aspect ratio, etc.  <a href="http://streetsign.readthedocs.org/en/latest/screen_options.html#screen-over-ride-options" target="_blank">More details</a>
 <hr/>
 <h2> Aliases </h2>
-<button data-bind="click: addAlias">Add</button>
+<button data-bind="click: addAlias" class="btn">Add</button>
+<button data-bind="click: saveAliases" class="btn btn-primary">Save</button>
 <table class="table table-striped">
 <thead>
   <tr>
@@ -64,6 +70,6 @@ You can add extra 'query arguments' to the URLs, to force the aspect ratio, etc.
 {{ linkmacros.static_js('alias_editor.js') }}
 <script>
 SCREEN_NAMES=[{% for s in screens %}"{{ s.urlname}}",{% endfor %}"(unset)"];
-ko.applyBindings(new AliasesView([]));
+ko.applyBindings(new AliasesView({{ aliases | tojson| safe }}));
 </script>
 {% endblock %}
