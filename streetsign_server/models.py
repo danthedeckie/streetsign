@@ -746,10 +746,10 @@ def config_var(key, default_value):
         NOTE: returns the *value*, and NOT the database record!
         '''
     try:
-        return json.loads(ConfigVar.get(id=key).value)
+        return json.loads(ConfigVar.get(ConfigVar.id == key).value)
     except ConfigVar.DoesNotExist:
         try:
             return default_value
         except peewee.IntegrityError:
             # ha! we have a race! and you lose...
-            return json.loads(ConfigVar.get(id=key).value)
+            return json.loads(ConfigVar.get(ConfigVar.id == key).value)
