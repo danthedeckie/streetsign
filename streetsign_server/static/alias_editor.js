@@ -8,6 +8,11 @@ var AliasModel = function(input_data) {
     alias.scrollspeed = ko.observable(input_data.scrollspeed || null);
     alias.forceaspect = ko.observable(input_data.forceaspect || null);
     alias.forcetop = ko.observable(input_data.forcetop || null);
+
+    alias.url = ko.computed(function () {
+        return '/client/' + this.name();
+        }, alias);
+
 };
 
 var AliasesView = function(initial_list) {
@@ -27,7 +32,9 @@ var AliasesView = function(initial_list) {
     };
 
     view.deleteAlias = function(alias) {
-        view.aliases.remove(alias);
+        if (confirm("Really delete this alias?")) {
+            view.aliases.remove(alias);
+        }
     };
 
     view.saveAliases = function() {

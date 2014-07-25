@@ -47,9 +47,9 @@ You can add extra 'query arguments' to the URLs, to force the aspect ratio, etc.
 <tbody data-bind="foreach: aliases">
   <tr>
     <td><button data-bind="click: $root.deleteAlias">&times;</button></td>
-    <td><input data-bind="value: name" /></td>
+    <td><input data-bind="value: name" /><br/><a data-bind="attr: {href: url}, text: url">URL</a></td>
     <td><select data-bind="options: SCREEN_NAMES, value:screen_name"></select></td>
-    <td><input data-bind="value: screen_type" /></td>
+    <td><select data-bind="options: SCREEN_TYPES, value: screen_type"></select></td>
     <td>
       <small>
       <label>fadetime: <input type="number" data-bind="value: fadetime" /></label>
@@ -70,6 +70,7 @@ You can add extra 'query arguments' to the URLs, to force the aspect ratio, etc.
 {{ linkmacros.static_js('alias_editor.js') }}
 <script>
 SCREEN_NAMES=[{% for s in screens %}"{{ s.urlname}}",{% endfor %}"(unset)"];
+SCREEN_TYPES=['basic', 'notrans', 'mobile'];
 ko.applyBindings(new AliasesView({{ aliases | tojson| safe }}));
 </script>
 {% endblock %}

@@ -3,12 +3,11 @@
 - External Data Sources
 - API and other 'public' documentation.
 - Unit tests
-- reworking animation in screens display to use CSS3 keyframe animations, and much less 'janky' callbacks, etc. (dev branch)
 - RSS "output" of feeds, so mobiles(etc) can subscribe.
+- a basic 'temporary' auto-screen router which sends different mac addressed or ip addressed
+  clients to different actual screens.  This could simply be using a ConfigVar for now, and
+  then be part of a proper client management system for 2.0
 
-# Bugs:
-
-- Single message on side-scrolling zone display doesn't go on for ever (some kind of timeout/race condition?)
 
 ## Urgent:
 
@@ -17,9 +16,6 @@
   `postid-imagename` isn't it?  then there's less chance of confict and over-writing.
 - screen restarting every 6 hours or so
 - a configvar editor for admins.
-- a basic 'temporary' auto-screen router which sends different mac addressed or ip addressed
-  clients to different actual screens.  This could simply be using a ConfigVar for now, and
-  then be part of a proper client management system for 2.0
 - float left/right for images in rich text posts??
 
 ## Needed, but copeable for alpha version.

@@ -227,6 +227,8 @@ def save_aliases():
 
 @app.route('/client/<alias_name>')
 def client_alias(alias_name):
+    ''' client alias repointing address '''
+
     raw_aliases = config_var('screens.aliases', [])
 
     aliases = {}
@@ -235,11 +237,27 @@ def client_alias(alias_name):
 
     if alias_name in aliases:
         alias = aliases[alias_name]
-        # TODO:
-        request.args=ImmutableDict(forceaspect=1.777,
-            **request.args)
+
+        # This is very ugly, and could certainly be improved,
+        # but it works for now:
+
+        details = []
+        if alias.get('forceaspect', None):
+            details.append(('forceaspect', alias['forceaspect']))
+        if alias.get('forcetop', None) != None:
+            details.append(('forcetop', alias['forcetop']))
+        if alias.get('fadetime', None) != None:
+            details.append(('fadetime', alias['fadetime']))
+        if alias.get('scrollspeed', None):
+            details.append(('scrollspeed', alias['scrollspeed']))
+
+        request.args=ImmutableDict(**dict(details + request.args.items()))
 
         return screendisplay(alias['screen_type'], alias['screen_name'])
 
     else:
-        return 'Screen Alias not found. Sorry...'
+        return ('<!doctype html><html><body><h1>Screen Alias not found.</h1>'
+                '<p>Sorry...</p><script>'
+                'setTimeout(function(){'
+                '    document.location.reload(true);}, 10000);'
+                '</script></body></html>')
