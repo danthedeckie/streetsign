@@ -313,7 +313,7 @@ class Feed(DBModel):
         ''' how many posts in this feed? '''
         q = self.posts
         if published:
-            q = q.where(Post.published==True)
+            q = q.where(Post.published == True)
         if not expired:
             q = q.where(Post.active_end > datetime.now())
         return q.count()

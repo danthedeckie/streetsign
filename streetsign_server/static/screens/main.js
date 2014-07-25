@@ -117,7 +117,7 @@ Zone.prototype = {
     color: 'white',
     post_time: 4000,
     fadetime: 500,
-    update_zones_timer: 6000,
+    update_zones_timer: 10000,
     no_posts_wait: 10000,
     current_post: false,
     current_post_index: -1,
@@ -210,8 +210,6 @@ Zone.prototype = {
 
         if (post.id === this.current_post.id) {
             // same post!
-            console.log(this.name + '| only this post is available');
-
             if (this.type == 'scroll') {
                 post_fadeout(post, function() { post_fadein(post, after_cb); } );
             } else {

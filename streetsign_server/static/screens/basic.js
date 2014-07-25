@@ -85,7 +85,6 @@ var zone_types = {
                 // Why does this need to be set here? it seems like the
                 // previous setting in main.js (Zone.prototype.addPost)
                 // gets an incorrect value...
-
                 post.width = post.el.scrollWidth;
 
                 // if we're on an old webkit browser, add their prefixes
