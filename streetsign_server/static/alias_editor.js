@@ -43,7 +43,9 @@ var AliasesView = function(initial_list) {
 
     view.saveAliases = function() {
         $.post('/aliases',
-            {'aliases': ko.toJSON(view.aliases)});
+            {'aliases': ko.toJSON(view.aliases)},
+            function(){alert('saved!');})
+         .fail(function(){alert('failed to save...');});
 
     };
 };
