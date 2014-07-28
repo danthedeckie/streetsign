@@ -85,7 +85,11 @@ function Zone(container, initial_data) {
     update('color');
     update('name');
     update('type');
-    update('fadetime', parseInt);
+    if (LOCALOPTS.hasOwnProperty('fadetime')) {
+        this['fadetime'] = parseInt(LOCALOPTS['fadetime'],10);
+    } else {
+        update('fadetime', function(x){return parseInt(x, 10);});
+    }
 
     this.feedsurl = url_insert(POSTS_URL, JSON.stringify(this.feeds));
 
