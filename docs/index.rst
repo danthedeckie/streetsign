@@ -22,6 +22,7 @@ Contents:
    :maxdepth: 3
 
    getting_started
+   screen_options
    admin_guide
    developer-overview
    developer-reference
