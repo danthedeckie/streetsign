@@ -58,6 +58,14 @@ Other CSS
 You can use standard CSS settings such as `text-shadow`, `font-weight` etc. in here to
 further style your zones.
 
+Screen 'client aliases'
+-----------------------
+
+As well as the Layouts described above, you can also set up "client aliases" which can be
+changed to point at different layouts, with different options, without the URL (and so the
+client configuration) needing to be changed.  These aliases are edited on the 'screens'
+section, and can be set to appear on the front 'dashboard' as well, if you choose.
+
 Screen "over-ride" Options
 --------------------------
 
@@ -69,6 +77,13 @@ over-ride options can be set by passing them in the URI query string::
 One useful combination for some lower powered machines is::
 
     ?fadetime=0&scrollspeed=20
+
+These can all be set as part of a client alias, which would result in a simpler URL
+such as::
+
+    /client/dining-hall
+
+for instance.
 
 Here are all the options, and how to use them:
 
