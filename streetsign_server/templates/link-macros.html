@@ -17,3 +17,7 @@
 {% macro post(post) %}
 <a href="{{ url_for('postpage', postid=post.id) }}">{{ post.repr() }}</a>
 {% endmacro %}
+
+{% macro admin_lock() %}
+{{- ' locked '  if sessions.display_admin_stuff else '' -}}
+{% endmacro %}

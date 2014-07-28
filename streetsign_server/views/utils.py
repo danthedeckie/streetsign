@@ -23,7 +23,9 @@
     No actual views in here, only bits and pieces to make views more
     fun.
 """
-from flask import request
+from flask import request, flash, redirect, url_for
+import streetsign_server.user_session as user_session
+from functools import wraps
 
 class PleaseRedirect(Exception):
     '''
@@ -63,3 +65,44 @@ def getstr(name, default):
     """ get a string from request.form. if it's not there, then return the
         default. """
     return request.form.get(name, default)
+
+def admin_only(*methods):
+    '''
+        decorator for views to restrict access to admin users only.
+    '''
+    def wrapper(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            if request.method in methods:
+                try:
+                    user = user_session.get_user()
+                except user_session.NotLoggedIn:
+                    flash('Sorry! You need to be logged in!')
+                    return redirect(url_for('index'))
+
+                if not user.is_admin:
+                    flash('Sorry! You need to be an admin!')
+                    return redirect(url_for('index'))
+            return f(*args, **kwargs)
+        return wrapped
+    return wrapper
+
+def registered_users_only(*methods):
+    '''
+        decorator for views to restrict access to registered users only.
+    '''
+    def wrapper(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            if request.method in methods:
+                try:
+                    user = user_session.get_user()
+                except user_session.NotLoggedIn:
+                    flash('Sorry! You need to be logged in!')
+                    return redirect(url_for('index'))
+
+            return f(*args, **kwargs)
+        return wrapped
+    return wrapper
+
+

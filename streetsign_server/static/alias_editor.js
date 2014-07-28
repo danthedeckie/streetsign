@@ -1,9 +1,13 @@
 var AliasModel = function(input_data) {
     var alias=this;
     input_data = input_data || {};
+
     alias.name = ko.observable(input_data.name || 'client-name...');
+    alias.show_on_dashboard = ko.observable(input_data.show_on_dashboard || false);
+
     alias.screen_name = ko.observable(input_data.screen_name || 'Default');
     alias.screen_type = ko.observable(input_data.screen_type || 'basic');
+
     alias.fadetime = ko.observable(input_data.fadetime || null);
     alias.scrollspeed = ko.observable(input_data.scrollspeed || null);
     alias.forceaspect = ko.observable(input_data.forceaspect || null);

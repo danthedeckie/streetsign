@@ -42,6 +42,7 @@ import streetsign_server.post_types as post_types
 from streetsign_server import app
 from streetsign_server.models import Feed, Post, Screen, ConfigVar, config_var
 from streetsign_server.post_types.image import allow_filetype
+from streetsign_server.views.utils import admin_only, registered_users_only
 
 
 def form_json(name, default):
@@ -60,6 +61,8 @@ def form_json(name, default):
 
 
 @app.route('/screens/')
+@admin_only('POST')
+@registered_users_only('GET')
 def screens():
     ''' HTML listing of all screens  '''
     return render_template('screens.html',
@@ -195,6 +198,8 @@ def post_types_js():
             200, {'Content-Type': 'application/javascript'})
 
 @app.route('/aliases', methods=['GET', 'POST'])
+@admin_only('POST')
+@registered_users_only('GET')
 def save_aliases():
     ''' save the current aliases. '''
     try:
@@ -217,10 +222,7 @@ def save_aliases():
             alias_configvar.save(force_insert=True)
 
         alias_configvar.value = aliases
-
         alias_configvar.save()
-        print 'id:', alias_configvar.id
-        print 'value:', alias_configvar.value
         return jsonify(aliases=json.loads(alias_configvar.value))
 
     return jsonify(aliases=config_var('screens.aliases', []))

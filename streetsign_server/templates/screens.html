@@ -22,9 +22,13 @@
     <tr>
         <td><a href="{{url_for('screendisplay', template='basic', screenname=s.urlname)}}">{{url_for('screendisplay', template='basic', screenname=s.urlname)}}</a>
         <td><a href="{{url_for('screendisplay', template='basic', screenname=s.urlname)}}" class="btn btn-sm btn-default">View</a>{% if session.display_admin_stuff %} - <a href="{{url_for('screenedit', screenid=s.id)}}" class="btn btn-sm btn-default" >Edit</a>{% endif %}</td>
-        <td>{% if session.display_admin_stuff %}<form method="POST" action="{{ url_for('screenedit', screenid=s.id) }}">
+        <td>{% if session.display_admin_stuff %}
+            <form method="POST" action="{{ url_for('screenedit', screenid=s.id) }}">
             <input type="hidden" name="action" value="delete" />
-            <input type="submit" value="&times; Delete" class="btn btn-sm delbutton confirm_delete"></form>{% endif %}</td>
+            <input type="submit" value="&times; Delete"
+                   class="btn btn-sm delbutton confirm_delete"></form>
+            {% endif %}
+        </td>
     </tr>
 {% endfor %}
 </tbody>
@@ -32,34 +36,57 @@
 You can add extra 'query arguments' to the URLs, to force the aspect ratio, etc.  <a href="http://streetsign.readthedocs.org/en/latest/screen_options.html#screen-over-ride-options" target="_blank">More details</a>
 <hr/>
 <h2> Aliases </h2>
+  {% if session.display_admin_stuff %}
 <button data-bind="click: addAlias" class="btn">Add</button>
 <button data-bind="click: saveAliases" class="btn btn-primary">Save</button>
+  {% endif %}
 <table class="table table-striped">
 <thead>
   <tr>
     <th></th>
     <th>Access Key / Client ID</th>
-    <th>Layout</th>
-    <th>Engine</th>
-    <th>Options</th>
+    <th>Layout & Engine</th>
+    <th>Display Options</th>
   </tr>
 </thead>
 <tbody data-bind="foreach: aliases">
   <tr>
-    <td><button data-bind="click: $root.deleteAlias">&times;</button></td>
     <td>
-        <input data-bind="value: name" /><br/>
+    {% if session.display_admin_stuff %}
+    <button data-bind="click: $root.deleteAlias">&times;</button>
+    {% endif %}</td>
+    <td>
+        <input data-bind="value: name" {{ utils.adminlock }} /><br/>
         URL: <a data-bind="attr: {href: url}, text: url">URL</a></br>
-        Display on public dashboard: <input type=checkbox />
+        {% if session.display_admin_stuff %}
+        Display on public dashboard: <input type=checkbox data-bind="checked: show_on_dashboard" />
+        {% endif %}
     </td>
-    <td><select data-bind="options: SCREEN_NAMES, value:screen_name"></select></td>
-    <td><select data-bind="options: SCREEN_TYPES, optionsText: 'name', optionsValue:'engine', value: screen_type"></select></td>
+    <td>
+       {% if session.display_admin_stuff %}
+       <label>Layout:
+        <select class="form-control"
+                data-bind="options: SCREEN_NAMES, value:screen_name"></select></label><br/>
+       <label>Engine:
+        <select class="form-control"
+                data-bind="options: SCREEN_TYPES,
+                           optionsText: 'name', optionsValue:'engine',
+                           value: screen_type"></select></label>
+      {% else %}
+      <b>Layout:</b> <span data-bind="text: screen_name"></span><br/>
+      <b>Engine:</b> <span data-bind="text: screen_type"></span><br/>
+      {% endif %}
+    </td>
     <td>
       <small>
-      <label>fadetime: <input type="number" data-bind="value: fadetime" /></label>
-      <label>scrollspeed: <input type="number" data-bind="value: scrollspeed" /></label>
-      <label>aspect radio: <input type="number" data-bind="value: forceaspect" /></label>
-      <label>vertical offset: <input type="number" data-bind="value: forcetop" /></label>
+      <label>fadetime:
+        <input {{utils.adminlock}} type="number" data-bind="value: fadetime" /></label><br/>
+      <label>scrollspeed:
+        <input {{utils.adminlock}} type="number" data-bind="value: scrollspeed" /></label><br/>
+      <label>aspect radio:
+        <input {{utils.adminlock}} type="number" data-bind="value: forceaspect" /></label><br/>
+      <label>vertical offset:
+        <input {{utils.adminlock}} type="number" data-bind="value: forcetop" /></label><br/>
       </small>
     </td>
   </tr>

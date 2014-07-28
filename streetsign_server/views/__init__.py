@@ -36,7 +36,7 @@ import streetsign_server.user_session as user_session
 
 # set up the app
 from streetsign_server import app
-from streetsign_server.models import DB, Post, Screen, Feed, User
+from streetsign_server.models import DB, Post, Screen, Feed, User, config_var
 
 ######################################################################
 # Basic App stuff:
@@ -75,12 +75,24 @@ def index():
                            .where((Post.published==False) &
                                   (Post.feed << publishable_feeds))
 
+    screens = Screen.select()
+    aliases = config_var('screens.aliases', [])
+
+    for alias in aliases:
+        for screen in screens:
+            if screen.urlname == alias['screen_name']:
+                alias['screen'] = screen
+                break
+        else:
+            alias['screen'] = None
+
     return render_template('dashboard.html',
-        feeds = Feed.select(),
+        aliases=aliases,
+        feeds=Feed.select(),
         publishable_feeds=publishable_feeds,
-        posts = Post.select().where(Post.author == user)\
-                    .order_by(Post.write_date.desc())\
-                    .limit(15),
-        posts_to_publish = posts_to_publish,
-        screens=Screen.select(),
+        posts=Post.select().where(Post.author == user)\
+                  .order_by(Post.write_date.desc())\
+                  .limit(15),
+        posts_to_publish=posts_to_publish,
+        screens=screens,
         user=user)

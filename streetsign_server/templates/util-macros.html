@@ -1,0 +1,5 @@
+{%- if not session.display_admin_stuff -%}
+    {%- set adminlock = ' readonly ' -%}
+{%- else -%}
+    {%- set adminlock = '' -%}
+{%- endif -%}
