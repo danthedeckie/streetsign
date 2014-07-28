@@ -35,11 +35,10 @@
 </table>
 You can add extra 'query arguments' to the URLs, to force the aspect ratio, etc.  <a href="http://streetsign.readthedocs.org/en/latest/screen_options.html#screen-over-ride-options" target="_blank">More details</a>
 <hr/>
+{% if session.display_admin_stuff %}
 <h2> Aliases </h2>
-  {% if session.display_admin_stuff %}
 <button data-bind="click: addAlias" class="btn">Add</button>
 <button data-bind="click: saveAliases" class="btn btn-primary">Save</button>
-  {% endif %}
 <table class="table table-striped">
 <thead>
   <tr>
@@ -56,7 +55,7 @@ You can add extra 'query arguments' to the URLs, to force the aspect ratio, etc.
     <button data-bind="click: $root.deleteAlias">&times;</button>
     {% endif %}</td>
     <td>
-        <input data-bind="value: name" {{ utils.adminlock }} /><br/>
+        <input data-bind="value: name" /><br/>
         URL: <a data-bind="attr: {href: url}, text: url">URL</a></br>
         {% if session.display_admin_stuff %}
         Display on public dashboard: <input type=checkbox data-bind="checked: show_on_dashboard" />
@@ -80,19 +79,19 @@ You can add extra 'query arguments' to the URLs, to force the aspect ratio, etc.
     <td>
       <small>
       <label>fadetime:
-        <input {{utils.adminlock}} type="number" data-bind="value: fadetime" /></label><br/>
+        <input type="number" data-bind="value: fadetime" /></label><br/>
       <label>scrollspeed:
-        <input {{utils.adminlock}} type="number" data-bind="value: scrollspeed" /></label><br/>
+        <input type="number" data-bind="value: scrollspeed" /></label><br/>
       <label>aspect radio:
-        <input {{utils.adminlock}} type="number" data-bind="value: forceaspect" /></label><br/>
+        <input type="number" data-bind="value: forceaspect" /></label><br/>
       <label>vertical offset:
-        <input {{utils.adminlock}} type="number" data-bind="value: forcetop" /></label><br/>
+        <input type="number" data-bind="value: forcetop" /></label><br/>
       </small>
     </td>
   </tr>
 </tbody>
 </table>
-
+{% endif %}
 
 {% endblock %}
 

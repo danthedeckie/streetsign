@@ -76,6 +76,24 @@ function safeGetJSON(url, callback, retry_time=60000) {
 
 }
 
+function reloadWhenThisURLContentChanges(){
+    "use strict";
+    var current_text = '',
+        reloader = (function () {
+            $.get(document.location.href, function(new_text) {
+                    if (new_text != current_text) {
+                        document.location.reload(true);
+                    }
+                });
+            });
+
+    // and start it all off:
+    $.get(document.location.href, function(first_text) {
+            current_text = first_text;
+            setInterval(reloader, 120000);
+        });
+}
+
 
 function magic_vars(text) {
     'use strict';
