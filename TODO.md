@@ -4,13 +4,20 @@
 - API and other 'public' documentation.
 - Unit tests
 - RSS "output" of feeds, so mobiles(etc) can subscribe.
+- a mobile friendly 'web app' display engine for screen(s).
 - a basic 'temporary' auto-screen router which sends different mac addressed or ip addressed
-  clients to different actual screens.  This could simply be using a ConfigVar for now, and
-  then be part of a proper client management system for 2.0
+  clients to different actual screens.  This uses a JSON list in a ConfigVar for now.  If this
+  system seems to make sense to people, and seems relatively sane, then it can be refactored
+  into a new SQL table later (which will be slightly faster...).
 
+## After TS this year:
+
+- rename 'Screen' to 'ScreenLayout'.
+- change client aliases to Table based, rather than dumping it all in a single configvar
 
 ## Urgent:
 
+- config.py way to 'lock' certain users so they can't be deleted...
 - make sure user uploaded files have the right place to go etc for new projects,
 - should uploaded post images still have their old names?? better that they get given
   `postid-imagename` isn't it?  then there's less chance of confict and over-writing.
@@ -22,7 +29,6 @@
 
 - Dropdown select box for font for screen zones (easy)
 - Better 'CSS' editing for zones and whole-screen.
-- Smarter 'live' Screen info updating, w/o reloading the whole page.
 - Post deactivation -> archive, and archive, future posts, etc view.
 - Group Editor, etc.
 - Better uploaded files editor.
@@ -38,6 +44,7 @@
 
 # Good things for the future:
 
+- Smarter 'live' Screen info updating, w/o reloading the whole page.
 - non-session auth as well for API, makes scripting easier.
 - Local machine mini-proxy which gets the latest info from the master server,
   but otherwise caches everything and keeps it running locally happily until
