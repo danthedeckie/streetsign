@@ -89,7 +89,6 @@ def test(data):
         tweets = get_new(data)
     except Exception as e: #pylint: disable=broad-except
         return '<h1>Invalid settings</h1><pre>' + str(e) + '</pre>'
-
     return render_template_string(my('test.html'), tweets=tweets)
 
 def get_new(data):
@@ -101,8 +100,6 @@ def get_new(data):
     auth.set_access_token(data['user_key'], data['user_secret'])
 
     api = tweepy.API(auth)
-
-    print dir(api)
 
     if data['feed_type'] == 'user_timeline':
         feed = api.user_timeline(data['query'])
@@ -126,6 +123,7 @@ def get_new(data):
 
     for entry in feed:
         entry.text = twitterify(entry.text)
+
         if entry.id not in previous_list:
             new_posts.append({'type': 'html', 'color': None,
                               'content': TWEET_TEMPLATE.render(tweet=entry, **data)})

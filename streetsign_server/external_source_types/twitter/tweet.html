@@ -1,2 +1,5 @@
 <a class="tweet_by" target="_new" href="https://twitter.com/{{tweet.user.name}}">{% if show_avatar == 'true' %}<img src="{{ tweet.user.profile_image_url }}" \>{% endif %}<small><b>{{ tweet.user.name }}</b></small></a><p>
-<span class="tweet_content">{{ tweet.text }}</span></p>
+<span class="tweet_content">{{ tweet.text }}</span>
+{% for ent in tweet.entities.media if ent.type == 'photo' %}
+<img class="embedded_photo" src="{{ ent.media_url }}"/>
+{% endfor %}</p>
