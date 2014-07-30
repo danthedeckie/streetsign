@@ -1,0 +1,33 @@
+<div class="cf"></div>
+<label>Embed a twitter timeline</label><br/>
+
+<label for="query">Query:</label>
+<input name="query" style="width: 100%;" value="{{query}}" />
+
+<hr/>
+<b>Preview:</b>
+<div id="preview" style="width: 100%;"></div>
+<!--
+<script type="text/javascript" defer>
+
+$( function() {
+    $('input[name="query"]').change(function(){
+        $("#preview").html('<iframe style="width:100%; min-height:200px;" src="' + $('input[name="query"]').val()+ '"/>');
+    });
+
+});
+
+</script>
+-->
+<script>
+_RENDERER={{ renderer | safe }};
+$(function() {
+    $('input[name="query"]').change(function(evt){
+        var query = evt.currentTarget.value;
+        $('#preview').html(_RENDERER._template(query, 400, 400));
+    });
+      //$('#preview').html(_RENDERER._template('danthedeckie', 400,400));
+});
+
+
+</script>

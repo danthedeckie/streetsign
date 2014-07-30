@@ -164,13 +164,15 @@ Zone.prototype = {
                 that.el.style.opacity = 0;
                 //$(that.el).css('opacity', 0);
                 setTimeout( function () {
+                    var old_opacity = $(post.el).css('opacity');
                     console.log("replacing content in live post");
                     post.el.remove();
                     post.el = post_render(post, that);
                     post.width = post.el.scrollWidth;
                     post.height = post.el.offsetHeight;
                     //$(that.el).css('opacity', 1.0);
-                    $(post.el).transition({'opacity': old_opacity}, 200);
+                    $(post.el).css('opacity', old_opacity);
+                    //$(post.el).transition({'opacity': old_opacity}, 200);
 
                     that.el.style.opacity = 1.0;
                     }, 1000);

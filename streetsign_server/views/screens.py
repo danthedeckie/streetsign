@@ -134,7 +134,15 @@ def screendisplay(template, screenname):
     '''
         The actual output screen view.
     '''
-    screen = Screen.get(urlname=screenname)
+    try:
+        screen = Screen.get(urlname=screenname)
+    except Screen.DoesNotExist:
+        # return first screen, if you can't find the one we really want.
+        # this stops us from ending up with screens which 'die' due to misnaming.
+        # They may show the wrong screen - but it's better than not showing
+        # a screen at all.
+        # TODO: add an config_var to decide what to do in this circumstance.
+        screen = Screen.get()
 
     return render_template('screens/' + template + '.html',
                            screen=screen)

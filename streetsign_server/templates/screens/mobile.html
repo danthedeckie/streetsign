@@ -7,7 +7,7 @@
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
-        <script type="text/javascript" charset="utf-8" src="intelxdk.js"></script>
+        <!--<script type="text/javascript" charset="utf-8" src="intelxdk.js"></script>-->
 
         <script type="text/javascript" language="javascript">
             // This event handler is fired once the AppMobi libraries are ready
@@ -30,6 +30,7 @@
             $.ui.autoLaunch=true;
             $.ui.useOSThemes=true;
             $.ui.blockPageScroll();
+            $.feat.nativeTouchScroll=true;
             $(document).ready(function(){
                 // This can be pulled in later as JSON if needed:
                 var SCREEN_DATA = {{ screen.to_dict() | tojson|safe }},

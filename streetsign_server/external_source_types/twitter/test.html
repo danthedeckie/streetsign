@@ -1,0 +1,12 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">Test Data</h2>
+    </div>
+    <div class="panel-body">
+        {% for tweet in tweets %}
+            <div class="well">
+            {{ tweet.text }}
+            </div>
+        {% endfor %}
+    </div>
+</div>
