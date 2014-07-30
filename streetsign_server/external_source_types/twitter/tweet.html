@@ -1,2 +1,2 @@
-<span class="tweet_by">{% if show_avatar == 'true' %}<img src="{{ tweet.user.profile_image_url }}" \>{% endif %} {{ tweet.user.name }}</span>
-<span class="tweet_content">{{ tweet.text }}</span>
+<a class="tweet_by" target="_new" href="https://twitter.com/{{tweet.user.name}}">{% if show_avatar == 'true' %}<img src="{{ tweet.user.profile_image_url }}" \>{% endif %}<small><b>{{ tweet.user.name }}</b></small></a><p>
+<span class="tweet_content">{{ tweet.text }}</span></p>

@@ -30,10 +30,23 @@ from jinja2 import Template
 import bleach
 from collections import defaultdict
 import tweepy
+from urllib import quote
+import re
 
 from streetsign_server.external_source_types import my
 
 DEFAULT_TAGS = "span,b,i,u,em,img"
+
+HASHTAGS = re.compile(r'#(\w*)')
+ATUSER = re.compile(r'@(\w*)')
+URL = re.compile(r'[^"](http[s]?://[^ ]*)')
+
+def twitterify(text):
+    ''' replace plain tweet with HTMLified tweet (hashtags, usernames, links) '''
+    # pylint: disable=line-too-long, bad-continuation,bad-whitespace
+    return re.sub(HASHTAGS, r' <a target="_new" href="https://twitter.com/hashtag/\1">#\1</a> ',
+           re.sub(ATUSER,   r' <a target="_new" href="https://twitter.com/\1">@\1</a> ',
+           re.sub(URL,      r' <a target="_new" href="\1">\1</a> ', text)))
 
 def receive(request):
     ''' get data from the web interface, extract the data, and return the object we
@@ -54,7 +67,7 @@ def receive(request):
             "user_secret": request.form.get('user_secret', ''),
 
             "current_posts": current_posts,
-            }
+            } #pylint: disable=bad-continuation
 
 def form(data):
     ''' the form for editing this type of post '''
@@ -74,9 +87,8 @@ def test(data):
 
     try:
         tweets = get_new(data)
-    except Exception as e:
+    except Exception as e: #pylint: disable=broad-except
         return '<h1>Invalid settings</h1><pre>' + str(e) + '</pre>'
-        return 'Invalid settings'
 
     return render_template_string(my('test.html'), tweets=tweets)
 
@@ -90,16 +102,18 @@ def get_new(data):
 
     api = tweepy.API(auth)
 
+    print dir(api)
+
     if data['feed_type'] == 'user_timeline':
         feed = api.user_timeline(data['query'])
     elif data['feed_type'] == 'retweeted_by_me':
-        feed = api.retweeted_by_me()
+        feed = api.retweets_of_me()
     elif data['feed_type'] == 'home_timeline':
         feed = api.home_timeline()
     elif data['feed_type'] == 'mentions':
-        feed = api.mentions()
+        feed = api.mentions_timeline()
     elif data['feed_type'] == 'search':
-        feed = api.search(q=data['query'])
+        feed = api.search(q=quote(data['query']))
     else:
         feed = api.home_timeline()
 
@@ -111,6 +125,7 @@ def get_new(data):
     new_posts = []
 
     for entry in feed:
+        entry.text = twitterify(entry.text)
         if entry.id not in previous_list:
             new_posts.append({'type': 'html', 'color': None,
                               'content': TWEET_TEMPLATE.render(tweet=entry, **data)})
