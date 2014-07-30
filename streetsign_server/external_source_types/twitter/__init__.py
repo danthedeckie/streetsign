@@ -44,7 +44,7 @@ def receive(request):
     except TypeError:
         print 'current_posts', request.form.get('current_posts', '[]')
 
-    return {"user_id": request.form.get('user_id', ''),
+    return {"query": request.form.get('query', ''),
             "show_avatar" : request.form.get('show_avatar', ''),
             "feed_type" : request.form.get('feed_type', 'user_timeline'),
 
@@ -72,7 +72,11 @@ def test(data):
     data = data.to_dict()
     data['current_posts'] = []
 
-    tweets = get_new(data)
+    try:
+        tweets = get_new(data)
+    except Exception as e:
+        return '<h1>Invalid settings</h1><pre>' + str(e) + '</pre>'
+        return 'Invalid settings'
 
     return render_template_string(my('test.html'), tweets=tweets)
 
@@ -87,9 +91,15 @@ def get_new(data):
     api = tweepy.API(auth)
 
     if data['feed_type'] == 'user_timeline':
-        feed = api.user_timeline(data['user_id'])
+        feed = api.user_timeline(data['query'])
     elif data['feed_type'] == 'retweeted_by_me':
         feed = api.retweeted_by_me()
+    elif data['feed_type'] == 'home_timeline':
+        feed = api.home_timeline()
+    elif data['feed_type'] == 'mentions':
+        feed = api.mentions()
+    elif data['feed_type'] == 'search':
+        feed = api.search(q=data['query'])
     else:
         feed = api.home_timeline()
 
@@ -99,8 +109,6 @@ def get_new(data):
         previous_list = json.loads(previous_list)
 
     new_posts = []
-
-    #templater = make_templater(data)
 
     for entry in feed:
         if entry.id not in previous_list:

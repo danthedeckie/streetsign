@@ -29,20 +29,23 @@
         {{ 'selected' if feed_type == 'user_timeline' }}
         >What someone else tweeted</option>
     <option value="home_timeline"
-        {{ 'selected' if feed_type == 'home_timeline' }}
+        {{ 'selected' if feed_type == 'home_timeline' or not feed_type }}
         >What's on my "home"</option>
     <option value="mentions"
         {{ 'selected' if feed_type == 'mentions' }}
-        >Mentions</option>
+        >Tweets that mention me</option>
     <option value="retweeted_by_me"
         {{ 'selected' if feed_type == 'retweeted_by_me' }}
         >Retweeted by me</option>
+    <option value="search"
+        {{ 'selected' if feed_type == 'search' }}
+        >Search</option>
   </select>
 </div>
 
-<div class="form-group {{'hidden' if not feed_type == 'user_timeline' }}" id="user_id_group">
-  <label class="control-label" for="user_id">User to follow</label>
-  <input class="form-control" name="user_id" type="text" value="{{user_id}}"/>
+<div class="form-group {{'hidden' if not feed_type in ('user_timeline','search') }}" id="query_group">
+  <label class="control-label" for="query">Search for:</label>
+  <input class="form-control" name="query" type="text" value="{{query}}"/>
 </div>
 
 <input type="hidden" name="show_avatar" value="true" />
@@ -74,10 +77,11 @@ jLater.push(function($) {
     var do_test = function() { $('#test_btn').click(); };
 
     $('select[name="feed_type"]').change(function(){
-        if ($('select[name="feed_type"]').val() == 'user_timeline') {
-            $('#user_id_group').removeClass('hidden');
+        var val = $('select[name="feed_type"]').val();
+        if ((val == 'user_timeline')||(val == 'search')) {
+            $('#query_group').removeClass('hidden');
         } else {
-            $('#user_id_group').addClass('hidden');
+            $('#query_group').addClass('hidden');
         }
         })
 
