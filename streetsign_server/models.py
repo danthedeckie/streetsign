@@ -606,13 +606,17 @@ class Post(DBModel):
             (returns a string 'now'/'future'/'past') '''
 
         time_now = datetime.now()
-        if not (self.active_start and self.active_end):
-            return 'future'
-        if self.active_start > time_now:
-            return 'future'
-        elif self.active_end < time_now:
-            return 'past'
-        else:
+        try:
+            if not (self.active_start and self.active_end):
+                return 'future'
+            if self.active_start > time_now:
+                return 'future'
+            elif self.active_end < time_now:
+                return 'past'
+            else:
+                return 'now'
+        except TypeError:
+            # SQLite doesn't really do types, so this can happen.
             return 'now'
 
     def publish(self, user, state=True):

@@ -126,16 +126,6 @@ def post_form_intake(post, form, editor):
 
     post.content = json.dumps(editor.receive(form))
 
-    try:
-        post.active_start = clean_date(form.get('active_start', ''))
-    except ValueError:
-        flash(form.get('active_start', '') + '!')
-        flash('Problem with start date.')
-    try:
-        post.active_end = clean_date(form.get('active_end', ''))
-    except ValueError:
-        flash('Problem with end date.')
-
     post.status = 0 # any time a post is edited, remove it from archive.
 
     post.time_restrictions_show = (form.get('times_mode', \

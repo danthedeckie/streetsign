@@ -39,6 +39,11 @@ def receive(request):
     ''' get data from the web interface, extract the data, and return the object we
         actually need to save. '''
 
+    try:
+        current_posts = json.loads(request.form.get('current_posts', '[]'))
+    except TypeError:
+        print 'current_posts', request.form.get('current_posts', '[]')
+
     return {"user_id": request.form.get('user_id', ''),
             "show_avatar" : request.form.get('show_avatar', ''),
             "feed_type" : request.form.get('feed_type', 'user_timeline'),
@@ -48,7 +53,7 @@ def receive(request):
             "user_key": request.form.get('user_key', ''),
             "user_secret": request.form.get('user_secret', ''),
 
-            "current_posts": json.loads(request.form.get('current_posts', '[]')),
+            "current_posts": current_posts,
             }
 
 def form(data):
@@ -63,6 +68,9 @@ def test(data):
     ''' we get sent a copy of the data, and should reply with some HTML
         that reassures the user if the url/whatever is correct (preferably
         with some data from the feed) '''
+
+    data = data.to_dict()
+    data['current_posts'] = []
 
     tweets = get_new(data)
 
@@ -85,7 +93,10 @@ def get_new(data):
     else:
         feed = api.home_timeline()
 
-    previous_list = json.loads(data['current_posts'])
+    # confusing... TODO: fix why we need this
+    previous_list = data.get('current_posts', '[]')
+    if type(previous_list) != list:
+        previous_list = json.loads(previous_list)
 
     new_posts = []
 

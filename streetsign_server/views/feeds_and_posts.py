@@ -490,9 +490,9 @@ def external_data_source_edit(source_id):
 
         source.frequency = getint('frequency', 60)
         source.publish = getbool('publish', False)
-        source.lifetime_start = request.form.get('lifetime_start',
+        source.lifetime_start = request.form.get('active_start',
                                                  source.lifetime_start)
-        source.lifetime_end = request.form.get('lifetime_end',
+        source.lifetime_end = request.form.get('active_end',
                                                  source.lifetime_end)
         source.display_time = getint('display_time', source.display_time)
         source.post_template = request.form.get('post_template',
@@ -570,9 +570,11 @@ def external_source_run(source_id):
             post_type_module = post_types.load(fresh_data.get('type', 'html'))
 
             post.feed = source.feed
+
+            fresh_data['active_start'] = source.current_lifetime_start()
+            fresh_data['active_end'] = source.current_lifetime_end()
+
             post_form_intake(post, fresh_data, post_type_module)
-            post.active_start = source.current_lifetime_start()
-            post.active_end = source.current_lifetime_end()
             post.display_time = source.display_time
 
             if source.publish:
