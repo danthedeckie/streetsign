@@ -712,6 +712,8 @@ class Screen(DBModel):
 
     #: screen settings (JSON)
     settings = TextField(default='{}')
+    #: general CSS settings for the whole page. Can contain selectors, etc.
+    css = TextField(default='')
     #: default post settings (JSON)
     defaults = TextField(default='{}')
     #: spec all the zones (JSON)
@@ -726,6 +728,7 @@ class Screen(DBModel):
             "background": self.background if self.background else '',
             "settings": safe_json_load(self.settings, {}),
             "defaults": safe_json_load(self.defaults, {}),
+            "css": self.css if self.css else '',
             "zones": safe_json_load(self.zones, []),
             }
     def md5(self):

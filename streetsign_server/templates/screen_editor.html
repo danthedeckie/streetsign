@@ -34,8 +34,10 @@
       <label>Default Text color:
       <input name="color" data-bind="value: color" type="color"><br/>-->
       <div class="col-md-12">
+        <span style="display:none;">
         <label>Other Settings:</label><br/>
         <textarea name="settings" data-bind="value: other_settings" class="form-control"></textarea>
+        </span>
         <label>CSS:</label><br/>
         <textarea name="css" data-bind="value: css" class="form-control"></textarea>
       </div>
@@ -149,8 +151,9 @@
 // server specified values:
 
 BG="{{ screen.background }}";
-CSS=JSON.stringify({{ screen.css|safe if screen.css else '{}' }});
+
 SETTINGS=JSON.stringify({{ screen.settings|safe if screen.settings else '{}' }});
+CSS="{{ screen.css | replace("\n","\\n") | replace("\r",'') |replace('</','') |safe }}";
 ZONES={{ screen.zones|safe if screen.zones else '[]' }};
 AVAILABLE_FEEDS = [
     {%- for feed in feeds -%}

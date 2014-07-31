@@ -115,7 +115,8 @@ def screenedit(screenid):
             flash("Sorry! That name is already being used!")
 
         screen.background = request.form.get('background')
-        screen.settings = request.form.get('settings', {'css': ''})
+        screen.settings = request.form.get('settings', '')
+        screen.css = request.form.get('css', '').replace('"',"'")
         screen.zones = form_json('zones', {})
         screen.save()
         flash('saved.')

@@ -76,9 +76,13 @@ var ScreenModel = function(background, other_settings, css, zones, color, type) 
     self.color = ko.observable(color);
     self.type = ko.observable(type);
     self.zones = ko.observableArray();
-    ko.mapping.fromJS(zones.map( function(x){
-        return $.extend({}, DEFAULT_ZONE,x);
-        }) , [], self.zones);
+
+
+    if (zones.map) {
+        ko.mapping.fromJS(zones.map( function(x){
+            return $.extend({}, DEFAULT_ZONE,x);
+            }) , [], self.zones);
+    }
 
 
     // Alas, knockout treats <select> options as strings.
