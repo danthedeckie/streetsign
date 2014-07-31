@@ -10,11 +10,11 @@
       <h2 class="panel-title">External Data Source ({{ source.type }})</h2>
     </div>
     <div class="panel-body form">
-      <div class="form-group col-md-8">
+      <div class="form-group col-md-6">
         <label class="control-label">Name:</label>
         <input class="form-control" name="name" type="text" value="{{ source.name }}" />
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <div class="form-group">
           <label class="form-label">Feed:</label>
           <select class="form-control" name="feed">
@@ -23,14 +23,16 @@
             {% endfor %}
           </select>
         </div>
+      </div>
+      <div class="col-md-3">
         <div class="form-group">
-          <label class="form-label">Check for updates every:</label>
+          <label class="form-label">Update Every:</label>
           <div class="input-group">
             <input class="form-control" name="frequency" type="number" value="{{ source.frequency }}" />
             <span class="input-group-addon">minutes</span>
           </div>
         </div>
-        (last checked: {{ source.last_checked }})
+        <small>(last checked: {{ source.last_checked }})</small>
       </div>
     </div>
   </div>

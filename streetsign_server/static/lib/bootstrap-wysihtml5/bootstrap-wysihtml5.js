@@ -89,10 +89,10 @@
                 "u": 1,
                 "img": {
                     "check_attributes": {
-                        "width": "numbers",
+                        //"width": "numbers",
                         "alt": "alt",
-                        "src": "url",
-                        "height": "numbers"
+                        "src": "url"
+                        //"height": "numbers"
                     }
                 },
                 "a":  {

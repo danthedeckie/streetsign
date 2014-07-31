@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #  StreetSign Digital Signage Project
-#     (C) Copyright 2013 Daniel Fairhead
+#     (C) Copyright 2014 Daniel Fairhead
 #
 #    StreetSign is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@ __MODULE__ = 'twitter'
 
 from flask import render_template_string, json
 from jinja2 import Template
-import bleach
-from collections import defaultdict
 import tweepy
 from urllib import quote
 import re
@@ -41,12 +39,24 @@ HASHTAGS = re.compile(r'#(\w*)')
 ATUSER = re.compile(r'@(\w*)')
 URL = re.compile(r'[^"](http[s]?://[^ ]*)')
 
-def twitterify(text):
+def twitterify(text, cleanup=None):
     ''' replace plain tweet with HTMLified tweet (hashtags, usernames, links) '''
     # pylint: disable=line-too-long, bad-continuation,bad-whitespace
-    return re.sub(HASHTAGS, r' <a target="_new" href="https://twitter.com/hashtag/\1">#\1</a> ',
-           re.sub(ATUSER,   r' <a target="_new" href="https://twitter.com/\1">@\1</a> ',
-           re.sub(URL,      r' <a target="_new" href="\1">\1</a> ', text)))
+
+    url_url = r' <a target="_new" href="\1">\1</a> '
+    tag_url = r' <a target="_new" href="https://twitter.com/hashtag/\1">#\1</a> '
+    user_url = r' <a target="_new" href="https://twitter.com/\1">@\1</a> '
+
+    if cleanup == 'strip_tags_and_urls':
+        tag_url = r''
+        url_url = r''
+
+    elif cleanup == 'pictures_only':
+        return ''
+
+    return re.sub(HASHTAGS, tag_url,
+                  re.sub(ATUSER, user_url,
+                         re.sub(URL, url_url, text)))
 
 def receive(request):
     ''' get data from the web interface, extract the data, and return the object we
@@ -58,8 +68,11 @@ def receive(request):
         print 'current_posts', request.form.get('current_posts', '[]')
 
     return {"query": request.form.get('query', ''),
-            "show_avatar" : request.form.get('show_avatar', ''),
-            "feed_type" : request.form.get('feed_type', 'user_timeline'),
+
+            "show_user": request.form.get('show_user', ''),
+            "feed_type": request.form.get('feed_type', 'user_timeline'),
+            "display_options": request.form.get('display_options', 'full_everything'),
+            "filter_type": request.form.get('filter_type', 'full_everything'),
 
             "api_key": request.form.get('api_key', ''),
             "api_secret": request.form.get('api_secret', ''),
@@ -102,7 +115,7 @@ def get_new(data):
     api = tweepy.API(auth)
 
     if data['feed_type'] == 'user_timeline':
-        feed = api.user_timeline(data['query'])
+        feed = api.user_timeline(screen_name=data['query'])
     elif data['feed_type'] == 'retweeted_by_me':
         feed = api.retweets_of_me()
     elif data['feed_type'] == 'home_timeline':
@@ -122,9 +135,20 @@ def get_new(data):
     new_posts = []
 
     for entry in feed:
-        entry.text = twitterify(entry.text)
+        entry.text = twitterify(entry.text, data['display_options'])
 
         if entry.id not in previous_list:
+            try:
+                photo_count = len([e for e in entry.entities['media']
+                                   if e['type']=='photo'])
+            except:
+                photo_count = 0
+
+            if data['filter_type'] == 'pictures_only' and not photo_count:
+                continue
+            elif data['filter_type'] == 'text_only' and photo_count:
+                continue
+
             new_posts.append({'type': 'html', 'color': None,
                               'content': TWEET_TEMPLATE.render(tweet=entry, **data)})
 

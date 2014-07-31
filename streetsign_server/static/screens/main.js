@@ -256,7 +256,7 @@ Zone.prototype = {
         // return a function for removing an element from the DOM.
         var make_removeel = function (post) {
             return function () {
-                post && post.el.remove(); }; };
+                post && post.hasOwnProperty('el') && post.el.remove(); }; };
 
 
         // check timing restrictions, 'delete_me' tags, and otherwise, use it.

@@ -82,3 +82,7 @@ div.zone {
 .zone_scroll h6 { font-size: 120%; font-weight: normal; display: inline; }
 
 .zone_scroll img { height: 0.7em; width: auto; }
+
+.tweet_content {
+    text-align: left;
+}

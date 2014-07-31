@@ -22,33 +22,52 @@
 <a href="https://apps.twitter.com/" target="_blank">Register this app (get some keys)</a>
 <hr/>
 
-<div class="form-group">
-  <label class="control-label" for="feed_type">Which tweets should I get?</label>
-  <select class="form-control" name="feed_type">
-    <option value="user_timeline"
-        {{ 'selected' if feed_type == 'user_timeline' }}
-        >What someone else tweeted</option>
-    <option value="home_timeline"
-        {{ 'selected' if feed_type == 'home_timeline' or not feed_type }}
-        >What's on my "home"</option>
-    <option value="mentions"
-        {{ 'selected' if feed_type == 'mentions' }}
-        >Mentions</option>
-    <option value="retweeted_by_me"
-        {{ 'selected' if feed_type == 'retweeted_by_me' }}
-        >Retweets</option>
-    <option value="search"
-        {{ 'selected' if feed_type == 'search' }}
-        >Search</option>
-  </select>
-</div>
+{% macro select_option(selector, value, text, extra=False) %}
+  <option value="{{ value }}" {{ 'selected' if (selector == value) or extra }}>{{text}}</option>
+{% endmacro %}
 
-<div class="form-group {{'hidden' if not feed_type in ('user_timeline','search') }}" id="query_group">
-  <label class="control-label" for="query">Search for:</label>
-  <input class="form-control" name="query" type="text" value="{{query}}"/>
-</div>
 
-<input type="hidden" name="show_avatar" value="true" />
+<div class="row">
+<div class="col-md-6">
+    <div class="form-group">
+      <label class="control-label" for="feed_type">Which tweets should I get?</label>
+      <select class="form-control" name="feed_type">
+        {{ select_option(feed_type, 'user_timeline', 'What someone else tweeted') }}
+        {{ select_option(feed_type, 'home_timeline', 'What\'s on my "home"', not feed_type) }}
+        {{ select_option(feed_type, 'mentions', 'Mentions') }}
+        {{ select_option(feed_type, 'retweeted_by_me', 'Retweets') }}
+        {{ select_option(feed_type, 'search', 'Search') }}
+      </select>
+    </div>
+
+    <div class="form-group {{'hidden' if not feed_type in ('user_timeline','search') }}" id="query_group">
+      <label class="control-label" for="query">Search for:</label>
+      <input class="form-control" name="query" type="text" value="{{query}}"/>
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="form-group">
+      <label class="control-label" for="display_options">How should I display tweets?</label>
+      <select class="form-control" name="display_options">
+         {{ select_option(display_options, 'full_everything', 'Everything', not display_options) }}
+         {{ select_option(display_options, 'text_only', 'Text Only') }}
+         {{ select_option(display_options, 'pictures_only', 'Pictures Only') }}
+         {{ select_option(display_options, 'strip_tags_and_urls', 'Remove #hashtags and URLS') }}
+      </select>
+    </div>
+    <div class="checkbox">
+      <label><input type="checkbox" name="show_user" {{ 'checked' if show_user }} /> Show User? </label>
+    </div>
+    <div class="form-group">
+      <label class="control-label" for="filter_type">Should I filter by content type?</label>
+      <select class="form-control" name="filter_type">
+         {{ select_option(filter_type, 'full_everything', 'Any Kind', not filter_type) }}
+         {{ select_option(filter_type, 'text_only', 'Pure Text') }}
+         {{ select_option(filter_type, 'pictures_only', 'With Pictures Only') }}
+      </select>
+    </div>
+</div>
+</div>
 
 <div class="cf"></div>
 <hr/>
@@ -58,16 +77,10 @@
 <div id="advanced_rss" class="collapse">
   <div class="panel panel-danger">
     <div class="panel-body">
-
- <div class="form-group">
-  <label class="control-label" for="url">Current Posts: <i>(automatically updated)</i></label>
-    <textarea class="form-control" name="current_posts" >{{current_posts|tojson if current_posts else '[]'}}</textarea>
-</div>
-
- <div class="form-group">
-  <label class="control-label" for="url">Allowed HTML Tags: (<i>comma,separated,list</i>)</label>
-    <input class="form-control" name="allowed_tags" type="text" value="{{allowed_tags if allowed_tags else default_tags}}"/>
-</div>
+         <div class="form-group">
+          <label class="control-label" for="url">Current Posts: <i>(automatically updated)</i></label>
+            <textarea class="form-control" name="current_posts" >{{current_posts|tojson if current_posts else '[]'}}</textarea>
+         </div>
     </div>
   </div>
 </div>

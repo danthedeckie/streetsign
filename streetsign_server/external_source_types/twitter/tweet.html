@@ -1,5 +1,19 @@
-<a class="tweet_by" target="_new" href="https://twitter.com/{{tweet.user.name}}">{% if show_avatar == 'true' %}<img src="{{ tweet.user.profile_image_url }}" \>{% endif %}<small><b>{{ tweet.user.name }}</b></small></a><p>
-<span class="tweet_content">{{ tweet.text }}</span>
-{% for ent in tweet.entities.media if ent.type == 'photo' %}
-<img class="embedded_photo" src="{{ ent.media_url }}"/>
-{% endfor %}</p>
+{%- if show_user -%}
+<div class="wysiwyg-text-align-left">
+<a class="tweet_by" target="_new" href="https://twitter.com/{{tweet.user.name}}">
+    <img src="{{ tweet.user.profile_image_url }}" class="wysiwyg-float-left" \>
+    <span class="wysiwyg-text-align-left">
+    <small><b>@{{ tweet.user.screen_name }}<br/>
+    <small>{{ tweet.user.name }}</small></b></small>
+    </span>
+</a>
+</div>
+{%- endif -%}
+{%- if display_options != 'pictures_only' -%}
+<span class="tweet_content wysiwyg-text-align-left">{{ tweet.text }}</span> <br/>
+{%- endif -%}
+{%- if display_options != 'text_only' -%}
+{%- for ent in tweet.entities.media if ent.type == 'photo' -%}
+<img class="embedded_photo" src="{{ ent.media_url }}" width="{{ ent.sizes.medium.w }}" height="{{ ent.sizes.medium.h}}"/>
+{%- endfor -%}
+{%- endif -%}

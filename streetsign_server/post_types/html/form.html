@@ -2,15 +2,30 @@
 <label>Contents: (rich text/HTML) </label><br/>
 <label>Custom Text Color:<input type="checkbox" name="owntextcolor" value="1" {{ 'checked' if owntextcolor }}></label>
 <label id="color_input" class="{{ 'hidden' if not owntextcolor }}">Color:<input type="color" name="color" value="{{color}}"/></label>
-<div id="content-toolbar" style="display:none;" class="btn-group">
-  <a data-wysihtml5-command="bold" class="btn btn-default"><b>B</b></a>
-  <a data-wysihtml5-command="italic" class="btn btn-default"><i>i</i></a>
+
+<div id="content-toolbar" class="btn-group">
+  <a id="btn_left" class="btn btn-default"><span class="glyphicon glyphicon-align-left"></span></a>
+  <a id="btn_center" class="btn btn-default"><span class="glyphicon glyphicon-align-center"></span></a>
+  <a id="btn_right" class="btn btn-default"><span class="glyphicon glyphicon-align-right"></span></a>
 </div>
 
 <textarea id="contenttextarea" name="content" rows="10" cols="80" style="width: 100%;">{{content}}</textarea>
 <script type="text/javascript" defer>
 
 $( function() {
+
+    $("#btn_left").on('click', function() {
+        editor.composer.commands.exec('justifyLeft');
+    });
+    $("#btn_center").on('click', function() {
+        editor.composer.commands.exec('justifyCenter');
+    });
+    $("#btn_right").on('click', function() {
+        editor.composer.commands.exec('justifyRight');
+    });
+
+
+
     $('input[type=color]').spectrum({
        clickoutFiresChange: true,
        showInput: true,

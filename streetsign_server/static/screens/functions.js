@@ -193,37 +193,46 @@ function reduce_font_size_to_fit(inner, outer) {
     // reduce fontsize until the inner fits within outer.
     // if it's a scrolling zone, then assume almost infinite width...
 
-    var percent = 100;
-    var height = 0;
-    var zone_height = $(outer).height();
-    var zone_width = $(outer).width();
-    var i = 100;
-    var height = inner.height();
-    var width = inner.width();
-    var scrolling = (outer[0].className.indexOf("scroll") !== -1);
+    var percent = 100,
+        height = 0,
+        zone_height = $(outer).height(),
+        zone_width = $(outer).width(),
+        i = 100,
+        height = inner.height(),
+        width = inner.width(),
+        scrolling = (outer[0].className.indexOf("scroll") !== -1),
+        img_sizes = {};
 
     if (scrolling) {
         zone_width = 900000;
     }
 
+    $(inner).find('img').each(function(i,img) {
+        var $img = $(img);
+        img_sizes[i] = { 'width%' : $img.attr('width')/100,
+                         'height%' : $img.attr('height')/100 };
+        });
 
-   // if ((height > zone_height) || (width > zone_width)) {
-        while(i > 1){
-            height = inner.height();
-            width = inner.width();
+    while(i > 1){
+        height = inner.height();
+        width = inner.width();
 
-            i = i / 2;
-            if ((height < zone_height) || ((!scrolling) && (width < zone_width))) {
-                percent += i;
+        i = i / 2;
+        if ((height < zone_height) || ((!scrolling) && (width < zone_width))) {
+            percent += i;
 
-            } else if ((height > zone_height) || ((!scrolling) && (width > zone_width))) {
-                percent -= i;
-            }
-            inner.css('font-size', percent + '%');
+        } else if ((height > zone_height) || ((!scrolling) && (width > zone_width))) {
+            percent -= i;
         }
-        inner.css('font-size', parseInt(percent) + '%');
-        console.log ('reducing font size to ' + parseInt(percent) + '%');
-    //}
+        inner.css('font-size', percent + '%');
+        inner.find('img').each(function(i, img){
+            var $img = $(img);
+            $img.attr('width', img_sizes[i]['width%'] * percent);
+            $img.attr('height', img_sizes[i]['height%'] * percent);
+            });
+    }
+    inner.css('font-size', parseInt(percent) + '%');
+    console.log ('reducing font size to ' + parseInt(percent) + '%');
 }
 
 setTimeout(reload_page, REFRESH_PAGE_TIMER);

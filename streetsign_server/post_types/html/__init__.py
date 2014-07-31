@@ -49,7 +49,7 @@ def safehtml(text):
               "small", "big", "img", "table",
               "tr", "td", "th", "thead",
               "tfoot", "h1", "h2", "h3", "h4", "h5", "h6", "p"],
-        attributes=['class', 'href', 'alt', 'src'])
+        attributes=['class', 'href', 'alt', 'src', 'style', 'width','height'])
 
 def safecolor(text, default="#fff"):
     ''' check that a color string is actually a html hex-type color... '''
