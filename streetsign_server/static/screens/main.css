@@ -82,6 +82,8 @@ div.zone {
 .zone_scroll h6 { font-size: 120%; font-weight: normal; display: inline; }
 
 .zone_scroll img { height: 0.7em; width: auto; }
+.zone_scroll br { display: none; }
+.zone_scroll .post_inner div { display: inline-block; }
 
 .tweet_content {
     text-align: left;
