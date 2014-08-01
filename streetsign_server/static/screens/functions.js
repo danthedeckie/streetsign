@@ -35,8 +35,9 @@ function nicemap(objects, func) {
     requestAnimationFrame(runner);
 }
 
-function safeGetJSON(url, callback, retry_time=60000) {
+function safeGetJSON(url, callback, retry_time) {
     "use strict";
+    retry_time = retry_time || 60000;
     // simple async JSON request.  Used instead of the jQuery version, which
     // makes about 15 external function calls, delving deeper into the jQuery
     // recursive vortex of confusion.  This simply calls the callback with the
