@@ -112,6 +112,8 @@ ko.bindingHandlers.timeHandler = {
         var inputbox = $(element).parent();
 
         inputbox.datetimepicker({pickDate: false,
+            use24hours: true,
+            format: "HH:mm"
             });
 
         inputbox.on('dp.change', function(e){

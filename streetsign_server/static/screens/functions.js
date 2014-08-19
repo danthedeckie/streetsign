@@ -140,7 +140,7 @@ function faketime(timestring) {
 
     if (timestring) {
         split = timestring.match(/(\d\d):(\d\d)/);
-        if (('length' in split)&&(split.length==3)) {
+        if ((split)&&(split.hasOwnProperty('length'))&&(split.length == 3)) {
             return (60*parseInt(split[1]))+parseInt(split[2]);
         } else {
             console.log ('invalid time: ' + JSON.stringify(timestring));
@@ -173,7 +173,7 @@ function any_relevent_restrictions(post) {
 
     for (i=0; i< post.time_restrictions.length; i += 1) {
         if (restriction_relevant(now, post.time_restrictions[i])) {
-            if (!thispost.time_restrictions_show) {
+            if (!post.time_restrictions_show) {
                 return true;
             }
         }
