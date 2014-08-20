@@ -1,0 +1,29 @@
+<script src="//cdn.ckeditor.com/4.4.4/full/ckeditor.js"></script>
+<div class="cf"></div>
+<label>Complex / Advanced HTML</label><br/>
+<label>Custom Text Color:<input type="checkbox" name="owntextcolor" value="1" {{ 'checked' if owntextcolor }}></label>
+<label id="color_input" class="{{ 'hidden' if not owntextcolor }}">Color:<input type="color" name="color" value="{{color}}"/></label>
+
+<textarea id="contenttextarea" name="content" rows="10" cols="80" style="width: 100%;">{{content}}</textarea>
+
+<script type="text/javascript" defer>
+
+$( function() {
+    $('input[type=color]').spectrum({
+       clickoutFiresChange: true,
+       showInput: true,
+       showPalette: true,
+       showInitial: true,
+       showButtons: false
+    });
+
+    setTimeout(function() {
+        window.CKEDITOR.replace('content');
+        }, 2000);
+
+    $('input[name=owntextcolor]').change(function(){
+        $('#color_input').toggleClass('hidden');
+        });
+
+});
+</script>
