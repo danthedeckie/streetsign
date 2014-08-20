@@ -110,9 +110,9 @@ function magic_time() {
     // by their <span>'d equivalents, and replaces the contents with the current
     // date or time.
 
-    var d = new Date;
+    var d = new Date();
     var timestr = ((d.getHours()<10?'0':'') + d.getHours() + ':'
-                  +(d.getMinutes()<10?'0':'') + d.getMinutes())
+                  + (d.getMinutes()<10?'0':'') + d.getMinutes());
 
     $('.magic_time').each(function(i){
         this.innerHTML = timestr;
@@ -167,18 +167,18 @@ function any_relevent_restrictions(post) {
 
     // returns True if *any* time restriction catches the current time.
 
-    var now = faketime();
-    var i;
+    var now = faketime(),
+        i,
+        any_hits = post.time_restrictions_show;
 
-
-    for (i=0; i< post.time_restrictions.length; i += 1) {
+    for (i=0; i< post.time_restrictions.length; i++) {
         if (restriction_relevant(now, post.time_restrictions[i])) {
-            if (!post.time_restrictions_show) {
-                return true;
-            }
+            any_hits = !post.time_restrictions_show;
         }
     }
-    return post.time_restrictions_show;
+
+    console.log('returning:' , post.time_restrictions_show, any_hits);
+    return any_hits;
 }
 
 function reload_page() {

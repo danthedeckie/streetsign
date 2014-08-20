@@ -1,3 +1,5 @@
+/*jslint browser:true, regexp: true, debug: true */
+/*global $, jLater, confirm, alert */
 ////////////////////////////////////////////////
 // Flashed notices:
 $('#flashed_notices').children('li').click(function(){
@@ -86,9 +88,6 @@ while (jLater.length) {
     jLater.pop()($);
 }
 
-
-
-
 ////////////////////////////////
 
 $(document).on('click', '.item_ajax_toggle', function() {
@@ -104,6 +103,5 @@ $(document).on('click', '.item_ajax_toggle', function() {
              error: function() {
                 item.toggleClass(toggle_class);
                 alert('failed to delete!');
-                }})
+                }});
 });
-

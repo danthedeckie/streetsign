@@ -1,3 +1,4 @@
+/*global $,ko */
 /************************************************************
 
     StreetSign Digital Signage Project
@@ -44,7 +45,7 @@ ko.bindingHandlers.chosen = {
     update: function(element) {
         $(element).trigger('liszt:updated');
     }
-}
+};
 
 // "spectrum" color picker knockout binding:
 
@@ -64,7 +65,7 @@ ko.bindingHandlers.spectrum = {
     update: function(element, valueAccessor) {
         $(element).val(ko.utils.unwrapObservable(valueAccessor()));
     }
-}
+};
 
 
 var ScreenModel = function(background, other_settings, css, zones, color, type) {
@@ -89,8 +90,8 @@ var ScreenModel = function(background, other_settings, css, zones, color, type) 
     // the data comes in as ints.  so fake it.
     for (var zone in self.zones()){
         self.zones()[zone].feeds(
-            self.zones()[zone].feeds().map(function(x){return ""+x}));
-        if (! 'css' in self.zones()[zone]) {
+            self.zones()[zone].feeds().map(String));
+        if (!self.zones()[zone].hasOwnProperty('css')) {
             self.zones()[zone].css = ko.observable('');
             }
         //self.zones()[zone].css = JSON.stringify(self.zones().css);
@@ -98,16 +99,20 @@ var ScreenModel = function(background, other_settings, css, zones, color, type) 
 
     self.addZone = function() {
         var new_obj = {};
-        $.extend(new_obj, DEFAULT_ZONE, {'name':'zone'+(self.zones().length+1)});
+        $.extend(new_obj, DEFAULT_ZONE, {'name': 'zone' + (self.zones().length + 1)});
         self.zones.push(ko.mapping.fromJS(new_obj));
     };
+
     self.removeZone = function(z) {
         self.zones.remove(z);
     };
 
     self.selectZone = function(z) {
         // set a zone to be selected.
-        for (var zone in self.zones()){ self.zones()[zone].selected(false); };
+        for (var zone in self.zones()){
+            self.zones()[zone].selected(false);
+            }
+
         if (z) {
             z.selected(true);
         }
@@ -120,6 +125,6 @@ var ScreenModel = function(background, other_settings, css, zones, color, type) 
         $('html, body').animate({
             scrollTop: $('*[data-zoneedit="' + z.name() +'"]').offset().top - 60
         }, 500);
-    }
+    };
 
 };

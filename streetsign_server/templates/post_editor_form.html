@@ -36,7 +36,7 @@
     <div class="col-md-6">
     <label>End:</label>
         <div class="form-group">
-            <div class="input-group date" id="datetimeend" data-date-format="YYYY-MM-DD hh:mm:ss" >
+            <div class="input-group date" id="datetimeend" data-date-format="YYYY-MM-DD HH:mm:ss" >
                 <input type="text" name="active_end" id="active_end"
                        class="form-control" {{ enabled_if(post.feed.user_can_write(user)) }}
                        value="{{ post.active_end }}"

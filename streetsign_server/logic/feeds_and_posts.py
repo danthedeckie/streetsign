@@ -133,6 +133,10 @@ def post_form_intake(post, form, editor):
             == 'only_show')
     post.time_restrictions = form.get('time_restrictions_json', '[]')
     post.display_time = min(100, max(2, int(form.get('displaytime', 8))))
+
+    post.active_start = form.get('active_start', post.active_start)
+    post.active_end = form.get('active_end', post.active_end)
+
     post.write_date = datetime.now()
 
 def delete_post_and_run_callback(post, typemodule):

@@ -251,7 +251,9 @@ Zone.prototype = {
     findNextPost: function (already_gone_once) {
         "use strict";
 
-        var thispost, i;
+        var thispost,
+            i,
+            index;
 
         // return a function for removing an element from the DOM.
         var make_removeel = function (post) {
@@ -261,22 +263,24 @@ Zone.prototype = {
 
         // check timing restrictions, 'delete_me' tags, and otherwise, use it.
 
-        for (i = this.current_post_index - 1; i !== this.current_post_index; i -= 1) {
+        for (index = this.current_post_index - 1, i=0;
+             index !== this.current_post_index, i < this.posts.length;
+             index -= 1, i++) {
 
             // wrap around:
-            if (i < 0) {
+            if (index < 0) {
                 if (this.posts.length === 0) {
                     return undefined;
                 } else {
-                    i = this.posts.length -1;
+                    index = this.posts.length - 1;
                 }
             }
 
-            thispost = this.posts[i];
+            thispost = this.posts[index];
 
             // check delete_me tags:
 
-            if (! thispost) {
+            if (!thispost) {
                 continue;
                 }
 
@@ -285,9 +289,9 @@ Zone.prototype = {
                             '|dropping post from feed (and removing el):' +
                             thispost.id);
 
-                post_fadeout(thispost, make_removeel(this.posts.splice(i, 1)));
+                post_fadeout(thispost, make_removeel(this.posts.splice(index, 1)));
 
-                if (this.current_post_index > i) {
+                if (this.current_post_index > index) {
                     this.current_post_index -= 1;
                 }
 
@@ -297,8 +301,16 @@ Zone.prototype = {
 
             if (!any_relevent_restrictions(thispost)) {
                 // we have a winner!
-                this.current_post_index = i;
+                console.log('was:', this.current_post_index, ' will be:', index);
+                this.current_post_index = index;
                 return thispost;
+            } else {
+                if (this.current_post_index === index) {
+                    console.log('current post has time restriction! fading out...');
+                    post_fadeout(thispost);
+                    this.current_post_index = -1;
+                    this.current_post = false;
+                }
             }
 
         }
