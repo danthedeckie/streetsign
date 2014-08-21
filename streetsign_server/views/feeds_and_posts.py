@@ -358,6 +358,13 @@ def postpage(postid):
             except PermissionDenied:
                 flash('Sorry, you do NOT have permission' \
                        ' to unpublish on this feed.')
+        elif action == 'move':
+            if not user_session.is_admin():
+                flash('Sorry! You are not an admin!')
+                return jsonify({'error': 'permission denied'})
+            post.feed = Feed.get(Feed.id == getint('feed', post.feed))
+            post.save()
+            return jsonify({'message': 'Moved to ' + post.feed.name})
 
         if action not in ('edit', 'update'):
             return redirect(request.referrer)

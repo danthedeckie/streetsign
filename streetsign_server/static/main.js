@@ -105,3 +105,17 @@ $(document).on('click', '.item_ajax_toggle', function() {
                 alert('failed to delete!');
                 }});
 });
+
+$(function() {
+    $('.autopost').change(function() {
+        $.post( this.form.getAttribute('action'), $(this.form).serialize(), function(data) {
+            if (data.message) {
+                flash(data.message);
+            } else {
+                flash(data);
+            }
+        });
+    });
+});
+
+

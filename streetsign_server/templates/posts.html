@@ -47,7 +47,18 @@
         {% endif %}
     </td>
     <td>{% if post.feed %}
+           {% if user.is_admin %}
+           <form action="{{ url_for('postpage', postid=post.id) }}" method="POST" >
+           <input type="hidden" name="action" value="move" />
+           <select name="feed" class="autopost">
+           {% for feed in user.writeable_feeds() %}
+                <option value="{{ feed.id }}" {{ 'selected' if post.feed == feed }}>{{ feed.name }}</option>
+           {% endfor %}
+           </select>
+           </form>
+           {% else %}
            {{ linkmacros.feed(post.feed) }}&nbsp;
+           {% endif %}
         {% else %}
             Not Published!
         {% endif %}
