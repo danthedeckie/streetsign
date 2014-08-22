@@ -7,13 +7,15 @@ import os
 import tempfile
 import unittest
 import html5lib
-import json
+from datetime import datetime
+from peewee import SqliteDatabase, create_model_tables
+from flask import json, url_for
 
 sys.path.append(os.path.dirname(__file__) + '/..')
 
 import streetsign_server
 import streetsign_server.models as models
-from peewee import SqliteDatabase, create_model_tables
+from streetsign_server.models import Post, Feed
 
 # pylint: disable=too-many-public-methods
 
@@ -98,16 +100,47 @@ class TestDB(StreetSignTestCase):
 
         p = models.Post.create(feed=f, type='html', content='{"content":"text"}', author=u)
 
+        # make sure times have sane defaults:
+
+        self.assertTrue(p.active_start < datetime.now())
+        self.assertTrue(p.active_end > datetime.now())
+        self.assertEqual(p.active_status(), 'now')
+
+        # make sure we can select it directly:
+
         self.assertEqual(models.Post.select().count(), 1)
+
+        # make sure the feed has it available:
 
         self.assertEqual(f.posts.count(), 1)
 
         # check that our views are displaying it correctly...
 
+        # we need to save(), as the views use different (joined) queries, which aren't cached/using this transaction's data.
+
+        p.save()
+        f.save()
+
+        # check that first there are no posts:
+
         self.assertEqual(json.loads(self.client.get('/screens/posts_from_feeds/%5B' + str(f.id) + '%5D').data),
                          {'posts':[]})
 
+        # set published, and try again:
+
         p.published = True
+
+        p.save()
+        f.save()
+
+        posts_list = json.loads(self.client.get('/screens/posts_from_feeds/%5B' + str(f.id) + '%5D').data)['posts']
+        self.assertEqual(len(posts_list), 1)
+
+        # now try retrieving the post as json, and comparing it to our local database retrieved version:
+
+        from_server = json.loads(self.client.get(posts_list[0]['uri']).data)
+        self.assertEqual(from_server, json.loads(json.dumps(p.dict_repr())))
+
 
 
 
