@@ -24,7 +24,7 @@
 
 '''
 
-from flask import render_template, g
+from flask import render_template, g, Response
 
 ##########################
 # views submodules:
@@ -96,3 +96,8 @@ def index():
         posts_to_publish=posts_to_publish,
         screens=screens,
         user=user)
+
+@app.route('/robots.txt')
+def robots_txt():
+    ''' block all well-behaved search engines. '''
+    return Response('User-agent: *\nDisallow: /', mimetype='text/plain')

@@ -6,7 +6,7 @@
 
 # You shouldn't have to change this, but if you need to force a specific
 # version (2.7, say) this can be helpful.
-PYTHON_VERSION=python2
+PYTHON_VERSION=python
 
 VDIR=.virtualenv
 SDIR=.setup
