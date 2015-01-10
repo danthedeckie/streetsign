@@ -76,13 +76,46 @@ class TestHTML(StreetSignTestCase):
 
         request = self.client.get(url)
         parser = html5lib.HTMLParser(strict=True)
-        doc = parser.parse(request.data)
+        try:
+            doc = parser.parse(request.data)
+        except Exception as e:
+            print request.data
+            raise e
+
+    def expect_code(self, url, code):
+        ''' expect a non 200 Code on a URL (don't care about validation) '''
+        request = self.client.get(url)
+
+        self.assertEqual(code, request.status_code)
 
     def test_non_logged_in_pages(self):
         ''' test HTML validity of all non-logged-in pages '''
 
         self.validate('/')
+        self.validate('/index.html')
         self.validate('/posts/')
+
+    def test_new_screen_not_logged_in(self):
+        m = models.Screen()
+        m.urlname = 'Default'
+        m.save()
+
+        self.validate('/screens/basic/Default')
+        self.expect_code('/screens-edit/0', 403) # permision denied
+
+
+class TestJSON(StreetSignTestCase):
+    ''' test various JSON views return valid JSON '''
+
+    def validate(self, url):
+        ''' test that a url returns valid JSON '''
+
+        request = self.client.get(url)
+        json.loads(request.data)
+
+    def test_screen_json(self):
+        ''' test screen_json is valid '''
+        self.validate('/screens/json/0')
 
 class TestDB(StreetSignTestCase):
     ''' test basic database interactions '''

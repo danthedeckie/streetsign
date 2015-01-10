@@ -1,0 +1,12 @@
+{% extends "index.html" %}
+{% block title %} Permission Denied {% endblock %}
+
+{% block body %}
+<div class="jumbotron bg-danger">
+<h1>Permission Denied!</h1>
+</div>
+<div class="bg-danger">
+<p>Sorry! You don't have permission to access this page!</p>
+<p>{{ message }}</p>
+</div>
+{% endblock %}

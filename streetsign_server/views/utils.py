@@ -23,7 +23,7 @@
     No actual views in here, only bits and pieces to make views more
     fun.
 """
-from flask import request, flash, redirect, url_for
+from flask import request, flash, redirect, url_for, render_template, make_response
 import streetsign_server.user_session as user_session
 from functools import wraps
 
@@ -78,11 +78,16 @@ def admin_only(*methods):
                     user = user_session.get_user()
                 except user_session.NotLoggedIn:
                     flash('Sorry! You need to be logged in!')
-                    return redirect(url_for('index'))
+                    return make_response(render_template('403.html',
+                                           message='You must be logged in!'),
+                                         403)
 
                 if not user.is_admin:
                     flash('Sorry! You need to be an admin!')
-                    return redirect(url_for('index'))
+                    return make_response(render_template('403.html',
+                                           message='You must be an admin!'),
+                                         403)
+
             return f(*args, **kwargs)
         return wrapped
     return wrapper
@@ -99,7 +104,9 @@ def registered_users_only(*methods):
                     user = user_session.get_user()
                 except user_session.NotLoggedIn:
                     flash('Sorry! You need to be logged in!')
-                    return redirect(url_for('index'))
+                    return make_response(render_template('403.html',
+                                           message='You must be logged in!'),
+                                         403)
 
             return f(*args, **kwargs)
         return wrapped

@@ -72,6 +72,8 @@ def screens():
 
 @app.route('/screens-edit/<screenid>', methods=['GET', 'POST'])
 @app.route('/screens-edit/<int:screenid>', methods=['GET', 'POST'])
+@admin_only('POST')
+@registered_users_only('GET')
 def screenedit(screenid):
     ''' edit one screen '''
 
@@ -91,15 +93,6 @@ def screenedit(screenid):
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        if not user_session.logged_in():
-            flash("You're not logged in!")
-            return redirect(url_for('posts'))
-
-        user = user_session.get_user()
-        if not user.is_admin:
-            flash('Sorry. You are NOT an admin!')
-            return redirect(url_for('index'))
-
         if request.form.get('action', 'update') == 'delete':
             screen.delete_instance()
             flash('deleted')
