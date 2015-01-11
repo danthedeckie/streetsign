@@ -1,0 +1,5 @@
+[run]
+branch = True
+omit = /home/travis/virtualenv/*
+       tests/
+       /usr/*

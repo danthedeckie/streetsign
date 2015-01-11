@@ -1,0 +1,14 @@
+language: python
+python:
+- "2.6"
+- "2.7"
+- "3.4"
+install:
+- pip install -r requirements.txt
+- pip install coveralls
+- .setup/make_initial_config_file.py > config.py
+script:
+- nosetests
+- coverage run -m nose
+after_success:
+- coveralls
