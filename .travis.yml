@@ -6,7 +6,7 @@ python:
 install:
 - pip install -r requirements.txt
 - pip install coveralls
-- .setup/make_initial_config_file.py > config.py
+- python .setup/make_initial_config_file.py > config.py
 script:
 - nosetests
 - coverage run -m nose
