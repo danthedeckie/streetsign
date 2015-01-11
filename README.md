@@ -1,4 +1,7 @@
 # StreetSign (Server)
+
+[![Coverage Status](https://coveralls.io/repos/danthedeckie/streetsign/badge.png)](https://coveralls.io/r/danthedeckie/streetsign)
+
 A digital signage system, inspired by Concerto, however written in Flask/Peewee/Python,
 with a simpler basis.  This project was originally written for Teenstreet 2013 in Germany
 (http://www.teenstreet.de).
