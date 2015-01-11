@@ -204,14 +204,8 @@ def post_types_js():
 @registered_users_only('GET')
 def save_aliases():
     ''' save the current aliases. '''
-    try:
-        user = user_session.get_user()
-    except user_session.NotLoggedIn:
-        flash('Sorry, you need to be logged in!')
-        return redirect(url_for('index'))
-    if not user.is_admin:
-        flash('Sorry. You are NOT an admin!')
-        return redirect(url_for('index'))
+
+    user = user_session.get_user()
 
     if request.method == 'POST':
         aliases = form_json('aliases', [])

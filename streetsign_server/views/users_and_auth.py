@@ -27,6 +27,8 @@
 
 from flask import render_template, url_for, request, redirect, flash
 import streetsign_server.user_session as user_session
+from streetsign_server.views.utils import admin_only, registered_users_only
+
 from streetsign_server import app
 from streetsign_server.models import User, Group, Post, UserGroup
 
@@ -69,12 +71,15 @@ def logout():
 # User Management:
 
 @app.route('/users')
+@admin_only('POST')
+@registered_users_only('GET')
 def users():
     ''' list of all users (HTML page). '''
     return render_template('users.html', users=User.select())
 
 @app.route('/users/<int:userid>', methods=['GET', 'POST'])
 @app.route('/users/-1', methods=['GET', 'POST'])
+@registered_users_only('GET')
 def user(userid=-1):
     ''' edit one user.  Admins can edit any user, but other users
         can only edit themselves. if userid is -1, create a new user. '''
@@ -166,6 +171,7 @@ def user(userid=-1):
 
 
 @app.route('/groups', methods=['GET', 'POST'])
+@registered_users_only('GET')
 def groups():
     ''' (HTML) user-groups list, and creation of new ones. '''
 
@@ -185,6 +191,7 @@ def groups():
     return render_template('groups.html', groups=Group.select())
 
 @app.route('/group/<int:groupid>', methods=['GET', 'POST'])
+@registered_users_only('GET')
 def group(groupid):
     ''' edit one user group. '''
 

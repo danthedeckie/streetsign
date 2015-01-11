@@ -29,6 +29,8 @@
 from flask import render_template, request, redirect, \
                   flash, g, url_for, Response
 import streetsign_server.user_session as user_session
+from streetsign_server.views.utils import admin_only, registered_users_only
+
 from glob import glob
 from os.path import basename, dirname, join as pathjoin, splitext, isdir, isfile
 from werkzeug import secure_filename # pylint: disable=no-name-in-module
@@ -87,6 +89,8 @@ def make_dirlist(path):
 
 @app.route('/user_files/', methods=['GET', 'POST'])
 @app.route('/user_files/<path:dir_name>', methods=['GET', 'POST'])
+@admin_only('POST')
+@registered_users_only('GET')
 def user_files_list(dir_name=""):
     ''' HTML list of user-uploaded files. '''
 

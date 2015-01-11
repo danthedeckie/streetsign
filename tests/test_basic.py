@@ -17,43 +17,7 @@ import streetsign_server
 import streetsign_server.models as models
 from streetsign_server.models import Post, Feed
 
-# pylint: disable=too-many-public-methods
-
-class StreetSignTestCase(unittest.TestCase):
-    ''' Base Class, initialises and tears down a streetsign_server context. '''
-
-    def setUp(self):
-        ''' initialise temporary new database. '''
-
-        self.db_fd, streetsign_server.app.config['DATABASE_FILE'] = \
-            tempfile.mkstemp()
-
-        streetsign_server.app.config['TESTING'] = True
-
-        models.DB = SqliteDatabase(None, threadlocals=True, autocommit=False)
-        models.DB.init(streetsign_server.app.config['DATABASE_FILE'])
-
-        model_list = []
-
-        for modelname in models.__all__:
-            model = getattr(models, modelname)
-            try:
-                model._meta.database = models.DB
-                model_list.append(model)
-            except AttributeError:
-                pass
-
-        create_model_tables(model_list)
-        models.DB.set_autocommit(False)
-
-        self.client = streetsign_server.app.test_client()
-
-    def tearDown(self):
-        ''' delete temporary database '''
-
-        models.DB.close()
-        os.close(self.db_fd)
-        os.unlink(streetsign_server.app.config['DATABASE_FILE'])
+from unittest_helpers import StreetSignTestCase
 
 class TestSetup(StreetSignTestCase):
     ''' First basic sanity checks '''
@@ -67,55 +31,6 @@ class TestSetup(StreetSignTestCase):
 
         request = self.client.get('/posts/')
         assert '<span class="post_count">No Posts at all!' in request.data
-
-class TestHTML(StreetSignTestCase):
-    ''' test for valid HTML '''
-
-    def validate(self, url):
-        ''' test that a URL is actually HTML5 compliant '''
-
-        request = self.client.get(url)
-        parser = html5lib.HTMLParser(strict=True)
-        try:
-            doc = parser.parse(request.data)
-        except Exception as e:
-            print request.data
-            raise e
-
-    def expect_code(self, url, code):
-        ''' expect a non 200 Code on a URL (don't care about validation) '''
-        request = self.client.get(url)
-
-        self.assertEqual(code, request.status_code)
-
-    def test_non_logged_in_pages(self):
-        ''' test HTML validity of all non-logged-in pages '''
-
-        self.validate('/')
-        self.validate('/index.html')
-        self.validate('/posts/')
-
-    def test_new_screen_not_logged_in(self):
-        m = models.Screen()
-        m.urlname = 'Default'
-        m.save()
-
-        self.validate('/screens/basic/Default')
-        self.expect_code('/screens-edit/0', 403) # permision denied
-
-
-class TestJSON(StreetSignTestCase):
-    ''' test various JSON views return valid JSON '''
-
-    def validate(self, url):
-        ''' test that a url returns valid JSON '''
-
-        request = self.client.get(url)
-        json.loads(request.data)
-
-    def test_screen_json(self):
-        ''' test screen_json is valid '''
-        self.validate('/screens/json/0')
 
 class TestDB(StreetSignTestCase):
     ''' test basic database interactions '''
@@ -173,9 +88,6 @@ class TestDB(StreetSignTestCase):
 
         from_server = json.loads(self.client.get(posts_list[0]['uri']).data)
         self.assertEqual(from_server, json.loads(json.dumps(p.dict_repr())))
-
-
-
 
 if __name__ == '__main__':
     unittest.main()
