@@ -50,7 +50,9 @@ def login():
     except:
         flash('Invalid username or password! Sorry!')
 
-    return redirect(request.referrer)
+    # TODO: add appropriate HTTP status codes...
+
+    return redirect(request.referrer if request.referrer else '/')
 
 @app.route('/logout', methods=['POST'])
 def logout():
@@ -171,15 +173,12 @@ def user(userid=-1):
 
 
 @app.route('/groups', methods=['GET', 'POST'])
+@admin_only('POST')
 @registered_users_only('GET')
 def groups():
     ''' (HTML) user-groups list, and creation of new ones. '''
 
     if request.method == 'POST':
-        if not user_session.is_admin():
-            flash('Only Admins can do this!')
-            return redirect(url_for('groups'))
-
         action = request.form.get('action', 'create')
 
         if action == 'create':

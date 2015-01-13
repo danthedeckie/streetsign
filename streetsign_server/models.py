@@ -47,7 +47,7 @@ DB = SqliteDatabase(None, threadlocals=True)
 
 __all__ = ['DB', 'user_login', 'user_logout', 'get_logged_in_user',
            'User', 'Group', 'Post', 'Feed', 'FeedPermission', 'UserGroup',
-           'ConfigVar', 'Screen', 'config_var',
+           'ConfigVar', 'Screen', 'config_var', 'UserSession',
            'init', 'create_all', 'by_id']
 
 
