@@ -28,3 +28,4 @@ waitress
 nose
 coverage
 pylint
+requests
