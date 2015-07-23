@@ -214,15 +214,16 @@ function reduce_font_size_to_fit(inner, outer) {
                          'height%' : $img.attr('height')/100 };
         });
 
+
     while(i > 1){
         height = inner.height();
         width = inner.width();
 
         i = i / 2;
-        if ((height < zone_height) || ((!scrolling) && (width < zone_width))) {
+        if ((height < zone_height) || ((!scrolling) && (width < zone_width-5))) {
             percent += i;
 
-        } else if ((height > zone_height) || ((!scrolling) && (width > zone_width))) {
+        } else if ((height > zone_height) || ((!scrolling) && (width > zone_width+5))) {
             percent -= i;
         }
         inner.css('font-size', percent + '%');
