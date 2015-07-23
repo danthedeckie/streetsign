@@ -156,17 +156,27 @@ def thumbnail(filename):
     else:
         return 'Sorry! not a valid original file!'
 
-@app.route('/user_files/fonts.css')
-def user_fonts_css():
-    ''' return a CSS file with @font-face definitions for each font in the user
-        uploaded fonts directory '''
-
+def user_fonts():
+    ''' return a list of (name, url) tuples for all user-available fonts. 
+    '''
     fonts = []
 
     for f in glob(app.config['SITE_VARS']['user_dir']+ 'fonts/*tf'):
         name = splitext(basename(f))[0]
         url = url_for('static', filename='user_files/fonts/' + basename(f))
-        fonts.append(
+        fonts.append((name, url))
+    return fonts
+
+
+@app.route('/user_files/fonts.css')
+def user_fonts_css():
+    ''' return a CSS file with @font-face definitions for each font in the user
+        uploaded fonts directory '''
+    fonts = user_fonts()
+    css_fonts = []
+    for name, url in fonts:
+        css_fonts.append(
             '@font-face {font-family: %s; src:url(%s)}' % (name, url)
             )
-    return Response('\n'.join(fonts), status=200, mimetype='text/css')
+
+    return Response('\n'.join(css_fonts), status=200, mimetype='text/css')

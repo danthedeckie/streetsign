@@ -3,6 +3,7 @@
 {% block htmlhead %}
     {{ super() }}
     {{ linkmacros.static_css('lib/colorpicker/bgrins-spectrum-2c2010c/spectrum.css') }}
+<link rel="stylesheet" href="{{ url_for('user_fonts_css') }}" />
 {% endblock %}
 {% block title %}Edit Screen:{{ screen.id }}{% endblock %}
 {% block body %}
@@ -23,7 +24,7 @@
       <div class="col-md-6">
         <label style="display:block; width: 40%;">Background:</label>
         <select name="background" id="background" autocomplete="off" class="chosen">
-         <option {{ selecetd if not screen.background }} value="">None</option>
+         <option {{ 'selected' if not screen.background }} value="">None</option>
           {% for bg in backgrounds %}
             <option {{ 'selected' if bg == screen.background }} value="{{bg}}">{{bg}}</option>
           {% endfor %}
@@ -93,6 +94,10 @@
           <label>Default Text Color:</label>
             <input type="color" data-bind="spectrum: color" class="form-control" />
           <br/>
+          <label>Font</label>
+          <select name="fontfamily" class="form-control" autocomplete="off"
+              data-bind="options: AVAILABLE_FONTS, value:fontfamily">
+          </select>
           <label>Other CSS:</label>
             <textarea name="css" data-bind="value: css" class="form-control"></textarea>
         </div>
@@ -122,7 +127,7 @@
   <div class="well" data-spy="affix" data-offset-top="30" data-offset-bottom="30">
     <div id="my_fake_screen" class="fake_screen">
     <!-- ko foreach: zones -->
-    <div class="fake_zone" data-bind="style: { top: top, left: left, right: right, bottom: bottom, color: color}, text: name, click: $root.selectZoneScroll, css: {selected: selected}"></div>
+    <div class="fake_zone" data-bind="style: { top: top, left: left, right: right, bottom: bottom, color: color, 'font-family': fontfamily}, text: name, click: $root.selectZoneScroll, css: {selected: selected}"></div>
     <!-- /ko -->
     </div>
     Preview Aspect Ratio:<select id="fake_screen_aspect" class="form-control">
@@ -159,6 +164,7 @@ AVAILABLE_FEEDS = [
     {%- for feed in feeds -%}
         {id: "{{ feed.id }}", name: "{{ feed.name}}"} {{- ',' if not loop.last -}}
     {%- endfor -%} ];
+AVAILABLE_FONTS = {{ fonts|tojson|safe }};
 ZONE_TYPES= [
     {'name': 'fade', 'display': 'Fade In, Fade Out'},
     {'name': 'scroll', 'display': 'Scrolling text'}];

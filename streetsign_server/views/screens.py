@@ -43,6 +43,7 @@ from streetsign_server import app
 from streetsign_server.models import Feed, Post, Screen, ConfigVar, config_var
 from streetsign_server.post_types.image import allow_filetype
 from streetsign_server.views.utils import admin_only, registered_users_only
+from streetsign_server.views.user_files import user_fonts
 
 
 def form_json(name, default):
@@ -117,9 +118,13 @@ def screenedit(screenid):
         if int(screenid) == -1:
             return redirect(url_for('screenedit', screenid=screen.id))
 
+    fonts=['','serif','sans-serif','monospace','cursive','fantasy']
+    fonts += [name for name,url in user_fonts()]
+
     return render_template('screen_editor.html',
                            feeds=Feed.select(),
                            backgrounds=backgrounds,
+                           fonts=fonts,
                            screen=screen)
 
 
