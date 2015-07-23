@@ -1,3 +1,6 @@
+# first upgrade pip
+pip >= 7.1
+
 # the web framework:
 flask
 

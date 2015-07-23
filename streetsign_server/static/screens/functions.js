@@ -101,8 +101,8 @@ function magic_vars(text) {
     // replaces %%TIME%% and %%DATE%% magic vars in a string with appropriate
     // classed <span> tags, so jquery thingy can replace them later on.
 
-    return (text.replace(/%%TIME%%/,'<span class="magic_time">&nbsp;</span>')
-                .replace(/%%DATE%%/,'<span class="magic_date">&nbsp;</span>'));
+    return (text.replace(/%%TIME(.*?)%%/,'<span class="magic_time" data-format="$1">&nbsp;</span>')
+                .replace(/%%DATE(.*?)%%/,'<span class="magic_date" data-format="$1">&nbsp;</span>'));
 }
 
 function magic_time() {
@@ -111,14 +111,14 @@ function magic_time() {
     // date or time.
 
     var d = new Date();
-    var timestr = ((d.getHours()<10?'0':'') + d.getHours() + ':'
-                  + (d.getMinutes()<10?'0':'') + d.getMinutes());
 
     $('.magic_time').each(function(i){
-        this.innerHTML = timestr;
+        var format = $(this).data('format') || '%H:%M';
+        this.innerHTML = d.toLocaleFormat(format);
     });
     $('.magic_date').each(function(i){
-        this.innerHTML = Date().replace(/:[^:]*$/,'');
+        var format = $(this).data('format') || '%F';
+        this.innerHTML = d.toLocaleFormat(format); // Date().replace(/:[^:]*$/,'');
     });
     setTimeout(magic_time, 60000);
 }

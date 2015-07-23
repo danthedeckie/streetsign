@@ -16,4 +16,14 @@ if [[ $? -ne 0 ]]; then
     sqlite3 database.db "alter table externalsource add column display_time integer not null default 8"
 fi
 
+
+sqlite3 database.db ".schema screen" |grep 'css' > /dev/null
+
+if [[ $? -ne 0 ]]; then
+    echo "adding 'css' column to screen table."
+    sqlite3 database.db "alter table screen add column css text not null default ''"
+fi
+
+
+
 echo "Done."
