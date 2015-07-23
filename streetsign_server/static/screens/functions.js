@@ -114,11 +114,11 @@ function magic_time() {
 
     $('.magic_time').each(function(i){
         var format = $(this).data('format') || '%H:%M';
-        this.innerHTML = d.toLocaleFormat(format);
+        this.innerHTML = d.format(format);
     });
     $('.magic_date').each(function(i){
         var format = $(this).data('format') || '%F';
-        this.innerHTML = d.toLocaleFormat(format); // Date().replace(/:[^:]*$/,'');
+        this.innerHTML = d.format(format); // Date().replace(/:[^:]*$/,'');
     });
     setTimeout(magic_time, 60000);
 }
