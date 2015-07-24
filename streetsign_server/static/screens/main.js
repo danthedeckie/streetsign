@@ -85,6 +85,8 @@ function Zone(container, initial_data) {
     update('color');
     update('name');
     update('type');
+    update('fontfamily');
+
     if (LOCALOPTS.hasOwnProperty('fadetime')) {
         this['fadetime'] = parseInt(LOCALOPTS['fadetime'],10);
     } else {
@@ -112,6 +114,9 @@ function Zone(container, initial_data) {
     this.width = this.el.scrollWidth;
 
     $(this.el).css('color', that['color']);
+    if (that['fontfamily']) {
+        $(this.el).css('font-family', that['fontfamily']);
+    }
 
 }
 

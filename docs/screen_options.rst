@@ -52,6 +52,13 @@ Size
 These 4 values are usually percentages, and are "distance from this side of the screen".
 So setting them all to 0 would mean a zone that filled the screen completely.
 
+Fonts
+~~~~~
+
+There are a few default commonly available font families listed, but you can also upload your
+own .TTF fonts into the `user_files/fonts` directory, and they should then appear for you
+to use.
+
 Other CSS
 ~~~~~~~~~
 

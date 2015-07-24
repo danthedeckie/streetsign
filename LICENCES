@@ -37,5 +37,8 @@ twitter bootstrap(3): (easy UI theme for the interface)
 A few background pictures from creativity103.com
  - Creative Commons Attribution 3.0 Licence.
 
+Date.js: (date formatting in JS for magic vars)
+- MIT License
+
 All of these can be found in the streetsign_server/static/lib/ folder, with their
  own copyright notices, and licence information.

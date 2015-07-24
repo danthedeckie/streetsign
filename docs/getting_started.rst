@@ -221,10 +221,22 @@ Magic Variables
 In HTML and plain text posts, you can put the following "magic variables":
 
 ``%%TIME%%`` and ``%%DATE%%`` which will show up on the output screens as
-the current date and time, respectively.  *Note: this time is local to that
-screen's computer!  So if you are using a raspberry pi or similar, and you're
-on a closed network without internet access, then you'll also need to set up
-some kind of NTP server too.*
+the current date and time, respectively.
+
+*Note: this time is local to that screen's computer!
+So if you are using a raspberry pi or similar, and you're
+on a closed network without internet access,
+then you'll also need to set up some kind of NTP server too.*
+
+You can customize how the DATE or TIME is formatted using standard
+strftime `style formatting tags <https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior>`_ after the word DATE or TIME Eg:
+
+``The month is: %%DATE%B%%`` (will show "July" only)
+
+``<h1>%%DATE%B</br>%Y%%</h1>`` (will show "July" and then "2015" on the next line)
+
+It's not recommended to put the current second, as due to the current
+design, that will only get updated infreqently, and has no way of guarenteing being right.
 
 Post Sizing/Scaling
 ~~~~~~~~~~~~~~~~~~~
@@ -241,8 +253,8 @@ scaled independently.
 The HTML "rich text" posts are intentionally somewhat limited.  If you want to
 have a post where the *design* is important, not just the textual content of
 the post, they you should use an external graphic design package, such as
-`Inkscape <http://www.inkscape.org>` (free), 
-`Adobe Illustrator <http://www.adobe.com/uk/products/illustrator.html>`
+`Inkscape <http://www.inkscape.org>`_ (free), 
+`Adobe Illustrator <http://www.adobe.com/uk/products/illustrator.html>`_
 (expensive), 
-`PixelMator <http://www.pixelmator.com/>` (good, not too expensive, mac only`),
+`PixelMator <http://www.pixelmator.com/>`_ (good, not too expensive, mac only`),
 and then post as an Image type.

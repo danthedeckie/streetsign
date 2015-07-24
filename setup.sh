@@ -53,6 +53,7 @@ fi
 
 # get required python modules:
 echo "Checking requirements (python modules)"
+$PIP install -U pip
 $PIP install -r "requirements.txt"
 if [[ $? -ne 0 ]]; then
     echo 'Something went wrong trying to install the required python modules...'
@@ -76,6 +77,8 @@ if [[ ! -f "database.db" ]]; then
     echo "the main user is 'admin' and the password is 'password'."
     echo "please change it!"
 fi
+
+mkdir -p streetsign_server/static/user_files/fonts
 
 echo
 echo "--------------------------------------------------------"

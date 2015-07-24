@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <link rel="manifest" href="/static/user_files/{{ screen.urlname }}.manifest.json">
         <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
         <!--<script type="text/javascript" charset="utf-8" src="intelxdk.js"></script>-->
 
@@ -101,7 +102,7 @@
             <div id="header"></div>
             <div id="content" style="">
                 <div data-appbuilder-object="page" selected="selected"
-                     style="" id="page_0" class="panel" title="Teenstreet Newsapp" data-nav="nav_0">
+                     style="" id="page_0" class="panel" title="{{ screen.urlname|replace('_',' ') }}" data-nav="nav_0">
                     <ul id="zonelist" data-position="static"
                         data-appbuilder-object="list" class="list"></ul>
                 </div>
