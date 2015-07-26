@@ -4,105 +4,113 @@
 {% block body %}
 <h2>All Posts</h2>
 <div class="pull-right">
-  <button type="button" class="btn btn-default" id="run_housekeeping"
-          title="Archive old posts, delete really old posts">
-    <span class="glyphicon glyphicon-compressed"></span>Do Housekeeping</button>
+	<button type="button" class="btn btn-default" id="run_housekeeping"
+	        title="Archive old posts, delete really old posts">
+<span class="glyphicon glyphicon-compressed"></span>Do Housekeeping</button>
 </div>
 
 <table class="table table-striped">
-<thead>
-<tr>
-<th>Content</th>
-<th>Author</th>
-<th>Feed</th>
-<th>
-{% if user.id %}
-  <div class="btn-group">
-  <button type="button" class="btn btn-default" id="show_past_posts">Show Past Posts</button>
+	<thead>
+		<tr>
+			<th>Content</th>
+			<th>Author</th>
+			<th>Feed</th>
+			<th>
+				{% if user.id %}
+					<div class="btn-group">
+						<button type="button" class="btn btn-default" id="show_past_posts">
+							Show Past Posts</button>
 
-  {% if user.writeable_feeds() %}
-  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-    New Post <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" role="menu">
-     {% for feed in user.writeable_feeds() %}
-        <li><a href="{{ url_for('post_new', feed_id=feed.id) }}">{{ feed.name }}</a></li>
-     {% endfor %}
-  </ul>
-  {% endif %}
-  </div>
-{% endif %}
-</th>
-</tr>
-</thead>
-<tbody>
-{% for post in posts|sort(attribute="active_end") %}
-    <tr class="time_{{- post.active_status() }} item {{ 'un' if not post.published}}published"
-        data-uri="{{ url_for('postpage', postid=post.id) }}" >
-    <td>{{ linkmacros.post(post) }}</td>
-    <td>{% if post.author %}
-            {{linkmacros.user(post.author)}} (on {{ post.write_date.date() }})
-        {% else %}
-            No Author!
-        {% endif %}
-    </td>
-    <td>{% if post.feed %}
-           {% if user.is_admin %}
-           <form action="{{ url_for('postpage', postid=post.id) }}" method="POST" >
-           <input type="hidden" name="action" value="move" />
-           <select name="feed" class="autopost">
-           {% for feed in user.writeable_feeds() %}
-                <option value="{{ feed.id }}" {{ 'selected' if post.feed == feed }}>{{ feed.name }}</option>
-           {% endfor %}
-           </select>
-           </form>
-           {% else %}
-           {{ linkmacros.feed(post.feed) }}&nbsp;
-           {% endif %}
-        {% else %}
-            Not Published!
-        {% endif %}
-    </td>
-    <td>{% if post.active_status()=="now" %}Active
-        {% elif post.active_status()=="future" %}Display later
-        {% elif post.active_status()=="past" %}
-            {% if post.status == 0 %}Finished display lifetime
-            {% else %}Archived
-            {% endif %}
-        {% endif %}
+						{% if user.writeable_feeds() %}
+							<button type="button" class="btn btn-default dropdown-toggle"
+											 data-toggle="dropdown">New Post <span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu" role="menu">
+								{% for feed in user.writeable_feeds() %}
+									<li><a href="{{ url_for('post_new', feed_id=feed.id) }}">{{ feed.name }}</a></li>
+								{% endfor %}
+							</ul>
+						{% endif %}
+					</div>
+				{% endif %}
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for post in posts|sort(attribute="active_end") %}
+			<tr class="time_{{- post.active_status() }} item 
+			    {{ 'un' if not post.published}}published"
+			    data-uri="{{ url_for('postpage', postid=post.id) }}" >
+				<td>{{ linkmacros.post(post) }}</td>
+				<td>
+					{% if post.author %}
+						{{linkmacros.user(post.author)}} (on {{ post.write_date.date() }})
+					{% else %}
+						No Author!
+					{% endif %}
+				</td>
+				<td>
+					{% if post.feed %}
+						{% if user.is_admin %}
+							<form action="{{ url_for('postpage', postid=post.id) }}" method="POST">
+								<input type="hidden" name="action" value="move" />
+								<select name="feed" class="autopost form-control">
+									{% for feed in user.writeable_feeds() %}
+										<option value="{{ feed.id }}"
+											{{ 'selected' if post.feed == feed }}>{{ feed.name }}</option>
+									{% endfor %}
+								</select>
+							</form>
+						{% else %}
+							{{ linkmacros.feed(post.feed) }}&nbsp;
+						{% endif %}
+					{% else %}
+						Not Published!
+					{% endif %}
+				</td>
+				<td>
+					{% if post.active_status()=="now" %}Active
+					{% elif post.active_status()=="future" %}Display later
+					{% elif post.active_status()=="past" %}
+						{% if post.status == 0 %}Finished display lifetime
+						{% else %}Archived
+						{% endif %}
+					{% endif %}
 
-        {# publish & delete buttons #}
+					{# publish & delete buttons #}
 
-        {% if post.feed.user_can_publish(user) %}
-        <span class="onlyunpublished">
-            <button class="btn btn-default item_ajax_toggle"
-                    data-ajaxtype="POST"
-                    data-ajaxtoggle="published unpublished" data-name="action" data-value="publish">Publish</button>
-        </span>
-        <span class="onlypublished">
-            <button class="btn btn-default item_ajax_toggle"
-                    data-ajaxtype="POST"
-                    data-ajaxtoggle="published unpublished" data-name="action" data-value="unpublish">UnPublish</button>
-        </span>
-        {% endif %}
-        {% if (post.published and post.feed.user_can_publish(user)) or
-              ((not post.published) and post.feed.user_can_write(user)) %}
-        <button data-ajaxtype="POST" data-ajaxtoggle="hidden" data-name="action" data-value="delete"
-                class="item_ajax_toggle btn delbutton confirm_delete">&times;</button>
-       {% endif %}</td>
-
-
-    </td>
-    </tr>
-{% endfor %}
-</tbody>
+					{% if post.feed.user_can_publish(user) %}
+						<span class="onlyunpublished">
+							<button class="btn btn-default item_ajax_toggle"
+							        data-ajaxtype="POST"
+							        data-ajaxtoggle="published unpublished"
+							        data-name="action" data-value="publish">Publish</button>
+						</span>
+						<span class="onlypublished">
+							<button class="btn btn-default item_ajax_toggle"
+							        data-ajaxtype="POST"
+							        data-ajaxtoggle="published unpublished"
+							        data-name="action" data-value="unpublish">UnPublish</button>
+						</span>
+					{% endif %}
+					{% if (post.published and post.feed.user_can_publish(user))
+					   or ((not post.published) and post.feed.user_can_write(user)) %}
+						<button data-ajaxtype="POST" data-ajaxtoggle="hidden"
+						        data-name="action" data-value="delete"
+						        class="item_ajax_toggle btn delbutton confirm_delete">&times;</button>
+					{% endif %}
+				</td>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
 </table>
 
 <!-- careful of changing this next line, as unit tests require it. -->
 {% if posts.count() == 0 %}
-    <span class="post_count">No Posts at all!</span>
+	<span class="post_count">No Posts at all!</span>
 {% else %}
-    <span class="post_count">{{ posts.count() }} posts</span>
+	<span class="post_count">{{ posts.count() }} posts</span>
 {% endif %}
 
 {% endblock %}

@@ -3,125 +3,126 @@
 
 {% block body %}
 <div class="row">
-{% if session.logged_in %}
+	{% if session.logged_in %}
+		<div class="col-sm-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title"> Unpublished Posts I can publish:</h2>
+				</div>
+				<div class="panel-body">
+					<ul class="list">
+						{% for post in posts_to_publish %}
+							<li><span class="{{ 'published' if post.published else 'unpublished' }}">{{ linkmacros.post(post) }}</span>
+									<form method="post" action="{{ url_for('postpage', postid=post.id) }}">
+										<input type="hidden" name="action" value="publish" />
+										<input type="submit" class="newbutton" value="Publish" style="" />
+									</form>
+							</li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</div>
 
-<div class="col-sm-6">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2 class="panel-title"> Unpublished Posts I can publish:</h2>
-    </div>
-    <div class="panel-body">
-      <ul class="list">
-      {% for post in posts_to_publish %}
-        <li><span class="{{ 'published' if post.published else 'unpublished' }}">{{ linkmacros.post(post) }}</span>
-            <form method="post" action="{{ url_for('postpage', postid=post.id) }}">
-              <input type="hidden" name="action" value="publish" />
-              <input type="submit" class="newbutton" value="Publish" style="" /></form>
-        </li>
-      {% endfor %}
-      </ul>
-    </div>
-  </div>
-</div>
+		{% if publishable_feeds %}
 
+			<div class="col-sm-6">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h2 class="panel-title"> Feeds I can publish to:</h2>
+					</div>
+					<div class="panel-body">
+						<ul class="list">
+							{% for feed in publishable_feeds %}
+								<li>
+									<a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
 
-{% if publishable_feeds %}
+		{% endif %} {# /publishable feeds #}
 
-<div class="col-sm-6">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2 class="panel-title"> Feeds I can publish to:</h2>
-    </div>
-    <div class="panel-body">
-      <ul class="list">
-      {% for feed in publishable_feeds %}
-        <li><a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a>
-        </li>
-      {% endfor %}
-      </ul>
-    </div>
-  </div>
-</div>
+		<div class="col-sm-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title"> My recent Posts:</h2>
+				</div>
+				<div class="panel-body">
+					<ul class="list">
+						{% for post in posts %}
+							<li class="{{ 'published' if post.published else 'unpublished' }}">{{ linkmacros.post(post) }} ( {{ 'published' if post.published else 'unpublished' }} ) </li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</div>
 
-{% endif %} <!-- /publishable feeds -->
+		<div class="col-sm-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title">Feeds I can write for:</h2>
+				</div>
+				<div class="panel-body">
+					<ul class="list">
+					{% for feed in feeds %}
+						<li>
+							<a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a> -
+							{% if feed.user_can_write(user) %}
+								<a href="{{ url_for('post_new', feed_id=feed.id) }}"
+								   class="btn btn-xs btn-default">New Post</a>
+							{% endif %}
+						</li>
+					{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</div>
 
+		<div class="col-sm-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title">Other:</h2>
+				</div>
+				<div class="panel-body">
+					<button type="button" class="btn btn-default" id="run_housekeeping"
+					        title="Archive old posts, delete really old posts">
+						<span class="glyphicon glyphicon-compressed"></span>Do Housekeeping</button>
 
-<div class="col-sm-6">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2 class="panel-title"> My recent Posts:</h2>
-    </div>
-    <div class="panel-body">
-      <ul class="list">
-      {% for post in posts %}
-        <li class="{{ 'published' if post.published else 'unpublished' }}">{{ linkmacros.post(post) }} ( {{ 'published' if post.published else 'unpublished' }} ) </li>
-      {% endfor %}
-      </ul>
-    </div>
-  </div>
-</div>
+				</div>
+			</div>
+		</div>
 
-<div class="col-sm-6">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2 class="panel-title"> Feeds I can write for:</h2>
-    </div>
-    <div class="panel-body">
-      <ul class="list">
-      {% for feed in feeds %}
-        <li><a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a> -
-            {% if feed.user_can_write(user) %}
-                <a href="{{ url_for('post_new', feed_id=feed.id) }}"
-                   class="btn btn-xs btn-default">New Post</a>
-            {% endif %}
-        </li>
-      {% endfor %}
-      </ul>
-    </div>
-  </div>
-</div>
+	</div>
 
-<div class="col-sm-6">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2 class="panel-title">Other:</h2>
-    </div>
-    <div class="panel-body">
-      <button type="button" class="btn btn-default" id="run_housekeeping"
-              title="Archive old posts, delete really old posts">
-        <span class="glyphicon glyphicon-compressed"></span>Do Housekeeping</button>
-
-    </div>
-  </div>
-</div>
-
-</div>
-
-<!-- endif logged in -->
+	<!-- endif logged in -->
 {% else %}
-    <div class="jumbotron">
-        <h1>{{ g.site_vars.site_title }}</h1>
-    </div>
+	<div class="jumbotron">
+		<h1>{{ g.site_vars.site_title }}</h1>
+	</div>
 {% endif %}
+
 <div class="row">
-    <h2>Public Screens</h2>
+	<h2>Public Screens</h2>
 </div>
 <div class="row">
-  {% for client in aliases if client.show_on_dashboard %}
-  <div class="col-xs-6 col-md-3">
-    <div class="thumbnail">
-        <a href="{{ url_for('client_alias', alias_name=client.name) }}">
-        {% if client.screen.background %}
-            <img src="/static/user_files/{{ client.screen.background }}"
-                 style="width:100%;height:auto" alt="...">
-        {% else %}
-            <div style="width:100%;height:2em;background:black"></div>
-        {% endif %}
-            <h3>{{ client.name }}</h3>
-       </a>
-    </div>
-  </div>
-  {% endfor %}
+	{% for client in aliases if client.show_on_dashboard %}
+		<div class="col-xs-6 col-md-3">
+			<div class="thumbnail">
+				<a href="{{ url_for('client_alias', alias_name=client.name) }}">
+					{% if client.screen.background %}
+						<img src="/static/user_files/{{ client.screen.background }}"
+								 style="width:100%;height:auto" alt="...">
+					{% else %}
+						<div style="width:100%;height:2em;background:black"></div>
+					{% endif %}
+					<h3>{{ client.name }}</h3>
+				 </a>
+			</div>
+		</div>
+	{% endfor %}
 </div>
 <div class="cf"></div>
 </div>
