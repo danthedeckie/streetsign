@@ -27,13 +27,15 @@
 
 from flask import render_template, url_for, request, redirect, flash
 import streetsign_server.user_session as user_session
-from streetsign_server.views.utils import admin_only, registered_users_only
+from streetsign_server.views.utils import admin_only, registered_users_only, \
+                                          permission_denied
+
+import peewee
 
 from streetsign_server import app
-from streetsign_server.models import User, Group, Post, UserGroup
+from streetsign_server.models import User, Group, Post, UserGroup, InvalidPassword
 
 # pylint: disable=no-member
-
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -47,7 +49,9 @@ def login():
     #return_to = request.form.get('from', 'index')
     try:
         user_session.login(request.form['username'], request.form['password'])
-    except:
+    except peewee.DoesNotExist:
+        flash('Invalid username or password! Sorry!')
+    except InvalidPassword:
         flash('Invalid username or password! Sorry!')
 
     # TODO: add appropriate HTTP status codes...
@@ -63,26 +67,41 @@ def logout():
     # delete the session from the database:
     try:
         user_session.logout()
-    except:
+    except Exception as e:
+        print 'Error Logging Out: %s' % e
         flash('error logging out. That is odd')
 
-    # return to where we were.
-    return redirect(request.referrer)
+    # return to dashboard
+    return redirect('/')
 
 ##################################################################
 # User Management:
 
-@app.route('/users')
+@app.route('/users_and_groups', methods=['GET', 'POST'])
 @admin_only('POST')
 @registered_users_only('GET')
-def users():
-    ''' list of all users (HTML page). '''
-    return render_template('users.html', users=User.select())
+def users_and_groups():
+    ''' list of all users and groups (HTML page). '''
+
+    if request.method == 'POST':
+        action = request.form.get('action', 'creategroup')
+
+        if action == 'creategroup':
+            if not request.form.get('name', '').strip():
+                flash("I'm not making you an un-named group!")
+                return redirect(url_for('users_and_groups'))
+
+            Group.create(name=request.form.get('name', 'blank').strip())
+
+
+    return render_template('users_and_groups.html',
+                           users=User.select(),
+                           groups=Group.select())
 
 @app.route('/users/<int:userid>', methods=['GET', 'POST'])
 @app.route('/users/-1', methods=['GET', 'POST'])
 @registered_users_only('GET')
-def user(userid=-1):
+def user_edit(userid=-1):
     ''' edit one user.  Admins can edit any user, but other users
         can only edit themselves. if userid is -1, create a new user. '''
 
@@ -90,7 +109,7 @@ def user(userid=-1):
         current_user = user_session.get_user()
     except user_session.NotLoggedIn as e:
         flash("Sorry, you're not logged in!")
-        return redirect(url_for('index'))
+        return permission_denied("You're not logged in!")
 
     userid = int(userid)
 
@@ -99,24 +118,23 @@ def user(userid=-1):
     else:
         if not current_user.is_admin:
             flash('Sorry! Only admins can create new users!')
-            return redirect(url_for('users'))
+            return permission_denied("Admins only!")
 
-        user = User()
+        user = User() #pylint: disable=no-value-for-parameter
+
         user.loginname = 'new'
         user.displayname = 'New User'
         user.emailaddress = '...'
-
 
     if request.method == 'POST':
         action = request.form.get('action', 'none')
         if action == 'update':
             if current_user != user and not current_user.is_admin:
-                flash('Sorry! You cannot edit this user!')
-                return render_template('user.html', user=user)
+                return permission_denied("Sorry, you may not edit this user.")
             try:
                 oldname = user.loginname
                 user.loginname = request.form.get('loginname', user.loginname)
-            except:
+            except peewee.IntegrityError:
                 user.loginname = oldname if oldname else 'NEW'
                 flash('Sorry! You cannot have that loginname.' \
                       ' Someone else does')
@@ -135,25 +153,37 @@ def user(userid=-1):
 
             if newpass:
                 if current_user.confirm_password(request.form.get('currpass', '')):
-                    user.set_password(request.form.get('newpass'))
-                    flash('password changed')
+                    user.set_password(newpass)
+                    if userid != -1:
+                        flash('Password changed.')
                 else:
-                    flash('Your password was wrong!')
-            else:
-                if not request.form.get('newpass', '') == '':
-                    flash('invalid password!')
+                    if not request.form.get('curpass',''):
+                        flash("You need to enter your current password"
+                              " as well as (2x) the new one.")
+                    else:
+                        flash('Your current password was wrong!')
+
+            else: # passwords either empty (so don't change) or don't match!
+                if request.form.get('newpass', '') != '':
+                    flash('Passwords don\'t match!')
 
             if current_user.is_admin:
                 user.set_groups(request.form.getlist('groups'))
 
-            user.save()
-            flash('Updated.')
-            if userid == -1:
-                return redirect(url_for('user', userid=user.id))
+            try:
+                user.save()
+                if userid == -1:
+                    flash('New user created.')
+                    return redirect(url_for('user_edit', userid=user.id))
+                else:
+                    flash('Saved')
+
+            except peewee.IntegrityError as err:
+                flash(str(err))
+
         elif action == 'delete':
             if not current_user.is_admin:
-                flash('Sorry! Only admins can delete users!')
-                return redirect(request.referrer)
+                return permission_denied("Sorry, only admins can delete users.")
 
             if user.id == current_user.id:
                 flash('Sorry! You cannot delete yourself!')
@@ -168,26 +198,9 @@ def user(userid=-1):
                                .limit(10)
 
     return render_template('user.html',
-                            allgroups=Group.select(),
-                            posts=users_posts, user=user)
+                           allgroups=Group.select(),
+                           posts=users_posts, user=user)
 
-
-@app.route('/groups', methods=['GET', 'POST'])
-@admin_only('POST')
-@registered_users_only('GET')
-def groups():
-    ''' (HTML) user-groups list, and creation of new ones. '''
-
-    if request.method == 'POST':
-        action = request.form.get('action', 'create')
-
-        if action == 'create':
-            if not request.form.get('name', '').strip():
-                flash("I'm not making you an un-named group!")
-                return redirect(url_for('groups'))
-            Group(name=request.form.get('name', 'blank').strip()).save()
-
-    return render_template('groups.html', groups=Group.select())
 
 @app.route('/group/<int:groupid>', methods=['GET', 'POST'])
 @registered_users_only('GET')
@@ -203,13 +216,13 @@ def group(groupid):
     if request.method == 'POST':
         if not user_session.is_admin():
             flash('Only Admins can do this!')
-            return redirect(url_for('groups'))
+            return redirect(url_for('users_and_groups'))
 
         if request.form.get('action', 'none') == 'delete':
             UserGroup.delete().where(UserGroup.group == thisgroup).execute()
             thisgroup.delete_instance()
             flash('group:'+ thisgroup.name +' deleted.')
-            return redirect(url_for('groups'))
+            return redirect(url_for('users_and_groups'))
 
         if request.form.get('action', 'none') == 'update':
             thisgroup.name = request.form.get('groupname', thisgroup.name)

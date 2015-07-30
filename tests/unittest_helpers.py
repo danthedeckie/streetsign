@@ -31,8 +31,9 @@ class StreetSignTestCase(unittest.TestCase):
     def setUp(self):
         ''' initialise temporary new database. '''
 
-        self.db_fd, streetsign_server.app.config['DATABASE_FILE'] = \
-            tempfile.mkstemp()
+        self.ctx = streetsign_server.app.test_request_context
+
+        streetsign_server.app.config['DATABASE_FILE'] = ':memory:'
 
         streetsign_server.app.config['TESTING'] = True
 
@@ -58,16 +59,14 @@ class StreetSignTestCase(unittest.TestCase):
         ''' delete temporary database '''
 
         models.DB.close()
-        os.close(self.db_fd)
-        os.unlink(streetsign_server.app.config['DATABASE_FILE'])
 
-    def validate(self, url, lang='html', code=200, req='GET', data={}):
+    def validate(self, url, lang='html', code=200, req='GET', data={}, **kwargs):
         ''' test that a URL is actually HTML5 compliant '''
 
         if req == 'GET':
-            request = self.client.get(url)
+            request = self.client.get(url, **kwargs)
         elif req=='POST':
-            request = self.client.post(url, data=data)
+            request = self.client.post(url, data=data, **kwargs)
 
         if lang == 'html':
             parser = html5lib.HTMLParser(strict=True)
@@ -82,6 +81,7 @@ class StreetSignTestCase(unittest.TestCase):
 
 
         if code != request.status_code:
+            print request.data
             raise WrongHTTPCode(url, code, request.status_code)
 
     def login(self, username, password):

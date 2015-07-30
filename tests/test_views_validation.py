@@ -31,9 +31,8 @@ class TestBasicViewValid(StreetSignTestCase):
         self.validate('/screens-edit/0', code=403)
         self.validate('/user_files/', code=403)
         self.validate('/user_files/thing.jpg', code=403)
-        self.validate('/users', code=403)
+        self.validate('/users_and_groups', code=403)
         self.validate('/users/0', code=403)
-        self.validate('/groups', code=403)
         self.validate('/group/0', code=403)
         self.validate('/aliases', code=403)
 

@@ -49,6 +49,21 @@ $('a.confirm_ajax_delete').click(function(evt) {
 
 });
 
+$('.popup_ask').click(function(evt) {
+  /* fills in a form value.  If attached to a submit button,
+     will submit the form as well. */
+
+  var input = $(this.form).find("input[name=" + $(this).data("inputname") + "]"),
+      value = prompt($(this).data("prompt"), $(this).data("autofill"));
+
+  if (value) {
+      input.val(value);
+  } else {
+      evt.preventDefault();
+  }
+  //$.post( this.form.getAttribute('action'), $(this.form).serialize(), function(data) {
+});
+
 // focus on username input box when 'login' clicked.
 $('#user_login_button').click(function(){
     setTimeout( function() {

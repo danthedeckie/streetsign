@@ -23,9 +23,12 @@
     No actual views in here, only bits and pieces to make views more
     fun.
 """
-from flask import request, flash, redirect, url_for, render_template, make_response
+from flask import request, flash, render_template, make_response
 import streetsign_server.user_session as user_session
 from functools import wraps
+
+# lots of wrappers, don't need these:
+# pylint: disable=missing-docstring
 
 class PleaseRedirect(Exception):
     '''
@@ -78,15 +81,11 @@ def admin_only(*methods):
                     user = user_session.get_user()
                 except user_session.NotLoggedIn:
                     flash('Sorry! You need to be logged in!')
-                    return make_response(render_template('403.html',
-                                           message='You must be logged in!'),
-                                         403)
+                    return permission_denied('You must be logged in!')
 
                 if not user.is_admin:
                     flash('Sorry! You need to be an admin!')
-                    return make_response(render_template('403.html',
-                                           message='You must be an admin!'),
-                                         403)
+                    return permission_denied('You must be an admin!')
 
             return f(*args, **kwargs)
         return wrapped
@@ -101,15 +100,16 @@ def registered_users_only(*methods):
         def wrapped(*args, **kwargs):
             if request.method in methods:
                 try:
-                    user = user_session.get_user()
+                    user_session.get_user()
                 except user_session.NotLoggedIn:
                     flash('Sorry! You need to be logged in!')
-                    return make_response(render_template('403.html',
-                                           message='You must be logged in!'),
-                                         403)
+                    return permission_denied('You must be logged in!')
 
             return f(*args, **kwargs)
         return wrapped
     return wrapper
 
+def permission_denied(message):
+    ''' return the 403.html template, with a message, and the HTTP code '''
+    return make_response(render_template('403.html', message=message), 403)
 

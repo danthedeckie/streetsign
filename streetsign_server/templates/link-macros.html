@@ -1,5 +1,5 @@
 {% macro user(a) -%}
-<a href="{{ url_for('user', userid=a.id) }}">{{a.displayname}}</a>
+<a href="{{ url_for('user_edit', userid=a.id) }}">{{a.displayname}}</a>
 {%- endmacro %}
 
 {% macro feed(a) -%}
