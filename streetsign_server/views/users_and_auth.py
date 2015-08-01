@@ -157,7 +157,7 @@ def user_edit(userid=-1):
                     if userid != -1:
                         flash('Password changed.')
                 else:
-                    if not request.form.get('curpass',''):
+                    if not request.form.get('currpass',''):
                         flash("You need to enter your current password"
                               " as well as (2x) the new one.")
                     else:

@@ -93,7 +93,24 @@ class ChangingPasswords(BasicUsersTestCase):
                                    follow_redirects=True)
 
         self.assertNotIn("Password changed", resp.data)
-        self.assertIn("You need to enter your current password", resp.data)
+        self.assertIn("Your current password was wrong", resp.data)
+
+        usernow = User.get(id=self.user.id)
+        self.assertEqual(usernow.passwordhash, self.user.passwordhash)
+
+    def test_cannot_change_password_with_differing_inputs(self):
+        self.login(USERNAME, USERPASS)
+
+        with self.ctx():
+            resp =self.client.post(url_for('user_edit', userid=self.user.id),
+                                   data={"action":"update",
+                                         "newpass": "200",
+                                         "conf_newpass": "201",
+                                         "currpass": USERPASS},
+                                   follow_redirects=True)
+
+        self.assertNotIn("Password changed", resp.data)
+        self.assertIn("Passwords don&#39;t match", resp.data)
 
         usernow = User.get(id=self.user.id)
         self.assertEqual(usernow.passwordhash, self.user.passwordhash)
@@ -139,6 +156,30 @@ class ChangingPasswords(BasicUsersTestCase):
         usernow = User.get(id=user2.id)
         self.assertEqual(usernow.passwordhash, user2.passwordhash)
 
+    def test_cannot_change_other_users_password_even_with_their_currpass(self):
+
+        user2 = models.User(loginname="user2",
+                            emailaddress='test@test.com',
+                            is_admin=False)
+        user2.set_password("userpass2")
+        user2.save()
+
+        self.login(USERNAME, USERPASS)
+
+        with self.ctx():
+            resp =self.client.post(url_for('user_edit', userid=user2.id),
+                                   data={"action":"update",
+                                         "newpass": "200",
+                                         "conf_newpass": "200",
+                                         "currpass": "userpass2"},
+                                   follow_redirects=True)
+
+        self.assertIn("Permission Denied", resp.data)
+        self.assertEquals(resp.status_code, 403)
+
+        usernow = User.get(id=user2.id)
+        self.assertEqual(usernow.passwordhash, user2.passwordhash)
+
     def test_admin_can_change_users_password(self):
         self.login(ADMINNAME, ADMINPASS)
 
@@ -174,21 +215,46 @@ class ChangingPasswords(BasicUsersTestCase):
 class CreatingUsers(BasicUsersTestCase):
     ''' Admin only can create new users. '''
 
-    def logged_out_cannot_create_user(self):
-        pass
+    def post_create_request(self, username="user2", userid=-1, **kwargs):
+        data = {"action": "update",
+                "loginname": username,
+                "newpass": "123",
+                "conf_newpass": "123",
+                }
+        data.update(kwargs)
 
-    def normal_user_cannot_create_user(self):
-        pass
+        with self.ctx():
+            return self.client.post(url_for('user_edit', userid=userid),
+                                    data=data)
 
-    def admin_can_create_user(self):
+    def test_logged_out_cannot_create_user(self):
+        resp = self.post_create_request()
+        self.assertEqual(resp.status_code, 403)
+
+    def test_normal_user_cannot_create_user(self):
+        self.login(USERNAME, USERPASS)
+        resp = self.post_create_request()
+        self.assertEqual(resp.status_code, 403)
+
+    def test_admin_can_create_user(self):
         self.login(ADMINNAME, ADMINPASS)
-        pass
+        resp = self.post_create_request(currpass=ADMINPASS)
+        self.assertEqual(resp.status_code, 302) # redirect to user page...
+
+        # TODO check actually has created user...
+
+    def admin_needs_password_to_create_user(self):
+        self.login(ADMINNAME, ADMINPASS)
 
     def cannot_have_empty_password(self):
         self.login(ADMINNAME, ADMINPASS)
         pass
 
     def cannot_have_matching_usernames(self):
+        self.login(ADMINNAME, ADMINPASS)
+        pass
+
+    def cannot_create_with_userid_not_minus_one(self):
         self.login(ADMINNAME, ADMINPASS)
         pass
 
@@ -199,6 +265,15 @@ class DeletingUsers(BasicUsersTestCase):
         pass
 
     def normal_user_cannot_delete_user(self):
+        self.login(USERNAME, USERPASS)
+        pass
+
+    def normal_user_cannot_delete_self(self):
+        self.login(USERNAME, USERPASS)
+        pass
+
+    def normal_user_cannot_delete_admin(self):
+        self.login(USERNAME, USERPASS)
         pass
 
     def admin_can_delete_user(self):

@@ -25,6 +25,17 @@ class WrongHTTPCode(AssertionError):
             'For Url {0}: Expected HTTP Code: {1}, actually got: {2}'
                 .format(url, should_be, actually_was))
 
+class MockBcrypt(object):
+    ''' Mock BCrypt out.  It's very slow.  Which is actually good... '''
+
+    def encrypt(self, text):
+        ''' FAKE encypt a password '''
+        return text
+
+    def verify(self, text, to_compare_to):
+        ''' FAKE verify a password against the hash version. '''
+        return text == to_compare_to
+
 class StreetSignTestCase(unittest.TestCase):
     ''' Base Class, initialises and tears down a streetsign_server context. '''
 
@@ -33,6 +44,8 @@ class StreetSignTestCase(unittest.TestCase):
 
         self.ctx = streetsign_server.app.test_request_context
 
+       # streetsign_server.app.config['MODE'] = 'testing'
+        models.bcrypt = MockBcrypt()
         streetsign_server.app.config['DATABASE_FILE'] = ':memory:'
 
         streetsign_server.app.config['TESTING'] = True
