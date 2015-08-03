@@ -47,7 +47,7 @@ DB = SqliteDatabase(None, threadlocals=True)
 
 __all__ = ['DB', 'user_login', 'user_logout', 'get_logged_in_user',
            'User', 'Group', 'Post', 'Feed', 'FeedPermission', 'UserGroup',
-           'ConfigVar', 'Screen', 'config_var', 'UserSession',
+           'ConfigVar', 'Screen', 'config_var', 'UserSession', 'ExternalSource',
            'init', 'create_all', 'by_id']
 
 
@@ -81,14 +81,17 @@ def eval_datetime_formula(string):
 
     return simple_eval(string, names={'NOW': time()})
 
-def init():
+def init(dbfile=False):
     ''' initialize the database connection '''
-    DB.init(app.config.get('DATABASE_FILE'))
+    if dbfile:
+        DB.init(dbfile)
+    else:
+        DB.init(app.config.get('DATABASE_FILE'))
 
-def create_all():
+def create_all(dbfile=False):
     ''' initialises the database, creates all needed tables. '''
 
-    init()
+    init(dbfile)
 
     [t.create_table(True) for t in
         (User, UserSession, Group, UserGroup, Post, Feed,

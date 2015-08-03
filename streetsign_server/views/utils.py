@@ -109,7 +109,15 @@ def registered_users_only(*methods):
         return wrapped
     return wrapper
 
-def permission_denied(message):
-    ''' return the 403.html template, with a message, and the HTTP code '''
-    return make_response(render_template('403.html', message=message), 403)
+def permission_denied(message="You don't have permission! Sorry!",
+                      title="Permission Denied"):
+    ''' return the error.html template, with a message, and the HTTP code '''
+    return make_response(render_template('error.html',
+                                         title=title,
+                                         message=message), 403)
 
+def not_found(message="Page Not Found", title="Not Found"):
+    ''' return the error.html template, with a message, and the HTTP code '''
+    return make_response(render_template('error.html',
+                                         title=title,
+                                         message=message), 404)

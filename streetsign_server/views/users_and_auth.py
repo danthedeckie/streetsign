@@ -28,7 +28,7 @@
 from flask import render_template, url_for, request, redirect, flash
 import streetsign_server.user_session as user_session
 from streetsign_server.views.utils import admin_only, registered_users_only, \
-                                          permission_denied
+                                          permission_denied, not_found
 
 import peewee
 
@@ -114,7 +114,11 @@ def user_edit(userid=-1):
     userid = int(userid)
 
     if userid != -1:
-        user = User.get(id=userid)
+        try:
+            user = User.get(id=userid)
+        except User.DoesNotExist:
+            return not_found(title="User doesn't exist",
+                             message="Sorry, that user does not exist!")
     else:
         if not current_user.is_admin:
             flash('Sorry! Only admins can create new users!')
@@ -131,21 +135,19 @@ def user_edit(userid=-1):
         if action == 'update':
             if current_user != user and not current_user.is_admin:
                 return permission_denied("Sorry, you may not edit this user.")
-            try:
-                oldname = user.loginname
-                user.loginname = request.form.get('loginname', user.loginname)
-            except peewee.IntegrityError:
-                user.loginname = oldname if oldname else 'NEW'
-                flash('Sorry! You cannot have that loginname.' \
-                      ' Someone else does')
+
+            oldname = user.loginname
+            user.loginname = request.form.get('loginname', user.loginname)
 
             user.displayname = request.form.get('displayname',
                                                 user.displayname)
             user.emailaddress = request.form.get('emailaddress',
                                                  user.emailaddress)
 
-            if not user.id == current_user.id:
+            if user.id != current_user.id:
                 user.is_admin = request.form.get('is_admin', False)
+
+            # Set password:
 
             newpass = request.form.get('newpass', '') if \
                         request.form.get('newpass', '') \
@@ -167,8 +169,12 @@ def user_edit(userid=-1):
                 if request.form.get('newpass', '') != '':
                     flash('Passwords don\'t match!')
 
+            # set groups:
+
             if current_user.is_admin:
                 user.set_groups(request.form.getlist('groups'))
+
+            # save:
 
             try:
                 user.save()
@@ -187,11 +193,18 @@ def user_edit(userid=-1):
 
             if user.id == current_user.id:
                 flash('Sorry! You cannot delete yourself!')
-                return redirect(request.referrer)
+                return redirect(url_for('users_and_groups'))
 
-            user.delete_instance(recursive=True)
-            flash('User:' + user.displayname + ' deleted. (And all their posts)')
-            return redirect(request.referrer)
+            try:
+                user.delete_instance(recursive=True)
+            except User.DoesNotExist:
+                flash("Non-existant user!")
+                return not_found(title="User Not Found",
+                                 message="Sorry, you cannot delete"
+                                         " that user, as they don't exist!")
+
+            flash('User: %s deleted. (And all their posts)' % user.displayname)
+            return redirect(url_for('users_and_groups'))
 
     users_posts = Post.select().where(Post.author == user) \
                                .order_by(Post.write_date.desc()) \

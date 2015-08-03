@@ -225,7 +225,7 @@ class CreatingUsers(BasicUsersTestCase):
 
         with self.ctx():
             return self.client.post(url_for('user_edit', userid=userid),
-                                    data=data)
+                                    data=data, follow_redirects=True)
 
     def test_logged_out_cannot_create_user(self):
         resp = self.post_create_request()
@@ -237,52 +237,149 @@ class CreatingUsers(BasicUsersTestCase):
         self.assertEqual(resp.status_code, 403)
 
     def test_admin_can_create_user(self):
+        # should not yet exist:
+        with self.assertRaises(User.DoesNotExist):
+            usernow = User.get(loginname="user2")
+
         self.login(ADMINNAME, ADMINPASS)
         resp = self.post_create_request(currpass=ADMINPASS)
-        self.assertEqual(resp.status_code, 302) # redirect to user page...
+        self.assertEqual(resp.status_code, 200)
 
-        # TODO check actually has created user...
+        usernow = User.get(loginname="user2")
 
-    def admin_needs_password_to_create_user(self):
+    def test_admin_needs_password_to_create_user(self):
+        with self.assertRaises(User.DoesNotExist):
+            usernow = User.get(loginname="user2")
+
         self.login(ADMINNAME, ADMINPASS)
+        resp = self.post_create_request()
+        self.assertIn("You need to enter your current password", resp.data)
 
-    def cannot_have_empty_password(self):
-        self.login(ADMINNAME, ADMINPASS)
-        pass
+        with self.assertRaises(User.DoesNotExist):
+            usernow = User.get(loginname="user2")
 
-    def cannot_have_matching_usernames(self):
-        self.login(ADMINNAME, ADMINPASS)
-        pass
+    def test_cannot_have_empty_password(self):
+        with self.assertRaises(User.DoesNotExist):
+            usernow = User.get(loginname="user2")
 
-    def cannot_create_with_userid_not_minus_one(self):
         self.login(ADMINNAME, ADMINPASS)
-        pass
+        resp = self.post_create_request(currpass=ADMINPASS,
+                                        newpass='',
+                                        conf_newpass='')
+        self.assertIn("passwordhash may not be NULL", resp.data)
+
+        with self.assertRaises(User.DoesNotExist):
+            usernow = User.get(loginname="user2")
+
+    def test_new_user_passwords_must_match(self):
+        with self.assertRaises(User.DoesNotExist):
+            usernow = User.get(loginname="user2")
+
+        self.login(ADMINNAME, ADMINPASS)
+        resp = self.post_create_request(currpass=ADMINPASS,
+                                        newpass='stuff',
+                                        conf_newpass='42')
+        self.assertIn("Passwords don&#39;t match", resp.data)
+
+        with self.assertRaises(User.DoesNotExist):
+            usernow = User.get(loginname="user2")
+
+
+
+    def test_cannot_have_matching_usernames(self):
+        user2 = models.User(loginname='user2',
+                            emailaddress='test@test.com',
+                            is_admin=False)
+        user2.set_password(USERPASS)
+        user2.save()
+
+        # if this get works, then the user exists:
+        usernow = User.get(loginname="user2")
+
+        self.login(ADMINNAME, ADMINPASS)
+        resp = self.post_create_request(currpass=ADMINPASS)
+        self.assertIn("loginname is not unique", resp.data)
+
+        # and just make sure we didn't delete them:
+
+        usernow2 = User.get(loginname="user2")
+
 
 class DeletingUsers(BasicUsersTestCase):
     ''' Only admin can delete users, and not themselves. '''
 
-    def logged_out_cannot_delete_user(self):
-        pass
+    def setUp(self):
+        super(DeletingUsers, self).setUp()
 
-    def normal_user_cannot_delete_user(self):
+        self.user2 = models.User(loginname='user2',
+                            emailaddress='test@test.com',
+                            is_admin=False)
+        self.user2.set_password(USERPASS)
+        self.user2.save()
+
+    def post_delete_request(self, username="user2", userid=False, **kwargs):
+        data = {"action": "delete"}
+        data.update(kwargs)
+
+        if userid == False:
+            userid = self.user2.id
+
+        with self.ctx():
+            return self.client.post(url_for('user_edit', userid=userid),
+                                    data=data, follow_redirects=True)
+
+    def test_logged_out_cannot_delete_user(self):
+        resp = self.post_delete_request()
+        self.assertEqual(resp.status_code, 403)
+        usernow = User.get(id=self.user2.id)
+
+    def test_normal_user_cannot_delete_user(self):
         self.login(USERNAME, USERPASS)
-        pass
+        resp = self.post_delete_request()
+        self.assertEqual(resp.status_code, 403)
+        usernow = User.get(id=self.user2.id)
 
-    def normal_user_cannot_delete_self(self):
+    def test_normal_user_cannot_delete_self(self):
         self.login(USERNAME, USERPASS)
-        pass
+        resp = self.post_delete_request(userid=self.user.id)
+        self.assertEqual(resp.status_code, 403)
 
-    def normal_user_cannot_delete_admin(self):
+        usernow = User.get(id=self.user.id)
+
+    def test_normal_user_cannot_delete_admin(self):
         self.login(USERNAME, USERPASS)
-        pass
+        resp = self.post_delete_request(userid=self.admin.id)
+        self.assertEqual(resp.status_code, 403)
 
-    def admin_can_delete_user(self):
+        usernow = User.get(id=self.admin.id)
+
+    def test_admin_can_delete_user(self):
         self.login(ADMINNAME, ADMINPASS)
-        pass
+        resp = self.post_delete_request()
+        for d in dir(resp):
+            print d, getattr(resp,d)
+        print resp.data
+        self.assertEqual(resp.status_code, 200)
 
-    def admin_cannot_delete_self(self):
+        with self.assertRaises(User.DoesNotExist):
+            usernow = User.get(id=self.user2.id)
+
+    def test_admin_cannot_delete_self(self):
         self.login(ADMINNAME, ADMINPASS)
-        pass
+        resp = self.post_delete_request(userid=self.admin.id)
+        self.assertIn("You cannot delete yourself", resp.data)
+
+        usernow = User.get(id=self.admin.id)
+
+    def test_admin_cannot_delete_nonexistant_user(self):
+        self.login(ADMINNAME, ADMINPASS)
+        resp = self.post_delete_request(userid=200)
+        self.assertEqual(resp.status_code, 404)
+
+    def test_normal_user_cannot_delete_nonexistant_user(self):
+        self.login(USERNAME, USERPASS)
+        resp = self.post_delete_request(userid=200)
+        self.assertEqual(resp.status_code, 404)
 
     def when_user_deleted_posts_also_deleted(self):
         self.login(ADMINNAME, ADMINPASS)
