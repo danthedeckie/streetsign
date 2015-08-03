@@ -195,13 +195,7 @@ def user_edit(userid=-1):
                 flash('Sorry! You cannot delete yourself!')
                 return redirect(url_for('users_and_groups'))
 
-            try:
-                user.delete_instance(recursive=True)
-            except User.DoesNotExist:
-                flash("Non-existant user!")
-                return not_found(title="User Not Found",
-                                 message="Sorry, you cannot delete"
-                                         " that user, as they don't exist!")
+            user.delete_instance(recursive=True)
 
             flash('User: %s deleted. (And all their posts)' % user.displayname)
             return redirect(url_for('users_and_groups'))
