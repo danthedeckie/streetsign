@@ -6,9 +6,11 @@ python:
 install:
 - pip install -r requirements.txt
 - pip install coveralls
+- pip install codecov
 - python .setup/make_initial_config_file.py > config.py
 script:
 - nosetests
 - coverage run -m nose
 after_success:
 - coveralls
+- codecov
