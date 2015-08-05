@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #  StreetSign Digital Signage Project
-#     (C) Copyright 2013 Daniel Fairhead
+#     (C) Copyright 2013-2015 Daniel Fairhead
 #
 #    StreetSign is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,16 @@ peewee ORM database models.
 
 '''
 
-# pylint: disable=invalid-name, too-many-public-methods, missing-docstring, pointless-string-statement
+# There's quite a bit of 'magic' / meta stuff going on in peewee, which totally
+# confuses the heck out of pylint.  Also, some formatting stuff which makes
+# sense for queries doesn't fit in exactly with PEP8 (eg:
+#      Thing.select()
+#           .where(items=things)
+#           .join(more=options)
+#
+# Thus, the following awful looking pylint tweaking string:
+#
+# pylint: disable=invalid-name, too-many-public-methods, missing-docstring, pointless-string-statement, no-value-for-parameter, no-member, bad-continuation, unexpected-keyword-arg
 
 from flask import json, url_for, Markup
 from peewee import * # pylint: disable=wildcard-import,unused-wildcard-import
@@ -36,6 +45,10 @@ from datetime import datetime, timedelta
 from time import time
 import bleach # html stripping.
 from hashlib import md5
+try:
+    import re2 as re # pylint: disable=import-error
+except ImportError:
+    import re
 
 from simpleeval import simple_eval
 
@@ -93,13 +106,36 @@ def create_all(dbfile=False):
 
     init(dbfile)
 
-    [t.create_table(True) for t in
-        (User, UserSession, Group, UserGroup, Post, Feed,
-         FeedPermission, ConfigVar, ExternalSource, Screen)]
+    for t in (User, UserSession, Group, UserGroup, Post, Feed,
+              FeedPermission, ConfigVar, ExternalSource, Screen):
+        t.create_table(True)
 
 def by_id(model, ids):
     ''' returns a list of objects, selected by id (list) '''
     return [x for x in model.select().where(model.id << [int(i) for i in ids])]
+
+'''
+--------------------------------------------------------------------------------
+Custom Exceptions
+--------------------------------------------------------------------------------
+'''
+
+class InvalidValue(Exception):
+    ''' for invalid values trying to be set by update_from '''
+    pass
+
+class PermissionDenied(Exception):
+    ''' for when an unauthorized user tries to do something. '''
+    pass
+
+class InvalidPassword(Exception):
+    ''' Oh no! Invalid password! '''
+
+    def __init__(self, value):
+        super(InvalidPassword, self).__init__(value)
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
 
 '''
 --------------------------------------------------------------------------------
@@ -110,13 +146,34 @@ Other
 class DBModel(Model):
     ''' base class for other database models '''
     # pylint: disable=too-few-public-methods
+
+    validation_regexp = {}
+
+    def update_from(self, form, field, formfield=None, cb=False):
+        ''' convenience method for updating fields in objects from a
+            submitted form. allows for a callback on failure.
+            each class has a validation_regexp dict '''
+        formfield = formfield if formfield else field
+        try:
+            value = form[field]
+            if value == re.match(self.validation_regexp.get(field, '.*'),
+                                 value).group():
+                setattr(self, field, value)
+        except KeyError:
+            # not in form
+            pass
+        except AttributeError:
+            # fails regexp!
+            err = '"%s" is not a valid %s' % (value, field)
+            if cb:
+                cb(err)
+            else:
+                raise InvalidValue(err)
+
     class Meta(object):
         ''' store DB info '''
         database = DB
 
-class PermissionDenied(Exception):
-    ''' for when an unauthorized user tries to do something. '''
-    pass
 
 '''
 --------------------------------------------------------------------------------
@@ -127,12 +184,17 @@ Users & Groups
 class User(DBModel):
     ''' Back-end user. '''
 
+    validation_regexp = {
+        'loginname': r'.{1,100}',
+        'emailaddress': r'.*@.*\..*'
+    }
+
     #: the unique name user to log in
-    loginname = CharField(unique=True)
+    loginname = CharField(unique=True, default='new_user')
     #: how the user would like to be displayed
-    displayname = CharField(null=True)
+    displayname = CharField(null=True, default="New User")
     #: how to contact the user:
-    emailaddress = CharField()
+    emailaddress = CharField(default='')
 
     #: bcrypt'd, salted, etc password hash
     passwordhash = CharField()
@@ -181,7 +243,8 @@ class User(DBModel):
     def groups(self):
         ''' Returns all the Groups that this user is part of. '''
 
-        return [g for g in Group.select().join(UserGroup)
+        return [g for g in Group.select()
+                                .join(UserGroup)
                                 .where(UserGroup.user == self)]
 
     def set_groups(self, groupidlist):
@@ -193,8 +256,8 @@ class User(DBModel):
         #set new ones:
         for gid in groupidlist:
             try:
-                g = Group.get(id=gid)
-                ug = UserGroup(user=self, group=g).save()
+                UserGroup(user=self,
+                          group=Group.get(id=gid)).save()
             except:
                 return False, 'Invalid user, or groupid'
 
@@ -223,8 +286,8 @@ class Group(DBModel):
         #set new ones:
         for uid in useridlist:
             try:
-                u = User.get(id=uid)
-                ug = UserGroup(group=self, user=u).save()
+                UserGroup(group=self,
+                          user=User.get(id=uid)).save()
             except:
                 return False, 'Invalid user'
 
@@ -256,16 +319,6 @@ class UserSession(DBModel):
 
     user = ForeignKeyField(User, related_name='sessions') #: the user
     login_time = DateTimeField(default=datetime.now) #: when did they log in?
-
-
-class InvalidPassword(Exception):
-    ''' Oh no! Invalid password! '''
-
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
-
 
 def user_login(name, password):
     ''' preferred way to get a user object, which checks the password,
@@ -448,7 +501,7 @@ class Feed(DBModel):
                                          &(p == True))
             else:
                 raise Exception('You must specify either a user or a group!')
-        except FeedPermission.DoesNotExist as e:
+        except FeedPermission.DoesNotExist:
             perm = FeedPermission(feed=self, user=user, group=group)
 
         perm.read = (permission == 'Read')
@@ -586,8 +639,8 @@ class Post(DBModel):
 
         if self.type == 'image':
             return Markup('<img src="{0}" alt="{1}" />'.format(
-                        url_for('thumbnail', filename='post_images/'+content),
-                        content))
+                          url_for('thumbnail', filename='post_images/'+content),
+                          content))
         else:
             return bleach.clean(content, tags=[], strip=True)[0:15] + '...(' + \
                     self.type + ')'
@@ -595,13 +648,13 @@ class Post(DBModel):
     def dict_repr(self):
         ''' must give all info, for use on screens, etc. '''
         return (
-            { 'id': self.id,
-              'type': self.type,
-              'content': safe_json_load(self.content, {}),
-              'time_restrictions': safe_json_load(self.time_restrictions, []),
-              'time_restrictions_show': self.time_restrictions_show,
-              'display_time': self.display_time * 1000, # in milliseconds
-              'changed': self.write_date
+            {'id': self.id,
+             'type': self.type,
+             'content': safe_json_load(self.content, {}),
+             'time_restrictions': safe_json_load(self.time_restrictions, []),
+             'time_restrictions_show': self.time_restrictions_show,
+             'display_time': self.display_time * 1000, # in milliseconds
+             'changed': self.write_date
             })
 
     def active_status(self):
@@ -677,14 +730,12 @@ class ExternalSource(DBModel):
     def current_lifetime_start(self):
         ''' given the equation in the lifetime_start field, what should
             the time be of a new post start time? '''
-        return datetime.fromtimestamp(
-                    eval_datetime_formula(self.lifetime_start))
+        return datetime.fromtimestamp(eval_datetime_formula(self.lifetime_start))
 
     def current_lifetime_end(self):
         ''' given the equation in the lifetime_end field, what time
             should the end of a new post lifetime be? '''
-        return datetime.fromtimestamp(
-                    eval_datetime_formula(self.lifetime_end))
+        return datetime.fromtimestamp(eval_datetime_formula(self.lifetime_end))
 
 
 '''
@@ -760,6 +811,6 @@ def config_var(key, default_value):
     except ConfigVar.DoesNotExist:
         try:
             return default_value
-        except peewee.IntegrityError:
+        except sqlite3.IntegrityError:
             # ha! we have a race! and you lose...
             return json.loads(ConfigVar.get(ConfigVar.id == key).value)

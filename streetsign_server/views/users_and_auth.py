@@ -98,8 +98,37 @@ def users_and_groups():
                            users=User.select(),
                            groups=Group.select())
 
-@app.route('/users/<int:userid>', methods=['GET', 'POST'])
-@app.route('/users/-1', methods=['GET', 'POST'])
+
+def update_user(user=None, form=None, current_user=None):
+    assert type(user) == User
+    assert type(current_user) == User
+
+    user.update_from(form, 'loginname', cb=flash)
+    user.update_from(form, 'displayname', cb=flash)
+    user.update_from(form, 'emailaddress', cb=flash)
+
+    if current_user.is_admin:
+        user.update_from(form, 'is_admin', cb=flash)
+        user.set_groups(request.form.getlist('groups'))
+
+    # password:
+
+    if form.get('newpass', False) and not form.get('currpass', False):
+        flash("You need to enter your current password,"
+              " as well as (2x) the new one.")
+    elif current_user.confirm_password(form.get('currpass', '')):
+        if form.get('newpass', '') != '':
+            if form.get('newpass', True) == form.get('conf_newpass', False):
+                user.set_password(form['newpass'])
+                flash("Password changed")
+            else:
+                flash("Passwords don't match!")
+    else:
+        flash("Your current password was wrong!")
+
+
+@app.route('/users/<int:userid>', methods=['GET', 'POST', 'DELETE'])
+@app.route('/users/-1', methods=['GET', 'POST', 'DELETE'])
 @registered_users_only('GET')
 def user_edit(userid=-1):
     ''' edit one user.  Admins can edit any user, but other users
@@ -126,79 +155,35 @@ def user_edit(userid=-1):
 
         user = User() #pylint: disable=no-value-for-parameter
 
-        user.loginname = 'new'
-        user.displayname = 'New User'
-        user.emailaddress = '...'
-
     if request.method == 'POST':
-        action = request.form.get('action', 'none')
-        if action == 'update':
-            if current_user != user and not current_user.is_admin:
-                return permission_denied("Sorry, you may not edit this user.")
+        if current_user != user and not current_user.is_admin:
+            return permission_denied("Sorry, you may not edit this user.")
 
-            oldname = user.loginname
-            user.loginname = request.form.get('loginname', user.loginname)
+        update_user(user, request.form, current_user)
 
-            user.displayname = request.form.get('displayname',
-                                                user.displayname)
-            user.emailaddress = request.form.get('emailaddress',
-                                                 user.emailaddress)
+        # save:
 
-            if user.id != current_user.id:
-                user.is_admin = request.form.get('is_admin', False)
+        try:
+            user.save()
+            if userid == -1:
+                flash('New user created.')
+                return redirect(url_for('user_edit', userid=user.id))
+            else:
+                flash('Saved')
 
-            # Set password:
+        except peewee.IntegrityError as err:
+            flash(str(err))
 
-            newpass = request.form.get('newpass', '') if \
-                        request.form.get('newpass', '') \
-                        == request.form.get('conf_newpass', '2') else False
+    elif request.method == 'DELETE':
+        if not current_user.is_admin:
+            return 'Sorry, only admins can delete users', 403
 
-            if newpass:
-                if current_user.confirm_password(request.form.get('currpass', '')):
-                    user.set_password(newpass)
-                    if userid != -1:
-                        flash('Password changed.')
-                else:
-                    if not request.form.get('currpass',''):
-                        flash("You need to enter your current password"
-                              " as well as (2x) the new one.")
-                    else:
-                        flash('Your current password was wrong!')
+        if user.id == current_user.id:
+            return 'Sorry! You cannot delete yourself!', 403
 
-            else: # passwords either empty (so don't change) or don't match!
-                if request.form.get('newpass', '') != '':
-                    flash('Passwords don\'t match!')
+        user.delete_instance(recursive=True)
 
-            # set groups:
-
-            if current_user.is_admin:
-                user.set_groups(request.form.getlist('groups'))
-
-            # save:
-
-            try:
-                user.save()
-                if userid == -1:
-                    flash('New user created.')
-                    return redirect(url_for('user_edit', userid=user.id))
-                else:
-                    flash('Saved')
-
-            except peewee.IntegrityError as err:
-                flash(str(err))
-
-        elif action == 'delete':
-            if not current_user.is_admin:
-                return permission_denied("Sorry, only admins can delete users.")
-
-            if user.id == current_user.id:
-                flash('Sorry! You cannot delete yourself!')
-                return redirect(url_for('users_and_groups'))
-
-            user.delete_instance(recursive=True)
-
-            flash('User: %s deleted. (And all their posts)' % user.displayname)
-            return redirect(url_for('users_and_groups'))
+        return 'User: %s deleted. (And all their posts)' % user.displayname
 
     users_posts = Post.select().where(Post.author == user) \
                                .order_by(Post.write_date.desc()) \
@@ -210,6 +195,7 @@ def user_edit(userid=-1):
 
 
 @app.route('/group/<int:groupid>', methods=['GET', 'POST'])
+@admin_only('POST')
 @registered_users_only('GET')
 def group(groupid):
     ''' edit one user group. '''
@@ -221,10 +207,6 @@ def group(groupid):
         return redirect(request.referrer)
 
     if request.method == 'POST':
-        if not user_session.is_admin():
-            flash('Only Admins can do this!')
-            return redirect(url_for('users_and_groups'))
-
         if request.form.get('action', 'none') == 'delete':
             UserGroup.delete().where(UserGroup.group == thisgroup).execute()
             thisgroup.delete_instance()

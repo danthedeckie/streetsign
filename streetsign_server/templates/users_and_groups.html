@@ -18,7 +18,7 @@
 	</thead>
 	<tbody>
 		{% for user in users %}
-			<tr>
+			<tr data-item="{{ url_for('user_edit', userid=user.id) }}">
 				<td>{{ linkmacros.user(user) }}</td>
 				<td>{{ user.loginname }}</td>
 				<td>{{ user.emailaddress }}</td>
@@ -27,11 +27,7 @@
 					{% if user.is_locked_out %} Locked Out! {% endif %}
 					{% if session.display_admin_stuff %}
 						{% if user.loginname != session.username %}
-							<form action="{{ url_for('user_edit',userid=user.id) }}" method="POST">
-								<input type="hidden" name="action" value="delete" />
-								<input type="submit" class="btn close btn-sm confirm_delete"
-								       value="&times;" />
-							</form>
+							<a class="confirm_ajax_delete btn close btn-sm" href="">&times;</a>
 						{% endif %}
 					{% endif %}
 				</td>

@@ -27,17 +27,17 @@ $('a.confirm_ajax_delete').click(function(evt) {
        and looks for parent specified in data-item, which it hides upon
        request sent, and deletes upon success, or restores on failure. */
 
-    var dom_item = $(this).parents($(this).data('item'));
+    var dom_item = $(this).parents('*[data-item]');
 
     evt.preventDefault();
 
     if (confirm('Really delete?')) {
         dom_item.slideUp();
         $.ajax({
-            url: $(this).attr('href'),
+            url: $(dom_item).data('item'),
             type: 'DELETE',
             success: function(resp) {
-                dom_item.remove();
+                dom_item.slideUp('fast', dom_item.remove);
                 flash('deleted');
                 },
             error: function(resp) {

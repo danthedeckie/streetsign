@@ -79,14 +79,14 @@
 				</thead>
 				<tbody>
 				{% for source in external_sources %}
-					<tr class="source_item">
+					<tr data-item="{{ url_for('external_data_source_edit', source_id=source.id) }}">
 						<td>{{ source.type }}</td>
 						<td><a href="{{ url_for('external_data_source_edit', source_id=source.id) }}">{{ source.name }}</a></td>
 						<td>{{ source.feed.name }}</td>
 						<td>{{ source.publish }}</td>
 						<td>
 								<a class="btn btn-default" href="{{ url_for('external_data_source_edit', source_id=source.id) }}">Edit</a>
-								<a class="btn btn-danger confirm_ajax_delete" href="{{ url_for('external_data_source_edit', source_id=source.id) }}" data-item=".source_item"> &times;</a>
+								<a class="btn btn-danger confirm_ajax_delete" href="#"> &times;</a>
 						</td>
 					</tr>
 				{% endfor %}
