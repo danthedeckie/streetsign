@@ -448,23 +448,114 @@ class UserUpdatesTestCase(BasicUsersTestCase):
         usernow = User.get(id=self.user.id)
         self.assertEqual(usernow.emailaddress, 'test@streetsign.org.uk')
 
+    def test_normal_user_cannot_set_self_admin(self):
+        self.login(USERNAME, USERPASS)
+        resp = self.post_update_request(is_admin=True)
+
+        usernow = User.get(id=self.user.id)
+        self.assertEqual(usernow.is_admin, False)
+
+    def test_normal_user_cannot_set_other_to_admin(self):
+        user2 = User(loginname="user2",
+                     emailaddress='test@streetsign.org.uk',
+                     is_admin=False)
+        user2.set_password("userpass2")
+        user2.save()
+
+        self.login(USERNAME, USERPASS)
+        resp = self.post_update_request(userid=user2.id, is_admin=True)
+
+        self.assertEqual(resp.status_code, 403)
+
+        usernow = User.get(id=user2.id)
+        self.assertEqual(usernow.is_admin, False)
+
+    def test_normal_user_cannot_unset_admin(self):
+        self.login(USERNAME, USERPASS)
+        resp = self.post_update_request(userid=self.admin.id, is_admin=False)
+
+        self.assertEqual(resp.status_code, 403)
+
+        adminnow = User.get(id=self.admin.id)
+        self.assertEqual(adminnow.is_admin, True)
+
+    def test_admin_can_make_admin(self):
+        self.assertFalse(self.user.is_admin)
+        self.login(ADMINNAME, ADMINPASS)
+        resp = self.post_update_request(userid=self.user.id, is_admin=True)
+
+        usernow = User.get(id=self.user.id)
+        self.assertTrue(usernow.is_admin)
+
+    def test_admin_can_unset_admin(self):
+        self.assertFalse(self.user.is_admin)
+        self.user.is_admin = True
+        self.user.save()
+
+        usernow = User.get(id=self.user.id)
+        self.assertTrue(usernow.is_admin)
+
+        self.login(ADMINNAME, ADMINPASS)
+        resp = self.post_update_request(userid=self.user.id, is_admin=False)
+
+        usernow = User.get(id=self.user.id)
+        self.assertFalse(usernow.is_admin)
+
+    def test_admin_cannot_unadmin_self(self):
+        self.login(ADMINNAME, ADMINPASS)
+        resp = self.post_update_request(userid=self.admin.id, is_admin=False)
+
+        adminnow = User.get(id=self.admin.id)
+        self.assertEqual(adminnow.is_admin, True)
+
+    ####################
+
+    def create_group(self, name):
+        g = Group(name=name)
+        g.save()
+        return g
+
+    def test_cannot_set_own_groups(self):
+        g1 = self.create_group('g1')
+
+        self.assertEqual(self.user.groups(), [])
+        self.login(USERNAME, USERPASS)
+
+        self.post_update_request(userid=self.user.id, groups=[g1.id])
+
+        usernow = User.get(id=self.user.id)
+        self.assertEqual(usernow.groups(), [])
+
+    def test_admin_can_set_groups(self):
+        g1 = self.create_group('g1')
+
+        self.assertEqual(self.user.groups(), [])
+        self.login(ADMINNAME, ADMINPASS)
+
+        self.post_update_request(userid=self.user.id, groups=[g1.id])
+
+        usernow = User.get(id=self.user.id)
+        self.assertEqual(usernow.groups(), [g1])
+
 
 '''
     TODO:
 
-    def test_normal_user_cannot_set_admin(self):
 
-    def test_admin_can_make_admin(self):
-
-    def test_admin_can_unset_admin(self):
-
-    def test_admin_can_unadmin_self(self):
 
     def test_loginname_bad_chars(self):
 
     def test_displayname_bad_chars(self):
 
     def test_emailaddress_bad_chars(self):
+
+    def test_cannot_set_own_groups(self):
+
+    def test_cannot_set_others_groups(self):
+
+    def test_admin_can_set_own_groups(self):
+
+    def test_admin_cannot_set_invalid_groups(self):
 '''
 
 class UserGroupsTestCase(BasicUsersTestCase):

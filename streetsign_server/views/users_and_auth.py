@@ -107,24 +107,28 @@ def update_user(user=None, form=None, current_user=None):
     user.update_from(form, 'displayname', cb=flash)
     user.update_from(form, 'emailaddress', cb=flash)
 
-    if current_user.is_admin:
+    if current_user.is_admin and user.id != current_user.id:
         user.update_from(form, 'is_admin', cb=flash)
         user.set_groups(request.form.getlist('groups'))
 
     # password:
 
-    if form.get('newpass', False) and not form.get('currpass', False):
+    newpass = form.get('newpass', False)
+    currpass = form.get('currpass', False)
+    newpass2 = form.get('conf_newpass', False)
+
+    if newpass and not currpass:
         flash("You need to enter your current password,"
               " as well as (2x) the new one.")
-    elif current_user.confirm_password(form.get('currpass', '')):
-        if form.get('newpass', '') != '':
-            if form.get('newpass', True) == form.get('conf_newpass', False):
-                user.set_password(form['newpass'])
+    elif newpass and currpass and newpass2:
+        if current_user.confirm_password(currpass):
+            if newpass == newpass2:
+                user.set_password(newpass)
                 flash("Password changed")
             else:
                 flash("Passwords don't match!")
-    else:
-        flash("Your current password was wrong!")
+        else:
+            flash("Your current password was wrong!")
 
 
 @app.route('/users/<int:userid>', methods=['GET', 'POST', 'DELETE'])

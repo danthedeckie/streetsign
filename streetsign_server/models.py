@@ -45,6 +45,7 @@ from datetime import datetime, timedelta
 from time import time
 import bleach # html stripping.
 from hashlib import md5
+from types import NoneType, BooleanType, UnicodeType
 try:
     import re2 as re # pylint: disable=import-error
 except ImportError:
@@ -154,11 +155,16 @@ class DBModel(Model):
             submitted form. allows for a callback on failure.
             each class has a validation_regexp dict '''
         formfield = formfield if formfield else field
+
         try:
-            value = form[field]
+            value = form[formfield]
             if value == re.match(self.validation_regexp.get(field, '.*'),
                                  value).group():
-                setattr(self, field, value)
+                fieldtype = type(getattr(self, field))
+                if fieldtype == BooleanType and type(value) == UnicodeType:
+                    setattr(self, field, value=='True')
+                else:
+                    setattr(self, field, value)
         except KeyError:
             # not in form
             pass
