@@ -1,29 +1,29 @@
 '''
-    First file on the noble epic tast of unit testing.
+    unittest helper functions, base TestCase class, mocks that are
+    used everywhere, etc.
+
 '''
 
 import sys
 import os
-import tempfile
 import unittest
 import html5lib
-from datetime import datetime
 from peewee import SqliteDatabase, create_model_tables
-from flask import json, url_for
+from flask import json
 
 sys.path.append(os.path.dirname(__file__) + '/..')
 
 import streetsign_server
 import streetsign_server.models as models
-from streetsign_server.models import Post, Feed
 
-# pylint: disable=too-many-public-methods
+# pylint: disable=too-many-public-methods, too-many-arguments
 
 class WrongHTTPCode(AssertionError):
+    ''' validate() got the wrong HTTP status code! '''
     def __init__(self, url, should_be, actually_was):
         super(WrongHTTPCode, self).__init__(
             'For Url {0}: Expected HTTP Code: {1}, actually got: {2}'
-                .format(url, should_be, actually_was))
+            .format(url, should_be, actually_was))
 
 class MockBcrypt(object):
     ''' Mock BCrypt out.  It's very slow.  Which is actually good... '''
@@ -58,7 +58,7 @@ class StreetSignTestCase(unittest.TestCase):
         for modelname in models.__all__:
             model = getattr(models, modelname)
             try:
-                model._meta.database = models.DB
+                model._meta.database = models.DB  # pylint: disable=protected-access
                 model_list.append(model)
             except AttributeError:
                 pass
@@ -73,18 +73,21 @@ class StreetSignTestCase(unittest.TestCase):
 
         models.DB.close()
 
-    def validate(self, url, lang='html', code=200, req='GET', data={}, **kwargs):
+    def validate(self, url, lang='html', code=200, req='GET', data=None, **kwargs):
         ''' test that a URL is actually HTML5 compliant '''
+
+        if not data:
+            data = {}
 
         if req == 'GET':
             request = self.client.get(url, **kwargs)
-        elif req=='POST':
+        elif req == 'POST':
             request = self.client.post(url, data=data, **kwargs)
 
         if lang == 'html':
             parser = html5lib.HTMLParser(strict=True)
             try:
-                doc = parser.parse(request.data)
+                parser.parse(request.data)
             except Exception as e:
                 print request.data
                 raise e
@@ -98,6 +101,10 @@ class StreetSignTestCase(unittest.TestCase):
             raise WrongHTTPCode(url, code, request.status_code)
 
     def login(self, username, password):
-        return self.client.post('/login', data=dict(
-            username=username,
-            password=password) , follow_redirects=True)
+        return self.client.post('/login',
+                                data=dict(username=username,
+                                          password=password),
+                                follow_redirects=True)
+
+    def logout(self):
+        return self.client.post('/logout', follow_redirects=True)

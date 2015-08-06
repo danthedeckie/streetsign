@@ -90,3 +90,55 @@ class TestLogin(StreetSignTestCase):
         assert b'Invalid' in resp.data
 
         self.validate('/users/' + str(self.user.id), code=403)
+
+    def test_login_logout(self):
+    # confirm not logged in:
+
+        self.validate('/users/' + str(self.user.id), code=403)
+
+        # log in:
+
+        resp = self.login('test', '123')
+
+        self.assertEqual(resp.status_code, 200)
+
+        self.validate('/users/' + str(self.user.id))
+
+        self.logout()
+
+        self.validate('/users/' + str(self.user.id), code=403)
+
+    def test_usersession_is_created(self):
+        self.assertEqual(models.UserSession.select().count(), 0)
+        resp = self.login('test', '123')
+        self.assertEqual(models.UserSession.select().count(), 1)
+
+    def test_logout_deletes_session(self):
+        self.assertEqual(models.UserSession.select().count(), 0)
+        resp = self.login('test', '123')
+
+        self.assertEqual(models.UserSession.select().count(), 1)
+
+        self.logout()
+        self.assertEqual(models.UserSession.select().count(), 0)
+
+    def test_db_usersession_gone_auth_breaks(self):
+        resp = self.login('test', '123')
+        self.validate('/users/' + str(self.user.id))
+
+        models.UserSession.delete().execute()
+
+        self.assertEqual(models.UserSession.select().count(), 0)
+        self.validate('/users/' + str(self.user.id), code=403)
+
+    def test_db_usersession_gone_can_login_again(self):
+        resp = self.login('test', '123')
+        self.validate('/users/' + str(self.user.id))
+
+        models.UserSession.delete().execute()
+
+        self.assertEqual(models.UserSession.select().count(), 0)
+        self.validate('/users/' + str(self.user.id), code=403)
+
+        resp = self.login('test', '123')
+        self.validate('/users/' + str(self.user.id))
