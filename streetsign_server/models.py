@@ -165,6 +165,8 @@ class DBModel(Model):
                     setattr(self, field, value=='True')
                 else:
                     setattr(self, field, value)
+            else:
+                raise AttributeError('Does not match regexp!')
         except KeyError:
             # not in form
             pass
@@ -487,6 +489,7 @@ class Feed(DBModel):
         # one of them *must* be selected...
         assert (user, group) != (None, None)
         assert (user and group) == None
+        assert permission in ('Read', 'Write', 'Publish')
         # first get previous permission, if there is one.
 
         if permission == 'Read':
@@ -495,6 +498,9 @@ class Feed(DBModel):
             p = FeedPermission.write
         elif permission == 'Publish':
             p = FeedPermission.publish
+        else:
+            raise Exception('Invalid permission.'
+                            ' Must be Read,Write, or Publish')
 
         try:
             if user:
@@ -509,6 +515,8 @@ class Feed(DBModel):
                 raise Exception('You must specify either a user or a group!')
         except FeedPermission.DoesNotExist:
             perm = FeedPermission(feed=self, user=user, group=group)
+
+        assert perm.user or perm.group
 
         perm.read = (permission == 'Read')
         perm.write = (permission == 'Write')

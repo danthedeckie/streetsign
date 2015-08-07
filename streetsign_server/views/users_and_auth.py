@@ -226,3 +226,4 @@ def group(groupid):
             flash('saved')
 
     return render_template('group.html', group=thisgroup, allusers=User.select())
+
