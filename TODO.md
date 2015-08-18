@@ -29,7 +29,6 @@
 
 ## Needed, but copeable for alpha version.
 
-- Dropdown select box for font for screen zones (easy)
 - Better 'CSS' editing for zones and whole-screen.
 - Post deactivation -> archive, and archive, future posts, etc view.
 - Group Editor, etc.

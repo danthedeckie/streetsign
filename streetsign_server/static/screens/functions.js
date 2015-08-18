@@ -65,13 +65,22 @@ function safeGetJSON(url, callback, retry_time) {
                     setTimeout(function() {safeGetJSON(url, callback, retry_time);},
                                retry_time);
                 }
-            }
+            } /*else {
+                console.log('invalide XHR readystate! (supposedly unusual)', xhr.readyState);
+                setTimeout(function() {safeGetJSON(url, callback, retry_time);},
+                           retry_time);
+            }*/
         });
 
     if (callback) {
         xhr.onreadystatechange = responder;
     }
-
+    xhr.ontimeout = function() {
+        console.log('timeout.');
+        setTimeout(function() {safeGetJSON(url, callback, retry_time);},
+                   retry_time);
+    };
+    xhr.timeout = 10000;
     xhr.open("GET", url, true);
     xhr.send(null);
 
