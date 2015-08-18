@@ -13,8 +13,11 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <h2 class="panel-title">Screen ID:{{ screen.id }}
+      <div class="pull-right">
+      <a href="{{ url_for('screendisplay', template='basic', screenname=screen.urlname) }}" class="btn btn-default btn-sm">Preview</a>
       <input type="submit" id="save_btn" value="Save"
-             class="btn btn-sm btn-primary pull-right"/>
+             class="btn btn-sm btn-primary"/>
+      </div>
       </h2>
     </div>
     <div class="panel-body">
@@ -123,7 +126,9 @@
 </div> <!-- col-md-6 -->
 
 <div class="col-md-6">
-  <h2>Preview</h2>
+  <h2>Zones layout
+      <a href="{{ url_for('screendisplay', template='basic', screenname=screen.urlname) }}" class="btn btn-default btn-sm pull-right">Preview</a>
+	</h2>
   <div class="well" data-spy="affix" data-offset-top="30" data-offset-bottom="30">
     <div id="my_fake_screen" class="fake_screen">
     <!-- ko foreach: zones -->
