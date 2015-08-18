@@ -226,6 +226,7 @@ function reduce_font_size_to_fit(inner, outer) {
         } else if ((height > zone_height) || ((!scrolling) && (width > zone_width+5))) {
             percent -= i;
         }
+
         inner.css('font-size', percent + '%');
         inner.find('img').each(function(i, img){
             var $img = $(img);

@@ -113,6 +113,8 @@ function Zone(container, initial_data) {
     this.height = this.el.offsetHeight;
     this.width = this.el.scrollWidth;
 
+    $(this.el).css('font-size', $(this.el).height() + 'px');
+
     $(this.el).css('color', that['color']);
     if (that['fontfamily']) {
         $(this.el).css('font-family', that['fontfamily']);
