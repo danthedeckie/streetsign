@@ -12,7 +12,7 @@
     <th>
       {% if session.display_admin_stuff %}
         <a href="{{ url_for('screenedit', screenid=-1) }}"
-           class="btn btn-primary">New</a>
+           class="btn btn-primary pull-right">New</a>
       {% endif %}
     </th>
   </tr>
@@ -25,8 +25,8 @@
         <td>{% if session.display_admin_stuff %}
             <form method="POST" action="{{ url_for('screenedit', screenid=s.id) }}">
             <input type="hidden" name="action" value="delete" />
-            <input type="submit" value="&times; Delete"
-                   class="btn btn-sm delbutton confirm_delete"></form>
+            <input type="submit" value="&times;"
+                   class="btn btn-sm close confirm_delete pull-right"></form>
             {% endif %}
         </td>
     </tr>
@@ -37,23 +37,21 @@ You can add extra 'query arguments' to the URLs, to force the aspect ratio, etc.
 <hr/>
 {% if session.display_admin_stuff %}
 <h2> Aliases </h2>
+<div class="pull-right">
 <button data-bind="click: addAlias" class="btn">Add</button>
 <button data-bind="click: saveAliases" class="btn btn-primary">Save</button>
+</div>
 <table class="table table-striped">
 <thead>
   <tr>
-    <th></th>
     <th>Access Key / Client ID</th>
     <th>Layout & Engine</th>
     <th>Display Options</th>
+    <th></th>
   </tr>
 </thead>
 <tbody data-bind="foreach: aliases">
   <tr>
-    <td>
-    {% if session.display_admin_stuff %}
-    <button data-bind="click: $root.deleteAlias">&times;</button>
-    {% endif %}</td>
     <td>
         <input data-bind="value: name" /><br/>
         URL: <a data-bind="attr: {href: url}, text: url">URL</a></br>
@@ -79,15 +77,20 @@ You can add extra 'query arguments' to the URLs, to force the aspect ratio, etc.
     <td>
       <small>
       <label>fadetime:
-        <input type="number" data-bind="value: fadetime" /></label><br/>
+        <input type="number" class="form-control" data-bind="value: fadetime" /></label><br/>
       <label>scrollspeed:
-        <input type="number" data-bind="value: scrollspeed" /></label><br/>
+        <input type="number" class="form-control" data-bind="value: scrollspeed" /></label><br/>
       <label>aspect radio:
-        <input type="number" data-bind="value: forceaspect" /></label><br/>
+        <input type="number" class="form-control" data-bind="value: forceaspect" /></label><br/>
       <label>vertical offset:
-        <input type="number" data-bind="value: forcetop" /></label><br/>
+        <input type="number" class="form-control" data-bind="value: forcetop" /></label><br/>
       </small>
     </td>
+    <td>
+    {% if session.display_admin_stuff %}
+       <button class="btn close"data-bind="click: $root.deleteAlias">&times;</button>
+    {% endif %}</td>
+
   </tr>
 </tbody>
 </table>
