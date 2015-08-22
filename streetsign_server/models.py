@@ -42,7 +42,7 @@ import sqlite3 # for catching an integrity error
 from passlib.hash import bcrypt # pylint: disable=no-name-in-module
 from uuid import uuid4 # for unique session ids
 from datetime import datetime, timedelta
-from time import time
+from time import time, mktime
 import bleach # html stripping.
 from hashlib import md5
 from types import NoneType, BooleanType, UnicodeType
@@ -71,6 +71,13 @@ Useful functions
 --------------------------------------------------------------------------------
 
 '''
+
+def now(timestamp=False):
+    if timestamp:
+         return mktime(now(False).timetuple())
+    else:
+        return datetime.now() + \
+               timedelta(minutes=app.config.get('TIME_OFFSET', 0))
 
 def safe_json_load(text, default):
     ''' either parse a string from JSON into python or else return default. '''
@@ -214,7 +221,7 @@ class User(DBModel):
     is_locked_out = BooleanField(default=False)
 
     #: when was the last attempt to log in?
-    last_login_attempt = DateTimeField(default=datetime.now)
+    last_login_attempt = DateTimeField(default=now)
     #: how many times has the user failed to log in?
     failed_logins = IntegerField(default=0)
 
@@ -326,7 +333,7 @@ class UserSession(DBModel):
     username = CharField() #: which username?
 
     user = ForeignKeyField(User, related_name='sessions') #: the user
-    login_time = DateTimeField(default=datetime.now) #: when did they log in?
+    login_time = DateTimeField(default=now) #: when did they log in?
 
 def user_login(name, password):
     ''' preferred way to get a user object, which checks the password,
@@ -379,7 +386,7 @@ class Feed(DBModel):
         if published:
             q = q.where(Post.published == True)
         if not expired:
-            q = q.where(Post.active_end > datetime.now())
+            q = q.where(Post.active_end > now())
         return q.count()
 
     def post_types_as_list(self):
@@ -603,7 +610,7 @@ class Post(DBModel):
 
     author = ForeignKeyField(User, related_name='posts') #: who wrote it?
 
-    write_date = DateTimeField(default=datetime.now) #: when was it written?
+    write_date = DateTimeField(default=now) #: when was it written?
 
     #publisher info:
     published = BooleanField(default=False) #: is this post published?
@@ -620,8 +627,8 @@ class Post(DBModel):
         }
 
     # When should the feed actually be shown:
-    active_start = DateTimeField(default=datetime.now) #: lifetime start
-    active_end = DateTimeField(default=lambda: datetime.now() + \
+    active_start = DateTimeField(default=now) #: lifetime start
+    active_end = DateTimeField(default=lambda: now() + \
                                                timedelta(weeks=1)) #: end
 
     #: Time restrictions don't need to be cross queried, and honestly
@@ -675,7 +682,7 @@ class Post(DBModel):
         ''' is this post active now, in the future, or the past?
             (returns a string 'now'/'future'/'past') '''
 
-        time_now = datetime.now()
+        time_now = now()
         try:
             if not (self.active_start and self.active_end):
                 return 'future'
@@ -695,7 +702,7 @@ class Post(DBModel):
         if self.feed.user_can_publish(user):
             self.published = state
             self.publisher = user if state else None
-            self.publish_date = datetime.now() if state else None
+            self.publish_date = now() if state else None
             self.save()
             return True
         else:

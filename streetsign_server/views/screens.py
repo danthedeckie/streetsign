@@ -35,12 +35,10 @@ import sqlite3
 from glob import glob
 from os.path import basename
 import urllib
-from datetime import datetime
-
-import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
 from streetsign_server import app
-from streetsign_server.models import Feed, Post, Screen, ConfigVar, config_var
+from streetsign_server.models import Feed, Post, Screen, ConfigVar, \
+                                     config_var, now
 from streetsign_server.post_types.image import allow_filetype
 from streetsign_server.views.utils import admin_only, registered_users_only
 from streetsign_server.views.user_files import user_fonts
@@ -110,7 +108,7 @@ def screenedit(screenid):
 
         screen.background = request.form.get('background')
         screen.settings = request.form.get('settings', '')
-        screen.css = request.form.get('css', '').replace('"',"'")
+        screen.css = request.form.get('css', '').replace('"', "'")
         screen.zones = form_json('zones', {})
         screen.save()
         flash('saved.')
@@ -118,8 +116,8 @@ def screenedit(screenid):
         if int(screenid) == -1:
             return redirect(url_for('screenedit', screenid=screen.id))
 
-    fonts=['','serif','sans-serif','monospace','cursive','fantasy']
-    fonts += [name for name,url in user_fonts()]
+    fonts = ['', 'serif', 'sans-serif', 'monospace', 'cursive', 'fantasy']
+    fonts += [name for name, _ in user_fonts()]
 
     return render_template('screen_editor.html',
                            feeds=Feed.select(),
@@ -144,7 +142,8 @@ def screendisplay(template, screenname):
         screen = Screen.get()
 
     return render_template('screens/' + template + '.html',
-                           screen=screen)
+                           screen=screen,
+                           server_time=now(timestamp=True)*1000)
 
 
 @app.route('/screens/posts_from_feeds/<json_feeds_list>')
@@ -155,7 +154,7 @@ def screens_posts_from_feeds(json_feeds_list):
     '''
     feeds_list = json.loads(json_feeds_list)
 
-    time_now = datetime.now()
+    time_now = now()
 
     posts = [{"id": p.id,
               "changed": p.write_date,
@@ -187,7 +186,8 @@ def screen_json(screenid, old_md5):
     screen_md5 = screen.md5()
 
     if screen_md5 == old_md5:
-        return jsonify(screenid=screenid, md5=screen_md5)
+        return jsonify(screenid=screenid,
+                       md5=screen_md5)
     else:
         return jsonify(screenid=screenid,
                        md5=screen_md5,
@@ -210,16 +210,14 @@ def post_types_js():
 def save_aliases():
     ''' save the current aliases. '''
 
-    user = user_session.get_user()
-
     if request.method == 'POST':
         aliases = form_json('aliases', [])
 
         try:
             alias_configvar = ConfigVar.get(ConfigVar.id == 'screens.aliases')
         except ConfigVar.DoesNotExist:
-            alias_configvar = ConfigVar()
-            alias_configvar.id='screens.aliases'
+            alias_configvar = ConfigVar() # pylint: disable=no-value-for-parameter
+            alias_configvar.id = 'screens.aliases'
             alias_configvar.save(force_insert=True)
 
         alias_configvar.value = aliases
@@ -254,7 +252,7 @@ def client_alias(alias_name):
         if alias.get('scrollspeed', None):
             details.append(('scrollspeed', alias['scrollspeed']))
 
-        request.args=ImmutableDict(**dict(details + request.args.items()))
+        request.args = ImmutableDict(**dict(details + request.args.items()))
 
         return screendisplay(alias['screen_type'], alias['screen_name'])
 

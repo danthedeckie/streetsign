@@ -1,21 +1,19 @@
 '''
-    First file on the noble epic tast of unit testing.
+    First basic unit tests, testing the system at least basically functions,
+    that having a new blank database doesn't make any views explode, etc.
 '''
+
+#pylint: disable=import-error,too-many-public-methods,missing-docstring,too-few-public-methods
 
 import sys
 import os
-import tempfile
 import unittest
-import html5lib
 from datetime import datetime
-from peewee import SqliteDatabase, create_model_tables
-from flask import json, url_for
+from flask import json
 
 sys.path.append(os.path.dirname(__file__) + '/..')
 
-import streetsign_server
 import streetsign_server.models as models
-from streetsign_server.models import Post, Feed
 
 from unittest_helpers import StreetSignTestCase
 
@@ -29,7 +27,18 @@ class TestSetup(StreetSignTestCase):
         assert 'Dashboard' in request.data # it is the front page
         assert 'Login' in request.data # not logged in
 
-        request = self.client.get('/posts/')
+        u = models.User.create(name='test user',
+                               loginname='test',
+                               emailaddress='test@example.com',
+                               passwordhash='')
+        u.set_password('test pass')
+        u.save()
+
+        self.login('test', 'test pass')
+
+        with self.ctx():
+            request = self.client.get('/posts/')
+
         assert '<span class="post_count">No Posts at all!' in request.data
 
 class TestDB(StreetSignTestCase):
@@ -42,11 +51,16 @@ class TestDB(StreetSignTestCase):
         f = models.Feed.create(name='first feed')
         self.assertEqual(models.Feed.select().count(), 1)
 
-        u = models.User.create(name='test user', loginname='test', emailaddress='test@example.com',
-            passwordhash='')
+        u = models.User.create(name='test user',
+                               loginname='test',
+                               emailaddress='test@example.com',
+                               passwordhash='')
         u.set_password('test pass')
 
-        p = models.Post.create(feed=f, type='html', content='{"content":"text"}', author=u)
+        p = models.Post.create(feed=f,
+                               type='html',
+                               content='{"content":"text"}',
+                               author=u)
 
         # make sure times have sane defaults:
 
@@ -64,15 +78,16 @@ class TestDB(StreetSignTestCase):
 
         # check that our views are displaying it correctly...
 
-        # we need to save(), as the views use different (joined) queries, which aren't cached/using this transaction's data.
+        # we need to save(), as the views use different (joined) queries,
+        # which aren't cached/using this transaction's data.
 
         p.save()
         f.save()
 
         # check that first there are no posts:
-
-        self.assertEqual(json.loads(self.client.get('/screens/posts_from_feeds/%5B' + str(f.id) + '%5D').data),
-                         {'posts':[]})
+        resp = self.client.get(
+            '/screens/posts_from_feeds/%5B' + str(f.id) + '%5D')
+        self.assertEqual(json.loads(resp.data), {'posts':[]})
 
         # set published, and try again:
 
@@ -81,10 +96,13 @@ class TestDB(StreetSignTestCase):
         p.save()
         f.save()
 
-        posts_list = json.loads(self.client.get('/screens/posts_from_feeds/%5B' + str(f.id) + '%5D').data)['posts']
+        resp = self.client.get(
+            '/screens/posts_from_feeds/%5B' + str(f.id) + '%5D')
+        posts_list = json.loads(resp.data)['posts']
         self.assertEqual(len(posts_list), 1)
 
-        # now try retrieving the post as json, and comparing it to our local database retrieved version:
+        # now try retrieving the post as json,
+        # and comparing it to our local database retrieved version:
 
         from_server = json.loads(self.client.get(posts_list[0]['uri']).data)
         self.assertEqual(from_server, json.loads(json.dumps(p.dict_repr())))

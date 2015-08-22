@@ -13,6 +13,7 @@ sys.path.append(os.path.dirname(__file__) + '/..')
 import streetsign_server.models as models
 
 from unittest_helpers import StreetSignTestCase
+from datetime import datetime, timedelta
 
 #pylint: disable=too-few-public-methods, invalid-name, no-member, missing-docstring, too-many-public-methods, no-init
 
@@ -218,3 +219,38 @@ class Test_update_from(StreetSignTestCase):
         t.update_from(f, 'text', formfield='text2')
 
         self.assertEqual(t.text, 'set now')
+
+class Test_models_now(unittest.TestCase):
+    def test_zero_offset(self):
+        models.app.config['TIME_OFFSET'] = 0
+
+        before = datetime.now()
+        now = models.now()
+        after = datetime.now()
+
+        self.assertLess(before, now)
+        self.assertGreater(after, now)
+
+    def test_30_mins_offset(self):
+        models.app.config['TIME_OFFSET'] = 30
+
+        before = datetime.now()
+        now = models.now()
+        after = datetime.now()
+        after_plus_hour = datetime.now() + timedelta(hours=1)
+
+        self.assertLess(before, now)
+        self.assertLess(after, now)
+        self.assertGreater(after_plus_hour, now)
+
+    def test_neg_30_mins_offset(self):
+        models.app.config['TIME_OFFSET'] = -30
+
+        before = datetime.now()
+        now = models.now()
+        after = datetime.now()
+        before_minus_hour = datetime.now() - timedelta(hours=1)
+
+        self.assertGreater(before, now)
+        self.assertGreater(after, now)
+        self.assertLess(before_minus_hour, now)

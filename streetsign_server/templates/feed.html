@@ -38,7 +38,7 @@
         <td>{% if (post.published and feed.user_can_publish(user)) or
                   ((not post.published) and feed.user_can_write(user)) %}
             <button data-ajaxtype="POST" data-ajaxtoggle="hidden" data-name="action" data-value="delete"
-                    class="item_ajax_toggle btn delbutton confirm_delete">&times;</button>
+                    class="item_ajax_toggle btn confirm_delete close">&times;</button>
            {% endif %}</td>
     </tr>
 {% endfor %}

@@ -85,8 +85,8 @@ so each screen view will fire a request to the server to do it once an hour or s
 It and can also be triggered through the interface by hitting the "housekeeping"
 button on the "All Posts" page, or on the front page (Dashboard).
 
-If you want to ensure that this runs every hour or so, you can use standard unix cron,
-or any other task scheduling program.
+If you want to ensure that this runs every hour or so, you can use standard unix
+cron, or any other task scheduling program.
 
 - ``HTTP POST`` to ``/posts/housekeeping``
 
@@ -97,13 +97,26 @@ so if you're using cron::
 should do it.
 
 For automatically updating content from external feeds, again, screen views will
-automatically do this once a minute, but you can also trigger it manually (or via cron)
-with a
+automatically do this once a minute, but you can also trigger it manually
+(or via cron) with a
 
 - ``HTTP POST`` to ``/external_data_sources/``
 
-If you are on a public network, and worry about DOS issues, then realistically, you should
-be running behind a revese proxy such as nginx.  With nginx you can add restrictions on
-what URLS are accessble by any IP address, so you can limit these addresses to only be
-accessed by the machine with cron, for instance.
+If you are on a public network, and worry about DOS issues, then realistically,
+you should be running behind a revese proxy such as nginx.  With nginx you can
+add restrictions on what URLS are accessble by any IP address, so you can limit
+these addresses to only be accessed by the machine with cron, for instance.
+
+Server Time
+-----------
+
+You may well have your main server running in one timezone (say GMT), but actually
+be using the signs in another time zone.  By default, clients will all use their
+own local time zone, and the server uses the server time.  There is a configuration
+option you can set in ``config.py``::
+
+    TIME_OFFSET=60
+
+for example, which will offset post lifetimes, etc, by an hour.  (Minutes are used
+so that half-hour-off timezones are supported).
 

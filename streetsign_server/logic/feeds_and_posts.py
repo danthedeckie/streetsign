@@ -27,7 +27,7 @@ logic for feeds_and_posts views, separated out for clarity.
 
 from flask import flash, url_for, json
 from streetsign_server.views.utils import PleaseRedirect
-from streetsign_server.models import Feed
+from streetsign_server.models import Feed, now
 from datetime import datetime
 
 def try_to_set_feed(post, new_feed_id, user):
@@ -137,7 +137,7 @@ def post_form_intake(post, form, editor):
     post.active_start = form.get('active_start', post.active_start)
     post.active_end = form.get('active_end', post.active_end)
 
-    post.write_date = datetime.now()
+    post.write_date = now()
 
 def delete_post_and_run_callback(post, typemodule):
     ''' before a post is actually deleted, check if there is a 'pre-delete'

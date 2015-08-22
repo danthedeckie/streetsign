@@ -208,7 +208,7 @@ def group(groupid):
         thisgroup = Group.get(id=groupid)
     except:
         flash('Invalid group ID')
-        return redirect(request.referrer)
+        return redirect(request.referrer if request.referrer else '/')
 
     if request.method == 'POST':
         if request.form.get('action', 'none') == 'delete':

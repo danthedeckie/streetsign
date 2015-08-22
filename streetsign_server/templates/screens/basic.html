@@ -28,7 +28,8 @@
 
     var LOCALOPTS={{ request.args | tojson|safe }},
         SCREEN_DATA={{screen.to_dict() | tojson|safe }},
-        POSTS_URL = "{{ url_for('screens_posts_from_feeds', json_feeds_list='-1') }}";
+        POSTS_URL = "{{ url_for('screens_posts_from_feeds', json_feeds_list='-1') }}",
+        SERVER_TIME = {{ server_time | int}};
 
     SCREEN_DATA.md5 = "{{screen.md5()}}";
 

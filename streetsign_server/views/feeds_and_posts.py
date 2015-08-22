@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #     StreetSign Digital Signage Project
-#     (C) Copyright 2013 Daniel Fairhead
+#     (C) Copyright 2013-2015 Daniel Fairhead
 #
 #    StreetSign is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,16 +24,21 @@
 
 """
 
+# alas, due to peewee:
+#pylint: disable=no-value-for-parameter,unexpected-keyword-arg
+
 from flask import render_template, url_for, request, redirect, \
                   flash, json, jsonify, make_response
 import peewee
-from datetime import datetime, timedelta
+from datetime import timedelta
 from feedformatter import Feed as RSSFeed
 import bleach
 
 import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
-from streetsign_server.views.utils import PleaseRedirect, getint, getbool, getstr
+from streetsign_server.views.utils import PleaseRedirect, getint, getbool, \
+                                          admin_only, \
+                                          registered_users_only
 
 from streetsign_server.logic.feeds_and_posts import try_to_set_feed, \
                                       if_i_cant_write_then_i_quit, \
@@ -43,7 +48,8 @@ from streetsign_server.logic.feeds_and_posts import try_to_set_feed, \
 
 from streetsign_server import app
 from streetsign_server.models import User, Group, Feed, Post, ExternalSource, \
-                                     by_id, config_var, PermissionDenied
+                                     by_id, config_var, PermissionDenied, \
+                                     now
 
 import streetsign_server.external_source_types as external_source_types
 
@@ -51,14 +57,12 @@ import streetsign_server.external_source_types as external_source_types
 # Feeds & Posts:
 
 @app.route('/feeds/', methods=['GET', 'POST'])
+@admin_only('POST')
+@registered_users_only('GET')
 def feeds():
     ''' the back end list of feeds. '''
 
     if request.method == 'POST':
-        if not user_session.is_admin():
-            flash('Only Admins can do this!')
-            return redirect(url_for('feeds'))
-
         action = request.form.get('action', 'create')
 
         if action == 'create':
@@ -69,7 +73,7 @@ def feeds():
 
     try:
         user = user_session.get_user()
-    except user_session.NotLoggedIn as e:
+    except user_session.NotLoggedIn:
         user = User()
 
     return render_template('feeds.html',
@@ -85,7 +89,7 @@ def feedpage(feedid):
     try:
         feed = Feed.get(id=feedid)
         user = user_session.get_user()
-    except user_session.NotLoggedIn as e:
+    except user_session.NotLoggedIn:
         user = User()
     except:
         flash('invalid feed id! (' + str(feedid) + ')')
@@ -156,15 +160,15 @@ def feedsrss(ids_raw):
         except Feed.DoesNotExist:
             continue
 
-    time_now = datetime.now()
-    posts = [p for p in \
-             Post.select().join(Feed)
-             .where((Feed.id << ids)
-                   &(Post.status == 0)
-                   &(Post.active_start < time_now)
-                   &(Post.active_end > time_now)
-                   &(Post.published)
-                   )]
+    time_now = now()
+    feed_posts = [p for p in \
+                  Post.select().join(Feed).where(
+                      (Feed.id << ids)
+                      &(Post.status == 0)
+                      &(Post.active_start < time_now)
+                      &(Post.active_end > time_now)
+                      &(Post.published)
+                      )]
 
     feed = RSSFeed()
 
@@ -172,7 +176,7 @@ def feedsrss(ids_raw):
     feed.feed["link"] = url_for('feeds')
     feed.feed["description"] = "Posts from " + (','.join(feed_names))
 
-    for post in posts:
+    for post in feed_posts:
         contents = json.loads(post.content)
         cleantext = bleach.clean(contents["content"], tags=[], strip=True)
         if len(cleantext) > 20:
@@ -196,14 +200,15 @@ def feedsrss(ids_raw):
 ##########################################
 # Posts:
 
-
 @app.route('/posts/')
+@admin_only('POST')
+@registered_users_only('GET')
 def posts():
     ''' (HTML) list of ALL posts. (also deletes broken posts, if error) '''
 
     try:
         user = user_session.get_user()
-    except user_session.NotLoggedIn as e:
+    except user_session.NotLoggedIn:
         user = User()
 
     try:
@@ -213,7 +218,7 @@ def posts():
             return render_template('posts.html',
                                    posts=Post.select() \
                                              .where(Post.status == 0), user=user)
-    except Feed.DoesNotExist as e:
+    except Feed.DoesNotExist:
         # Ah. Database inconsistancy! Not good, lah.
         ps = Post.raw('select post.id from post'
                       ' left join feed on feed.id = post.feed_id'
@@ -242,7 +247,7 @@ def post_new(feed_id):
 
     if not feed.user_can_write(user):
         flash("Sorry! You don't have permission to write here!")
-        return redirect(request.referrer)
+        return redirect(request.referrer if request.referrer else '/')
 
     if request.method == 'GET':
         # send a blank form for the user:
@@ -267,10 +272,10 @@ def post_new(feed_id):
         # return the page:
 
         return render_template('postnew.html',
-                current_feed=feed,
-                post=post,
-                user=user,
-                post_types=allowed_post_types)
+                               current_feed=feed,
+                               post=post,
+                               user=user,
+                               post_types=allowed_post_types)
 
     else: # POST. new post!
         post_type = request.form.get('post_type')
@@ -278,11 +283,11 @@ def post_new(feed_id):
             post_type_module = post_types.load(post_type)
         except:
             flash('Sorry! invalid post type.')
-            return redirect(request.referrer)
+            return redirect(request.referrer if request.referrer else '/')
 
         if feed.post_types and post_type not in feed.post_types_as_list():
             flash('sorry! this post type is not allowed in this feed!')
-            return redirect(request.referrer)
+            return redirect(request.referrer if request.referrer else '/')
 
         post = Post(type=post_type, author=user)
 
@@ -367,7 +372,7 @@ def postpage(postid):
             return jsonify({'message': 'Moved to ' + post.feed.name})
 
         if action not in ('edit', 'update'):
-            return redirect(request.referrer)
+            return redirect(request.referrer if request.referrer else '/')
 
         # finally get around to editing the content of the post...
         try:
@@ -406,9 +411,11 @@ def posts_housekeeping():
     ''' goes through all posts, move 'old' posts to archive status,
         delete reeeeealy old posts. '''
 
-    now = datetime.now()
-    archive_time = now - timedelta(days=config_var('posts.archive_after_days', 7))
-    delete_time = now - timedelta(days=config_var('posts.delete_after_days', 30))
+    time_now = now()
+    archive_time = time_now - \
+                   timedelta(days=config_var('posts.archive_after_days', 7))
+    delete_time = time_now - \
+                  timedelta(days=config_var('posts.delete_after_days', 30))
 
     # first delete really old posts:
 
@@ -434,7 +441,7 @@ def posts_housekeeping():
                     "archived": archive_count,
                     "delete_before": delete_time,
                     "archive_before": archive_time,
-                    "now": now})
+                    "now": time_now})
 
 ###############################################################
 
@@ -447,10 +454,11 @@ def json_post(postid):
 
 ###############################################################
 
-@app.route('/external_data_sources/NEW', defaults={'source_id': None},
-                                         methods=['GET', 'POST'])
+@app.route('/external_data_sources/NEW',
+           defaults={'source_id': None},
+           methods=['GET', 'POST'])
 @app.route('/external_data_sources/<int:source_id>',
-                                         methods=['GET', 'POST', 'DELETE'])
+           methods=['GET', 'POST', 'DELETE'])
 def external_data_source_edit(source_id):
     ''' Editing a external data source '''
 
@@ -500,7 +508,7 @@ def external_data_source_edit(source_id):
         source.lifetime_start = request.form.get('active_start',
                                                  source.lifetime_start)
         source.lifetime_end = request.form.get('active_end',
-                                                 source.lifetime_end)
+                                               source.lifetime_end)
         source.display_time = getint('display_time', source.display_time)
         source.post_template = request.form.get('post_template',
                                                 source.post_template)
@@ -518,9 +526,10 @@ def external_data_source_edit(source_id):
                 getint('feed', '-11')))
 
 
-    return render_template("external_source.html", source=source,
-            feeds=Feed.select(),
-            form=module.form(json.loads(source.settings)))
+    return render_template("external_source.html",
+                           source=source,
+                           feeds=Feed.select(),
+                           form=module.form(json.loads(source.settings)))
 
 
 @app.route('/external_data_sources/test')
@@ -554,16 +563,16 @@ def external_source_run(source_id):
     except ExternalSource.DoesNotExist:
         return 'Invalid Source', 404
 
-    now = datetime.now()
+    time_now = now()
     if user_session.is_admin() and request.form.get('force', 'no') == 'yes':
-        flash ("Update forced.")
+        flash("Update forced.")
     else:
         if source.last_checked:
             next_check = source.last_checked + timedelta(minutes=source.frequency)
 
-            if next_check > now:
+            if next_check > time_now:
                 return "Nothing to do. Last: {0}, Next: {1}, Now: {2} ".format(
-                    source.last_checked, next_check, now)
+                    source.last_checked, next_check, time_now)
 
     module = external_source_types.load(source.type)
 
@@ -586,13 +595,13 @@ def external_source_run(source_id):
 
             if source.publish:
                 post.publisher = source.post_as_user
-                post.publish_date = datetime.now()
+                post.publish_date = now()
                 post.published = True
             post.save()
     # else, no new posts! oh well!
 
     source.settings = json.dumps(settings_data)
-    source.last_checked = datetime.now()
+    source.last_checked = now()
     source.save()
 
     return 'Done!'

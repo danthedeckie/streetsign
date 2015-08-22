@@ -2,24 +2,83 @@
 {% block title %} Dashboard {% endblock %}
 
 {% block body %}
-<div class="row">
-	{% if session.logged_in %}
+{% if session.logged_in %}
+	<div class="row">
 		<div class="col-sm-6">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h2 class="panel-title"> Unpublished Posts I can publish:</h2>
 				</div>
 				<div class="panel-body">
-					<ul class="list">
+					<table class="table table-striped">
 						{% for post in posts_to_publish %}
-							<li><span class="{{ 'published' if post.published else 'unpublished' }}">{{ linkmacros.post(post) }}</span>
+							<tr>
+								<td>
+									{{ linkmacros.post(post) }}
+								</td>
+								<td>
 									<form method="post" action="{{ url_for('postpage', postid=post.id) }}">
 										<input type="hidden" name="action" value="publish" />
-										<input type="submit" class="newbutton" value="Publish" style="" />
+										<input type="submit" class="btn btn-default btn-sm newbutton pull-right" value="Publish" style="" />
 									</form>
-							</li>
+								</td>
+							</tr>
 						{% endfor %}
-					</ul>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-sm-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title">Feeds I can write for:</h2>
+				</div>
+				<div class="panel-body">
+					<table class="table table-striped">
+					{% for feed in feeds %}
+						{% if feed.user_can_write(user) %}
+							<tr>
+								<td>
+								<a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a>
+								</td>
+								<td>
+									<a href="{{ url_for('post_new', feed_id=feed.id) }}"
+										 class="btn btn-sm btn-default pull-right">New Post</a>
+								</td>
+							</tr>
+						{% endif %}
+					{% endfor %}
+					</table>
+				</div>
+			</div>
+		</div>
+
+		
+		<div class="col-sm-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title"> My recent Posts:</h2>
+				</div>
+				<div class="panel-body">
+					<table class="table table-striped">
+						{% for post in posts %}
+							<tr>
+							<td class="{{ 'published' if post.published else 'unpublished' }}">
+								{{ linkmacros.post(post) }}
+								{{ '(unpublished)' if not post.published }}
+							</td>
+							<td>
+							{% if post in posts_to_publish %}
+									<form method="post" action="{{ url_for('postpage', postid=post.id) }}">
+										<input type="hidden" name="action" value="publish" />
+										<input type="submit" class="btn btn-default btn-sm newbutton pull-right" value="Publish" style="" />
+									</form>
+							{% endif %}
+							</td>
+							</tr>
+						{% endfor %}
+					</table>
 				</div>
 			</div>
 		</div>
@@ -44,42 +103,6 @@
 			</div>
 
 		{% endif %} {# /publishable feeds #}
-
-		<div class="col-sm-6">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h2 class="panel-title"> My recent Posts:</h2>
-				</div>
-				<div class="panel-body">
-					<ul class="list">
-						{% for post in posts %}
-							<li class="{{ 'published' if post.published else 'unpublished' }}">{{ linkmacros.post(post) }} ( {{ 'published' if post.published else 'unpublished' }} ) </li>
-						{% endfor %}
-					</ul>
-				</div>
-			</div>
-		</div>
-
-		<div class="col-sm-6">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h2 class="panel-title">Feeds I can write for:</h2>
-				</div>
-				<div class="panel-body">
-					<ul class="list">
-					{% for feed in feeds %}
-						<li>
-							<a href="{{url_for('feedpage', feedid=feed.id)}}">{{ feed.name }}</a> -
-							{% if feed.user_can_write(user) %}
-								<a href="{{ url_for('post_new', feed_id=feed.id) }}"
-								   class="btn btn-xs btn-default">New Post</a>
-							{% endif %}
-						</li>
-					{% endfor %}
-					</ul>
-				</div>
-			</div>
-		</div>
 
 		<div class="col-sm-6">
 			<div class="panel panel-default">
@@ -125,5 +148,4 @@
 	{% endfor %}
 </div>
 <div class="cf"></div>
-</div>
 {% endblock %}

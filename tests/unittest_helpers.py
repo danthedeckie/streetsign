@@ -89,7 +89,16 @@ class StreetSignTestCase(unittest.TestCase):
             try:
                 parser.parse(request.data)
             except Exception as e:
-                print request.data
+                lineno = parser.errors[0][0][0] - 1
+
+                print 'HTML Parse Error, %s, %s:' % parser.errors[0][0]
+                print '----------------:', parser.errors[0][1]
+                print '----------------:', parser.errors[0][2]
+
+                print '\n    '.join(request.data.split('\n')[lineno-3: lineno])
+                print '-->', request.data.split('\n')[lineno]
+                print '\n    ' + ('\n    '.join(request.data.split('\n')[lineno+1: lineno+3]))
+
                 raise e
 
         elif lang == 'json':
