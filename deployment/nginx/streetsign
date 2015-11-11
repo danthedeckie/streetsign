@@ -1,0 +1,13 @@
+server {
+	listen 80;
+	server_name streetsign;
+
+	location / {
+		proxy_pass http://127.0.0.1:5000/$request_uri;
+		proxy_set_header $host;
+	}
+
+	location /static {
+		alias /srv/streetsign/streetsign_server/static;
+	}
+}

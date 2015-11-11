@@ -1,5 +1,5 @@
-StreetSign Admin's guide:Deployment
-========================
+Deploying Streetsign in Production
+==================================
 
 How to deploy a 'production-ready' streetsign installation.
 
@@ -116,6 +116,64 @@ Getting Streetsign on to Port 80
 If streetsign is going to be 'public facing', and so you want it to be running on the regular
 HTTP port 80, or over HTTPS, then it's best to run a 'reverse proxy' in front of it.
 
-The most popular options are Apache, NGiNX, and varnish.
+The most popular options are Apache and NGiNX.
 
-TODO
+Apache
+~~~~~~
+
+Apache is pretty easy to install::
+
+    sudo apt-get install apache2
+
+is usually enough.  There's a default configuration file to put streetsign on its own
+virtualhost in the ``deployment/apache`` folder.  If streetsign is the only site running behind
+apache here, then that configuration file may be enough.  Usually, however, you'll need to
+modify the VirtualHost / Server Name / other settings a bit yourself.
+
+You will need the apache ``mod_proxy``  and ``proxy_http`` modules enabled::
+
+    sudo a2enmod proxy proxy_http
+
+You can then copy in the config file::
+
+    sudo cp /srv/streetsign/deployment/apache/streetsign.conf /etc/apache2/sites-available/
+
+Edit it to have the settings you need, and enable it::
+
+    sudo a2ensite streetsign
+
+And if you want to, disable the default apache welcome-page/site::
+
+    sudo a2dissite 000-default
+
+Finally, restart apache::
+
+    sudo service apache restart
+
+and it should all be working.
+
+nginx
+~~~~~
+
+Install nginx::
+
+    sudo apt-get install nginx
+
+copy the basic streetsign configuration file in::
+
+    sudo cp /srv/streetsign/deployment/nginx/streetsign /etc/nginx/sites-available/
+
+Edit it with whatever settings you wish.
+
+Enable it::
+
+    sudo ln -s /etc/nginx/sites-available/streetsign /etc/nginx/sites-enabled/
+
+And if streetsign is the only thing you're using nginx for, and you don't need
+the default welcome page, turn that off::
+
+    sudo rm /etc/nginx/sites-enabled/default
+
+And of course, restart nginx::
+
+    sudo service nginx restart

@@ -3,6 +3,7 @@ StreetSign Admin's guide
 
 Here's first a guide on how to set up streetsign to play with.  For full proper
 deployment (for real live production usage) check the :doc:`deployment` page.
+
 Instalation
 -----------
 
