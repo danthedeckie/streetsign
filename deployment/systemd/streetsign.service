@@ -1,0 +1,12 @@
+[Unit]
+description=Streetsign Digital Signage Server
+
+[Service]
+Type=Simple
+WorkingDirectory=/srv/streetsign
+ExecStart=/srv/streetsign/run.py waitress
+User=streetsign
+Group=streetsign
+
+[Install]
+WantedBy=multi-user.target

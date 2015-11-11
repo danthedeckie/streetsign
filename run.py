@@ -36,15 +36,18 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         if sys.argv[1] == 'waitress':
             print("'Production' Server with Waitress.")
+            print("Press <Ctrl-C> to stop")
             from waitress import serve
             serve(app, host=__HOST__, port=__PORT__, threads=__THREADS__)
         elif sys.argv[1] == 'profiler':
             print("Loading dev server with profiling on.")
+            print("Press <Ctrl-C> to stop")
             from werkzeug.contrib.profiler import ProfilerMiddleware
             app.config['PROFILE'] = True
             app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[20])
             app.run(debug=True)
     else:
         print("Starting Development Server...")
+        print("Press <Ctrl-C> to stop")
         app.run(host=__HOST__, port=__PORT__, debug = True)
 

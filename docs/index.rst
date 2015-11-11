@@ -24,6 +24,7 @@ Contents:
    getting_started
    screen_options
    admin_guide
+   deployment
    developer-overview
    developer-reference
    external_libs

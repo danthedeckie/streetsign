@@ -1,8 +1,8 @@
 StreetSign Admin's guide
 ========================
 
-This is where the information goes about how to run a streetsign system.
-
+Here's first a guide on how to set up streetsign to play with.  For full proper
+deployment (for real live production usage) check the :doc:`deployment` page.
 Instalation
 -----------
 
@@ -20,10 +20,10 @@ want it to be, you need to run the setup script::
 which will create a python virtualenv in ``.virtualenv``, and install all the
 libraries and other requirements into there.
 
-Deployment
-----------
+Running it.
+-----------
 
-You can use the built in ``waitress`` web server::
+To run the server in 'production mode' you can use the built in ``waitress`` web server::
 
     ./run.py waitress
 

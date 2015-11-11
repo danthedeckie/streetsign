@@ -44,7 +44,7 @@ So on CentOS:
 
 or on Debian/Ubuntu:
 
-    apt-get install python-dev imagemagick
+    apt-get install python-pip python-dev imagemagick
 
 ## More info:
 
