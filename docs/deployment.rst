@@ -148,7 +148,7 @@ And if you want to, disable the default apache welcome-page/site::
 
 Finally, restart apache::
 
-    sudo service apache restart
+    sudo service apache2 restart
 
 and it should all be working.
 
