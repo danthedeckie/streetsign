@@ -28,7 +28,7 @@ Installation path
 -----------------
 
 As per the LSB, probably the best place for public facing services to install their
-data is ``srv/``.  So we should create that directory, and install streetsign there::
+data is ``/srv/``.  So we should create that directory, and install streetsign there::
 
     sudo mkdir /srv/streetsign
     sudo chown -R streetsign:streetsign /srv/streetsign

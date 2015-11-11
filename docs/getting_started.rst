@@ -34,6 +34,8 @@ the initial database (a local sqlite file).  Then ::
 
 To actually run a local test server.
 
+To deploy streetsign for production use, check out the :doc:`deployment` guide.
+
 The initial administration user 'admin' is created, with a password of 'password'.
 
 If you need to start again with a fresh database, then delete the `database.db` file,
@@ -41,7 +43,6 @@ and re-run `./setup.sh`.
 
 This rest of this document hopes to make the different concepts and terminology clear, so
 that you can be up to speed as quickly as possible.
-
 
 Basic Overview
 --------------
