@@ -10,9 +10,13 @@ First you need to install the python headers (for compiling some extra modules),
 imagemagick (to generate thumbnails), and pip for installing other python modules,
 and git for downloading streetsign itself.
 
-On Debian/Ubuntu Server, this will be something like ::
+On Debian/Ubuntu Server, this will be ::
 
     sudo apt-get install python-pip python-dev imagemagick git
+
+On CentOS 6.7, its::
+
+    sudo yum install python-devel python-pip ImageMagick git
 
 User/Group
 ----------
@@ -56,6 +60,8 @@ the server IP::
 
     ifconfig |grep 'inet addr:'
 
+Note that often servers may have a firewall (e.g. IPTables, or similar) blocking port 5000.
+
 And then you can ``exit`` from the streetsign user.
 
 Configure streetsign to start on system-boot
@@ -66,7 +72,7 @@ between Ubuntu 14 and Ubuntu 15, for instance.
 
 There are startup files in the streetsign source, in the ``deployment`` folder.
 
-systemd systems (Ubuntu 15.x, Debian Jessie, etc)
+systemd systems (Ubuntu 15.x, CentOS 7, Debian Jessie, etc)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you're on a systemd based linux (Such as Ubuntu 15.x),
