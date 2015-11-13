@@ -1,0 +1,50 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          streetsign-server
+# Required-Start:    $network
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Runs streetsign server on port 5000
+# Description:       Runs streetsign digital signage web server on port 5000, via waitress (python)
+
+### END INIT INFO
+#
+# Author:	Daniel Fairhead
+#
+#set -e 
+
+PIDFILE="/var/run/streetsign.pid"
+LOGFILE="/dev/null" # if you don't want logging
+#LOGFILE="/var/log/streetsign.log" # if you do want logging
+
+case "$1" in
+	start)
+		if [[ -e "$PIDFILE" ]]; then
+			kill -0 $(cat "$PIDFILE") 2>1&> /dev/null
+			if [[ 0 -ne $? ]]; then
+				echo "Streetsign already appears to be running. If it is not, then please delete $PIDFILE"
+				exit 1
+			fi
+		fi
+		echo "Loading Streetsign"
+		cd /srv/streetsign
+		nohup su streetsign -c '/srv/streetsign/run.py waitress' < /dev/null > "$LOGFILE" 2>&1 &
+		echo "$!" > "$PIDFILE"
+	;;
+	stop)
+		echo "Closing Streetsign server"
+		if [[ -e "$PIDFILE" ]]; then
+			kill "$(cat "$PIDFILE")"
+			rm "$PIDFILE"
+		else
+			echo "Streetsign does not appear to be running."
+		fi
+	;;
+	*)
+		echo "Usage: service streetsign {start|stop}"
+		exit 1
+	;;
+esac
+
+exit 0
