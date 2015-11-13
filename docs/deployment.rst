@@ -93,6 +93,10 @@ And then you can actually start it up::
 If it's all running quite happily, then cool.  If you want to test that it does actually start on
 boot, feel free to reboot the server and see what happens.
 
+Logs for streetsign can then be found using the normal systemd logging utils::
+
+    journalctl -u streetsign.service
+
 (Recent) upstartd systems (Ubuntu 14.x, etc)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -109,6 +113,10 @@ You can now start the service, to test it's all working OK::
 
 And it should automatically run on boot as well.  To stop that, you can edit the
 ``/etc/init/streetsign.conf`` file, and put a ``#`` in front of ``start on runlevel [2345]``.
+
+The streetsign log file can be found with the rest of the upstart log files at::
+
+    /var/log/upstart/streetsign.log
 
 
 SysV (initscript) systems (CentOS 6.x, etc.)

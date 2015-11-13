@@ -17,7 +17,8 @@
 #
 #    ---------------------------
 '''
-    Pull data from an RSS feed
+    Look in a local images folder (on this computer) for pictures, and pull
+    them into a feed.
 
 '''
 
@@ -25,10 +26,6 @@ __NAME__ = 'Local Folder (images)'
 __MODULE__ = 'localfolderimages'
 
 from flask import render_template_string, json
-from jinja2 import Template
-import feedparser
-import bleach
-from collections import defaultdict
 from os.path import join as pathjoin, isdir, isfile, exists, basename, dirname
 from glob import glob
 
