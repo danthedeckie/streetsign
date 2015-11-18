@@ -132,7 +132,7 @@ def thumbnail(filename):
     full_path = pathjoin(g.site_vars['user_dir'], filename)
     thumb_path = pathjoin(g.site_vars['user_dir'], '.thumbnails', filename)
 
-    if splitext(filename)[-1] not in IMAGE_FORMATS:
+    if splitext(filename)[-1].lower() not in IMAGE_FORMATS:
         return 'not an image I will not make a thumbnail.'
 
     if isfile(full_path):
