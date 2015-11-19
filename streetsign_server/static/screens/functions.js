@@ -247,5 +247,15 @@ function reduce_font_size_to_fit(inner, outer) {
     console.log ('reducing font size to ' + parseInt(percent) + '%');
 }
 
+function get_servertime(url) {
+	var xhr = new XMLHttpRequest();
+
+	url = url || document.location;
+
+	xhr.open('GET', url, false) // get syncronously.
+	xhr.send(null);
+	return Date.parse(new Date(Date.parse(xhr.getResponseHeader('Date'))))
+};
+
 setTimeout(reload_page, REFRESH_PAGE_TIMER);
 setTimeout(magic_time, 2000);
