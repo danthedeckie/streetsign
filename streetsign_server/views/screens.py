@@ -143,7 +143,7 @@ def screendisplay(template, screenname):
 
     return render_template('screens/' + template + '.html',
                            screen=screen,
-                           server_time=now(timestamp=True)*1000)
+                           site_mode=app.config['MODE'])
 
 
 @app.route('/screens/posts_from_feeds/<json_feeds_list>')

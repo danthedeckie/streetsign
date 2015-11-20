@@ -308,7 +308,6 @@ Zone.prototype = {
 
             if (!any_relevent_restrictions(thispost)) {
                 // we have a winner!
-                console.log('was:', this.current_post_index, ' will be:', index);
                 this.current_post_index = index;
                 return thispost;
             } else {

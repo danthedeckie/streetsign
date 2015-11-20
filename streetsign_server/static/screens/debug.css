@@ -1,0 +1,25 @@
+/*
+ * These are to help with debugging various screen related issues, and make all divs, posts, zones, etc show up clearly.
+ * I find it useful, anyway.
+ *
+ * box-shadow is used rather than border as that way the actual sizes of zones/etc. aren't changed.
+ */
+
+div {
+	box-shadow: inset 0 0 1px #fff;
+}
+
+.zone {
+	/*border: 1px solid red;*/
+	box-shadow: inset 0 0 2px #f00;
+}
+
+.post {
+	background: rgba(100,255,255,0.4);
+	border-radius: 10px; /* so you can tell where post corners are. */
+	box-shadow: inset 0 0 5px #00f;
+}
+
+.post_inner {
+	box-shadow: inset 0 0 1px #0f0;
+}

@@ -20,6 +20,9 @@
     screens output, generic-ish functions.
 
 *************************************************************/
+function debug() {
+	console.log(Array.prototype.slice.call(arguments));
+}
 
 function nicemap(objects, func) {
     'use strict';
@@ -186,7 +189,6 @@ function any_relevent_restrictions(post) {
         }
     }
 
-    console.log('returning:' , post.time_restrictions_show, any_hits);
     return any_hits;
 }
 
@@ -213,6 +215,7 @@ function reduce_font_size_to_fit(inner, outer) {
         scrolling = (outer[0].className.indexOf("scroll") !== -1),
         img_sizes = {};
 
+
     if (scrolling) {
         zone_width = 900000;
     }
@@ -231,7 +234,6 @@ function reduce_font_size_to_fit(inner, outer) {
         i = i / 2;
         if ((height < zone_height) || ((!scrolling) && (width < zone_width-5))) {
             percent += i;
-
         } else if ((height > zone_height) || ((!scrolling) && (width > zone_width+5))) {
             percent -= i;
         }

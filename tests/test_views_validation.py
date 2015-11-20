@@ -36,6 +36,23 @@ class TestBasicViewValid(StreetSignTestCase):
         self.validate('/posts/', code=403)
         self.validate('/feeds/', code=403)
 
+    def test_screen_doesnt_change(self):
+        ''' javascript in the screen pulls the screen itself down every
+            minute or so to check if any screen layout data has changed,
+            and if it does, it refreshes the page.  When I (daftly) added
+            a server_time attribute to the screen page, it meant it was always
+            different, and so always refreshed every minute.'''
+
+        s = models.Screen()
+        s.urlname='TestScreen'
+        s.save()
+
+        self.validate('/screens/basic/TestScreen')
+        a = self.client.get('/screens/basic/TestScreen')
+        b = self.client.get('/screens/basic/TestScreen')
+
+        self.assertEqual(a.data, b.data)
+
     def test_logged_in_valid(self):
         u = models.User(loginname='test', emailaddress='test@test.org')
         u.set_password('123')
