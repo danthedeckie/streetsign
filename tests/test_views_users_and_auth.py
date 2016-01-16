@@ -271,7 +271,7 @@ class CreatingUsersTestCase(BasicUsersTestCase):
         resp = self.post_create_request(currpass=ADMINPASS,
                                         newpass='',
                                         conf_newpass='')
-        self.assertIn("passwordhash may not be NULL", resp.data)
+        self.assertIn("NOT NULL constraint failed: user.passwordhash", resp.data)
 
         with self.assertRaises(User.DoesNotExist):
             User.get(loginname="user2")
@@ -303,12 +303,14 @@ class CreatingUsersTestCase(BasicUsersTestCase):
         self.assertEqual(user2.id, usernow.id)
 
         self.login(ADMINNAME, ADMINPASS)
-        resp = self.post_create_request(currpass=ADMINPASS)
-        self.assertIn("loginname is not unique", resp.data)
+        resp = self.post_create_request(currpass=ADMINPASS,
+                                        newpass='not42', conf_newpass='not42')
+        self.assertIn("Username already exists", resp.data)
 
-        # and just make sure we didn't delete them:
+        # and just make sure we didn't delete them, or set their password...
 
-        User.get(loginname="user2")
+        usernew = User.get(loginname="user2")
+        self.assertEqual(usernow.passwordhash, usernew.passwordhash)
 
 
 class DeletingUsers(BasicUsersTestCase):

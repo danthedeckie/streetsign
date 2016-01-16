@@ -157,6 +157,12 @@ def user_edit(userid=-1):
             flash('Sorry! Only admins can create new users!')
             return permission_denied("Admins only!")
 
+        try:
+            user = User.get(loginname=request.form['loginname'])
+            return permission_denied("Username already exists!")
+        except peewee.DoesNotExist:
+            pass
+
         user = User() #pylint: disable=no-value-for-parameter
 
     if request.method == 'POST':
