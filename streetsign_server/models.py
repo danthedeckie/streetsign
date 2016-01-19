@@ -169,7 +169,7 @@ class DBModel(Model):
                                  value).group():
                 fieldtype = type(getattr(self, field))
                 if fieldtype == BooleanType and type(value) == UnicodeType:
-                    setattr(self, field, value=='True')
+                    setattr(self, field, value.lower() in ('true', 'yes', 'on'))
                 else:
                     setattr(self, field, value)
             else:

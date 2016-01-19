@@ -489,6 +489,16 @@ class UserUpdatesTestCase(BasicUsersTestCase):
         usernow = User.get(id=self.user.id)
         self.assertTrue(usernow.is_admin)
 
+    def test_admin_can_make_admin_with_on(self):
+        self.assertFalse(self.user.is_admin)
+        self.login(ADMINNAME, ADMINPASS)
+        resp = self.post_update_request(userid=self.user.id, is_admin="on")
+
+        usernow = User.get(id=self.user.id)
+        self.assertTrue(usernow.is_admin)
+
+
+
     def test_admin_can_unset_admin(self):
         self.assertFalse(self.user.is_admin)
         self.user.is_admin = True
