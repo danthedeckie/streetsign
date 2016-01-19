@@ -1,5 +1,5 @@
 #!/bin/bash
 
-convert "$1" -resize 300x "$1"
+convert "$1" -resize 1280x\> "$1"
 
 exit $?
