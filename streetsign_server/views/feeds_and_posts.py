@@ -234,6 +234,7 @@ def posts():
                                posts=Post.select()\
                                          .where(Post.status == 0), user=user)
 
+@registered_users_only('GET', 'POST')
 @app.route('/posts/new/<int:feed_id>', methods=['GET', 'POST'])
 def post_new(feed_id):
     ''' create a new post! '''
@@ -243,7 +244,12 @@ def post_new(feed_id):
         return redirect(url_for('index'))
 
     user = user_session.get_user()
-    feed = Feed.get(id=feed_id)
+
+    try:
+        feed = Feed.get(id=feed_id)
+    except Feed.DoesNotExist:
+        flash('Sorry, Feed does not exist!')
+        return redirect(url_for('feeds'))
 
     if not feed.user_can_write(user):
         flash("Sorry! You don't have permission to write here!")
