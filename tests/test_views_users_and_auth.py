@@ -271,7 +271,8 @@ class CreatingUsersTestCase(BasicUsersTestCase):
         resp = self.post_create_request(currpass=ADMINPASS,
                                         newpass='',
                                         conf_newpass='')
-        self.assertIn("NOT NULL constraint failed: user.passwordhash", resp.data)
+        self.assertIn("Cannot Save", resp.data)
+        self.assertIn("passwordhash", resp.data)
 
         with self.assertRaises(User.DoesNotExist):
             User.get(loginname="user2")

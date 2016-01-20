@@ -182,7 +182,7 @@ def user_edit(userid=-1):
                 flash('Saved')
 
         except peewee.IntegrityError as err:
-            flash(str(err))
+            flash('Cannot Save:' + str(err))
 
     elif request.method == 'DELETE':
         if not current_user.is_admin:
