@@ -23,8 +23,8 @@
     brings in all the main views from the other files.
 
 '''
-
-from flask import render_template, g, Response
+from __future__ import print_function
+from flask import render_template, g, Response, url_for
 
 ##########################
 # views submodules:
@@ -61,7 +61,7 @@ def index():
     ''' main front page / dashboard / index. '''
     try:
         user = user_session.get_user()
-    except user_session.NotLoggedIn as e:
+    except user_session.NotLoggedIn:
         user = User()
 
     if not user:
@@ -72,7 +72,7 @@ def index():
 
 
     posts_to_publish = Post.select()\
-                           .where((Post.published==False) &
+                           .where((Post.published == False) &
                                   (Post.feed << publishable_feeds))
 
     screens = Screen.select()
@@ -87,17 +87,32 @@ def index():
             alias['screen'] = None
 
     return render_template('dashboard.html',
-        aliases=aliases,
-        feeds=Feed.select(),
-        publishable_feeds=publishable_feeds,
-        posts=Post.select().where(Post.author == user)\
-                  .order_by(Post.write_date.desc())\
-                  .limit(15),
-        posts_to_publish=posts_to_publish,
-        screens=screens,
-        user=user)
+                           aliases=aliases,
+                           feeds=Feed.select(),
+                           publishable_feeds=publishable_feeds,
+                           posts=Post.select().where(Post.author == user)\
+                                     .order_by(Post.write_date.desc())\
+                                     .limit(15),
+                           posts_to_publish=posts_to_publish,
+                           screens=screens,
+                           user=user)
 
 @app.route('/robots.txt')
 def robots_txt():
     ''' block all well-behaved search engines. '''
     return Response('User-agent: *\nDisallow: /', mimetype='text/plain')
+
+
+# Expected Error Handlers:
+
+@app.errorhandler(user_session.NotLoggedIn)
+def not_logged_in(err):
+    ''' Not Logged In handler '''
+    # TODO: nicer looking.
+    print(err)
+
+    return '''<!doctype html>
+    <body><h1>StreetSign</h1>
+    <h2>Permission Denied</h2>
+    You\'re not logged in!
+    <a href="{}">Return to StreetSign</a>'''.format(url_for('index')), 403
