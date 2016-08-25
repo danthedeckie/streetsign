@@ -229,7 +229,7 @@ class TestLifetimesPostedWithOffsets(TestLifetimes):
 
         self.assertEqual(self.get_posts_ids([self.feed.id]), [])
 
-    def test_post_neg1h_offset(self):
+    def test_post_neg_1h_offset(self):
         ''' check that one hour in the past works '''
 
         models.app.config['TIME_OFFSET'] = -60
