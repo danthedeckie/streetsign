@@ -138,6 +138,7 @@ def user_edit(userid=-1):
     ''' edit one user.  Admins can edit any user, but other users
         can only edit themselves. if userid is -1, create a new user. '''
 
+
     try:
         current_user = user_session.get_user()
     except user_session.NotLoggedIn as e:
@@ -146,6 +147,7 @@ def user_edit(userid=-1):
 
     userid = int(userid)
 
+
     if userid != -1:
         try:
             user = User.get(id=userid)
@@ -153,15 +155,17 @@ def user_edit(userid=-1):
             return not_found(title="User doesn't exist",
                              message="Sorry, that user does not exist!")
     else:
+
         if not current_user.is_admin:
             flash('Sorry! Only admins can create new users!')
             return permission_denied("Admins only!")
 
         try:
-            user = User.get(loginname=request.form['loginname'])
+            user = User.get(loginname=request.form.get('loginname',''))
             return permission_denied("Username already exists!")
         except peewee.DoesNotExist:
             pass
+
 
         user = User() #pylint: disable=no-value-for-parameter
 
