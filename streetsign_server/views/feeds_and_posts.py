@@ -239,9 +239,9 @@ def posts():
 def post_new(feed_id):
     ''' create a new post! '''
 
-    if not user_session.logged_in():
-        flash("You're not logged in!")
-        return redirect(url_for('index'))
+    #if not user_session.logged_in():
+    #    flash("You're not logged in!")
+    #    return redirect(url_for('index'))
 
     user = user_session.get_user()
 
