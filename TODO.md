@@ -16,6 +16,7 @@
 - change client aliases to Table based, rather than dumping it all in a single configvar
 - 'injest' method on all models, to simplify the form views.  Should then allow validation to
   become a lot more declarative.
+- renaming feed(s)
 
 ## Urgent:
 

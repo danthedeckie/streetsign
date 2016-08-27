@@ -27,16 +27,18 @@
 # alas, due to peewee:
 #pylint: disable=no-value-for-parameter,unexpected-keyword-arg
 
+from datetime import timedelta
+
 from flask import render_template, url_for, request, redirect, \
                   flash, json, jsonify, make_response
 import peewee
-from datetime import timedelta
 from feedformatter import Feed as RSSFeed
 import bleach
 
 import streetsign_server.user_session as user_session
 import streetsign_server.post_types as post_types
 from streetsign_server.views.utils import PleaseRedirect, getint, getbool, \
+                                          getstr, DATESTR, \
                                           admin_only, \
                                           registered_users_only
 
@@ -511,10 +513,12 @@ def external_data_source_edit(source_id):
 
         source.frequency = getint('frequency', 60)
         source.publish = getbool('publish', False)
-        source.lifetime_start = request.form.get('active_start',
-                                                 source.lifetime_start)
-        source.lifetime_end = request.form.get('active_end',
-                                               source.lifetime_end)
+        source.lifetime_start = getstr('active_start',
+                                       source.lifetime_start,
+                                       validate=DATESTR)
+        source.lifetime_end = getstr('active_end',
+                                     source.lifetime_end,
+                                     validate=DATESTR)
         source.display_time = getint('display_time', source.display_time)
         source.post_template = request.form.get('post_template',
                                                 source.post_template)

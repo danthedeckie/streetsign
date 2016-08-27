@@ -26,6 +26,7 @@
 from flask import request, flash, render_template, make_response
 import streetsign_server.user_session as user_session
 from functools import wraps
+import re
 
 # lots of wrappers, don't need these:
 # pylint: disable=missing-docstring
@@ -48,26 +49,43 @@ class PleaseRedirect(Exception):
 # later we should probably transition to WTForms, or similar. But these
 # will do for now.
 
-def getint(name, default, minimum=0, maximum=999999999):
+def getint(name, default, minimum=0, maximum=999999999, form=None):
     """ get an integer from the request.form, capped with min and max,
         and a default.  If its not a valid integer, return the default.  """
+
+    form = form or request.form
     try:
-        return min(max(int(request.form.get(name, default)), minimum), maximum)
+        return min(max(int(form.get(name, default)), minimum), maximum)
     except:
         return default
 
-def getbool(name, default):
+def getbool(name, default, form=None):
     """ get a bool from the request.form.  if it's not valid, return the
         default. """
+    form = form or request.form
     try:
-        return bool(request.form.get(name, default))
+        val = form.get(name, default)
+        return val in (True, 1, '1',
+                       'true', 'True', 'TRUE',
+                       'yes', 'Yes', 'YES',
+                       'checked', 'Checked', 'CHECKED')
     except:
         return default
 
-def getstr(name, default):
+# some getstr helper regexps:
+STRIPSTR = re.compile(r'^(?:\W*)([\w].*?)(\W*)$')
+DATESTR = re.compile(r'(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)')
+
+def getstr(name, default, validate='(.*)', flags=0, form=None):
     """ get a string from request.form. if it's not there, then return the
         default. """
-    return request.form.get(name, default)
+    form = form or request.form
+    try:
+        return re.search(validate, unicode(form[name]), flags).groups()[0]
+    except AttributeError: # no matches
+        return default
+    except KeyError: # no key in form
+        return default
 
 def admin_only(*methods):
     '''

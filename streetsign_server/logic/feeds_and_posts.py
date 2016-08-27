@@ -25,10 +25,14 @@ logic for feeds_and_posts views, separated out for clarity.
 
 """
 
-from flask import flash, url_for, json
-from streetsign_server.views.utils import PleaseRedirect
-from streetsign_server.models import Feed, now
 from datetime import datetime
+
+from flask import flash, url_for, json
+
+from streetsign_server.views.utils import PleaseRedirect, \
+                                          getstr, getint, getbool, \
+                                          STRIPSTR, DATESTR
+from streetsign_server.models import Feed, now
 
 def try_to_set_feed(post, new_feed_id, user):
     ''' Is this user actually allowed to set the feed of this post to what
@@ -128,14 +132,20 @@ def post_form_intake(post, form, editor):
 
     post.status = 0 # any time a post is edited, remove it from archive.
 
-    post.time_restrictions_show = (form.get('times_mode', \
-                'do_not_show') \
-            == 'only_show')
+    post.time_restrictions_show = \
+        (form.get('times_mode', 'do_not_show') == 'only_show')
     post.time_restrictions = form.get('time_restrictions_json', '[]')
-    post.display_time = min(100, max(2, int(form.get('displaytime', 8))))
+    post.display_time = \
+        getint('displaytime', 8, minimum=2, maximum=100, form=form)
 
-    post.active_start = form.get('active_start', post.active_start)
-    post.active_end = form.get('active_end', post.active_end)
+    print type(form['active_start'])
+
+    post.active_start = \
+        getstr('active_start', post.active_start, validate=DATESTR, form=form)
+
+    print type(post.active_start)
+    post.active_end = \
+        getstr('active_end', post.active_end, validate=DATESTR, form=form)
 
     post.write_date = now()
 
