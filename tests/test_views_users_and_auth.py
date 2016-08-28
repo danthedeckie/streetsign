@@ -41,6 +41,12 @@ class BasicUsersTestCase(StreetSignTestCase):
         self.admin.set_password(ADMINPASS)
         self.admin.save()
 
+    def login_user(self):
+        self.login(USERNAME, USERPASS)
+
+    def login_admin(self):
+        self.login(ADMINNAME, ADMINPASS)
+
 class ChangingPasswords(BasicUsersTestCase):
     ''' Testing Passwords can be changed sensibly. '''
 

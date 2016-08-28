@@ -35,13 +35,16 @@ class TestBasicViewValid(StreetSignTestCase):
         self.validate('/aliases', code=403)
         self.validate('/posts/', code=403)
         self.validate('/feeds/', code=403)
+        self.validate('/external_data_sources/test', code=403)
 
     def test_screen_doesnt_change(self):
-        ''' javascript in the screen pulls the screen itself down every
-            minute or so to check if any screen layout data has changed,
-            and if it does, it refreshes the page.  When I (daftly) added
-            a server_time attribute to the screen page, it meant it was always
-            different, and so always refreshed every minute.'''
+        '''
+        javascript in the screen pulls the screen itself down every
+        minute or so to check if any screen layout data has changed,
+        and if it does, it refreshes the page.  When I (daftly) added
+        a server_time attribute to the screen page, it meant it was always
+        different, and so always refreshed every minute.
+        '''
 
         s = models.Screen()
         s.urlname='TestScreen'
@@ -71,6 +74,7 @@ class TestBasicViewValid(StreetSignTestCase):
             self.validate('/aliases', lang='json')
             self.validate('/posts/')
             self.validate('/feeds/')
+            self.validate('/external_data_sources/test', code=403)
 
     def test_admin_logged_in_valid(self):
         u = models.User(loginname='test',
@@ -91,7 +95,7 @@ class TestBasicViewValid(StreetSignTestCase):
             self.validate('/aliases', lang='json')
             self.validate('/posts/')
             self.validate('/feeds/')
-
+            self.validate('/external_data_sources/test', code=404)
 
     def test_user_info_not_logged_in(self):
         ''' user info should be private! '''

@@ -92,7 +92,7 @@ class TestLogin(StreetSignTestCase):
         self.validate('/users/' + str(self.user.id), code=403)
 
     def test_login_logout(self):
-    # confirm not logged in:
+        # confirm not logged in:
 
         self.validate('/users/' + str(self.user.id), code=403)
 

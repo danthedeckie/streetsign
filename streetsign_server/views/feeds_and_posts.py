@@ -241,10 +241,6 @@ def posts():
 def post_new(feed_id):
     ''' create a new post! '''
 
-    #if not user_session.logged_in():
-    #    flash("You're not logged in!")
-    #    return redirect(url_for('index'))
-
     user = user_session.get_user()
 
     try:
@@ -316,12 +312,9 @@ def post_new(feed_id):
         return redirect(url_for('feedpage', feedid=post.feed.id))
 
 @app.route('/posts/<int:postid>', methods=['GET', 'POST'])
+@registered_users_only('GET', 'POST')
 def postpage(postid):
     ''' Edit a post. '''
-
-    if not user_session.logged_in():
-        flash("You're not logged in!")
-        return redirect(url_for('posts'))
 
     try:
         post = Post.get(Post.id == postid)
@@ -458,7 +451,7 @@ def json_post(postid):
     try:
         return jsonify(Post.get(Post.id == postid).dict_repr())
     except:
-        return jsonify({"error": "Invalid Post ID"})
+        return jsonify({"error": "Invalid Post ID"}), 404
 
 ###############################################################
 
@@ -467,12 +460,9 @@ def json_post(postid):
            methods=['GET', 'POST'])
 @app.route('/external_data_sources/<int:source_id>',
            methods=['GET', 'POST', 'DELETE'])
+@admin_only('GET', 'POST', 'DELETE')
 def external_data_source_edit(source_id):
     ''' Editing a external data source '''
-
-    if not user_session.is_admin():
-        flash('Only Admins can do this!')
-        return redirect(url_for('feeds'))
 
     # first find the data type:
 
@@ -541,27 +531,21 @@ def external_data_source_edit(source_id):
                            feeds=Feed.select(),
                            form=module.form(json.loads(source.settings)))
 
-
 @app.route('/external_data_sources/test')
+@admin_only('GET')
 def external_source_test():
     '''
         test an external source, and return some comforting HTML
         (for the editor)
     '''
-    if not user_session.is_admin():
-        flash('Only Admins can do this!')
-        return redirect(url_for('feeds'))
 
-    '''
-    try:
-        source = ExternalSource.get(id=source_id)
-    except ExternalSource.DoesNotExist:
-        return 'Invalid Source.', 404
-    '''
     # load the type module:
-    module = external_source_types.load(request.args.get('type', None))
-    # and request the test html
-    return module.test(request.args)
+    try:
+        mod_type = request.args['type']
+    except KeyError:
+        return '<!doctype html><html>No Source Specificed</html>', 404
+
+    return external_source_types.load(mod_type).test(request.args)
 
 @app.route('/external_data_sources/<int:source_id>/run', methods=['POST'])
 def external_source_run(source_id):
