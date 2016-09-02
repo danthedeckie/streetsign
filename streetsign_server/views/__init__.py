@@ -26,17 +26,13 @@
 from __future__ import print_function
 from flask import render_template, g, Response, url_for
 
-##########################
-# views submodules:
-import streetsign_server.views.users_and_auth
-import streetsign_server.views.feeds_and_posts
-import streetsign_server.views.user_files
-import streetsign_server.views.screens
-import streetsign_server.user_session as user_session
-
 # set up the app
 from streetsign_server import app
-from streetsign_server.models import DB, Post, Screen, Feed, User, config_var
+from streetsign_server.models import Post, Screen, Feed, User, config_var
+
+from streetsign_server.helpers.database import DB
+
+import streetsign_server.views.api
 
 ######################################################################
 # Basic App stuff:
@@ -54,65 +50,9 @@ def end_of_request(exception): # pylint: disable=unused-argument
     ''' close the database '''
     DB.close()
 
-
 @app.route('/')
-@app.route('/index.html')
 def index():
-    ''' main front page / dashboard / index. '''
-    try:
-        user = user_session.get_user()
-    except user_session.NotLoggedIn:
-        user = User()
+    ''' main administration dashboard '''
 
-    if not user:
-        user = User()
+    return render_template('newdash.html')
 
-
-    publishable_feeds = user.publishable_feeds()
-
-
-    posts_to_publish = Post.select()\
-                           .where((Post.published == False) &
-                                  (Post.feed << publishable_feeds))
-
-    screens = Screen.select()
-    aliases = config_var('screens.aliases', [])
-
-    for alias in aliases:
-        for screen in screens:
-            if screen.urlname == alias['screen_name']:
-                alias['screen'] = screen
-                break
-        else:
-            alias['screen'] = None
-
-    return render_template('dashboard.html',
-                           aliases=aliases,
-                           feeds=Feed.select(),
-                           publishable_feeds=publishable_feeds,
-                           posts=Post.select().where(Post.author == user)\
-                                     .order_by(Post.write_date.desc())\
-                                     .limit(15),
-                           posts_to_publish=posts_to_publish,
-                           screens=screens,
-                           user=user)
-
-@app.route('/robots.txt')
-def robots_txt():
-    ''' block all well-behaved search engines. '''
-    return Response('User-agent: *\nDisallow: /', mimetype='text/plain')
-
-
-# Expected Error Handlers:
-
-@app.errorhandler(user_session.NotLoggedIn)
-def not_logged_in(err):
-    ''' Not Logged In handler '''
-    # TODO: nicer looking.
-    print(err)
-
-    return '''<!doctype html>
-    <body><h1>StreetSign</h1>
-    <h2>Permission Denied</h2>
-    You\'re not logged in!
-    <a href="{}">Return to StreetSign</a>'''.format(url_for('index')), 403

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """  StreetSign Digital Signage Project
-     (C) Copyright 2013 Daniel Fairhead
+     (C) Copyright 2016 Daniel Fairhead
 
     StreetSign is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,9 +22,10 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from flask import Flask
+from flask.json import JSONEncoder
+
 import flask
-#from flask_peewee.admin import Admin
-#from flask_peewee.auth import Auth
+
 try:
     import config
 except:
@@ -36,11 +37,21 @@ app.config.from_object('config')
 
 import models
 import streetsign_server.views as views
-from models import DB, User, Group, Post, Feed, FeedPermission
+from models import User, Group, Post, Feed, FeedPermission
 
-#auth = Auth(app, db)
-#admin = Admin(app, auth)
+class StreetSignEncoder(JSONEncoder):
+    '''
+        "Custom" JSON Encoder that works nicely with any model with a
+        dict_repr() function. (IE, all our DBModels, hopefully.)
+    '''
+    def default(self, o):
+        if hasattr(o, 'dict_repr'):
+            return self.default(o.dict_repr())
+        elif hasattr(o, 'keys'):
+            return o
+        elif hasattr(o, '__iter__'):
+            return [self.default(i) for i in o]
+        else:
+            return JSONEncoder.default(self, o)
 
-#[admin.register(x) for x in (User,Group,Post,Feed,FeedPermission)]
-#admin.setup()
-
+app.json_encoder = StreetSignEncoder

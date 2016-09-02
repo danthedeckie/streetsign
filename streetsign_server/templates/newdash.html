@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Dashboard</title>
+		<link rel="stylesheet" type="text/css" href="/static/semantic/semantic.min.css" />
+		<!--
+		<script src="/static/semantic/semantic.min.js"></script>
+		-->
+		<script src="/static/lib/mithril.min.js"></script>
+	</head>
+	<body>
+	</body>
+	<script src="{{ url_for('static',
+		filename='admin/models.js') }}"></script>
+	<script src="{{ url_for('static',
+		filename='admin/fakedata.js') }}"></script>
+	<script src="{{ url_for('static',
+		filename='admin/template_elements.js') }}"></script>
+
+	<script>
+
+m.route.mode = 'hash';
+
+var streetsign = {};
+
+
+/*******************
+ * full pages
+ *******************/
+
+var layouts = {
+
+	dashboard: function(ctrl) {
+		return m('#pagebody.ui.container', [
+			m('h1', 'Dashboard'),
+			m('.ui.two.cards.stackable.grid', [
+				my_feeds(ctrl.my_feeds()),
+				my_posts(ctrl.my_posts())
+			]),
+		])
+	},
+
+	feeds: function(ctrl) {
+		return m('#pagebody.ui.container', [
+			m('h1', 'Feeds'),
+			feeds_table(ctrl.feeds()),
+		])
+	},
+
+	posts: function(ctrl) {
+		return m('#pagebody.ui.container', [
+			m('h1', 'All Posts'),
+			posts_table(ctrl.posts()),
+		])
+	},
+
+	feed: function(ctrl) {
+		return m('#pagebody.ui.container', [
+			m('h1', ctrl.feed().name()),
+			posts_table(ctrl.posts())
+		]);
+	},
+
+	/* And a wrapper for the above: */
+
+	site: function(body) {
+		return (function(ctrl) {
+			return m('#site', [
+				topmenu(),
+				body(ctrl),
+				footer()
+			])
+		})
+	},
+}
+
+/* Actual Pages */
+
+var PageVMs = {
+	Dashboard: {
+		controller: function () {
+			return {
+				my_posts: Post.list(),
+				my_feeds: Feed.list()
+			}
+		},
+		view: layouts.site(layouts.dashboard)
+	},
+	Feeds: {
+		controller: function () {
+			return {
+				feeds: Feed.list()
+			}
+		},
+		view: layouts.site(layouts.feeds)
+	},
+	Posts: {
+		controller: function () {
+			return {
+				posts: Post.list()
+			}
+		},
+		view: layouts.site(layouts.posts)
+	},
+	Feed: {
+		controller: function () {
+			return {
+				feed: Feed.get(m.route.param('feedid')),
+				posts: Post.list({feeds:m.route.param('feedid')})
+			}
+		},
+		view: layouts.site(layouts.feed)
+	}
+}
+
+m.route(document.body, '/', {
+	'/': PageVMs.Dashboard,
+	'/feeds': PageVMs.Feeds,
+	'/posts': PageVMs.Posts,
+	'/feeds/:feedid': PageVMs.Feed,
+	'/posts/:postid': PageVMs.Post,
+})
+	</script>
+</html>
