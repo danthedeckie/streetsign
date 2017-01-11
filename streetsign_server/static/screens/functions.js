@@ -232,9 +232,9 @@ function reduce_font_size_to_fit(inner, outer) {
         width = inner.width();
 
         i = i / 2;
-        if ((height < zone_height) || ((!scrolling) && (width < zone_width-5))) {
+        if ((height < zone_height - 5) || ((!scrolling) && (width < zone_width-5))) {
             percent += i;
-        } else if ((height > zone_height) || ((!scrolling) && (width > zone_width+5))) {
+        } else if ((height > zone_height + 5) || ((!scrolling) && (width > zone_width+5))) {
             percent -= i;
         }
 
