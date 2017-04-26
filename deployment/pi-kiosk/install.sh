@@ -11,8 +11,8 @@ URL='https://streetsign.org.uk/'
 cd /tmp/
 git clone https://bitbucket.org/dfairhead/simple-redirect-server.git
 cd simple-redirect-server
-cp redirect_server.py /usr/local/bin/
-chmod +x /usr/local/bin/redirect_server.py
+cp simple_redirect.py /usr/local/bin/
+chmod +x /usr/local/bin/simple_redirect.py
 
 echo '[server]' > /boot/redirect.conf
 echo "redirect_to_url=$URL" >> /boot/redirect.conf
