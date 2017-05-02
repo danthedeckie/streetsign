@@ -162,8 +162,7 @@ Zone.prototype = {
         post.time_restrictions_show = newData.time_restrictions_show;
         post.time_restrictions = newData.time_restrictions;
 
-        // Maybe better not ?
-        if (JSON.stringify(post.content) !== JSON.stringify(newData.content)) {
+        if (post.changed !== newData.changed) {
 
             post.content = newData.content;
 

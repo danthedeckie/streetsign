@@ -709,6 +709,13 @@ class Post(DBModel):
             raise PermissionDenied("You don't have permission to publish"
                                    " posts on this feed.")
 
+    def save(self, *vargs, **kwargs):
+        ''' Save the state of the object to the database, updating
+            the 'write_date' time along the way. '''
+
+        self.write_date = now()
+        return super(Post, self).save(*vargs, **kwargs)
+
 
 
 class ExternalSource(DBModel):
