@@ -68,7 +68,7 @@ def logout():
     try:
         user_session.logout()
     except Exception as e:
-        print 'Error Logging Out: %s' % e
+        print('Error Logging Out: %s' % e)
         flash('error logging out. That is odd')
 
     # return to dashboard

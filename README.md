@@ -6,8 +6,13 @@ A digital signage system, inspired by Concerto, however written in Flask/Peewee/
 with a simpler basis.  This project was originally written for Teenstreet 2013 in Germany
 (http://www.teenstreet.de).
 
-Although this has been used at a large conference, it's still very much work in progress,
-so if you do use it, expect changes in the future, and some features missing.
+Although this has been used at large conferences, and is currently used in some
+corporate environments, and has quite a lot of tests - this version was written
+pretty quickly under tight deadlines, so doesn't have the most solid archetexture
+ever.  I would like to re-write it at some point.
+
+This has just recently been ported to Python3, after not having many updates in
+a while.
 
 There is a full documentation in progress at [streetsign.readthedocs.org](http://streetsign.readthedocs.org/en/latest/)
 
@@ -33,18 +38,18 @@ to run the server using the waitress WSGI server, or you can use any other WSGI 
 
 Most packages will be installed by the ./setup.sh script into a folder called .virtualenv.
 
-You you will need Python 2.6/2.7 or so, and the Python headers package (python-dev on Debian, python-devel on CentOS),
-with a  functioning gcc for compiling the various requirements.
+You you will need Python 3.6+ and the Python headers package (python3-dev on Debian, python3-devel on CentOS),
+with a functioning gcc for compiling the various requirements.
 
 For the thumbnail generation, and image-resizing, you'll need 'ImageMagick' installed (the 'convert' command).
 
 So on CentOS:
 
-    yum install python-devel ImageMagick
+    yum install python3-devel ImageMagick
 
 or on Debian/Ubuntu:
 
-    apt-get install python-pip python-dev imagemagick
+    apt-get install python3-pip python3-dev imagemagick
 
 ## More info:
 

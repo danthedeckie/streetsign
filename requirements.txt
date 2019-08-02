@@ -1,31 +1,51 @@
+# This file is generated from requirements_raw.txt.
 # the web framework:
-flask
+Flask==1.1.1
 
 # database stuff:
-peewee
-flask-peewee
-
+peewee==3.9.6
+flask-peewee==3.0.3
 # for importing 'external data' sources:
-feedparser
-feedformatter
-tweepy
-bleach
-
+feedparser==5.2.1
+#feedformatter
+tweepy==3.8.0
+bleach==3.1.0
 # a lot of our modules are separately pulled in later:
-importlib
-
+#importlib
 # for passwords:
-py-bcrypt
-passlib
-
+py-bcrypt==0.4
+passlib==1.7.1
 # for parsing date-related formulae:
-simpleeval
-
+simpleeval==0.9.8
 # simple python-based WSGI webserver:
-waitress
-
+waitress==1.3.0
 # for tests:
-nose
-coverage
-pylint
-requests
+nose==1.3.7
+coverage==4.5.4
+pylint==2.3.1
+requests==2.22.0
+html5lib==1.0.1
+## The following requirements were added by pip freeze:
+astroid==2.2.5
+certifi==2019.6.16
+chardet==3.0.4
+Click==7.0
+idna==2.8
+isort==4.3.21
+itsdangerous==1.1.0
+Jinja2==2.10.1
+lazy-object-proxy==1.4.1
+MarkupSafe==1.1.1
+mccabe==0.6.1
+oauthlib==3.0.2
+pkg-resources==0.0.0
+PySocks==1.7.0
+requests-oauthlib==1.2.0
+six==1.12.0
+typed-ast==1.4.0
+urllib3==1.25.3
+webencodings==0.5.1
+Werkzeug==0.15.5
+wrapt==1.11.2
+wtf-peewee==3.0.0
+WTForms==2.2.1

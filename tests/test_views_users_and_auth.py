@@ -61,7 +61,7 @@ class ChangingPasswords(BasicUsersTestCase):
                                           "conf_newpass": "200"},
                                     follow_redirects=True)
 
-        self.assertIn("Permission Denied", resp.data)
+        self.assertIn(b"Permission Denied", resp.data)
 
         # and make sure the password didn't get changed!
 
@@ -78,8 +78,8 @@ class ChangingPasswords(BasicUsersTestCase):
                                           "conf_newpass": "200"},
                                     follow_redirects=True)
 
-        self.assertNotIn("Password changed", resp.data)
-        self.assertIn("You need to enter your current password", resp.data)
+        self.assertNotIn(b"Password changed", resp.data)
+        self.assertIn(b"You need to enter your current password", resp.data)
 
         usernow = User.get(id=self.user.id)
         self.assertEqual(usernow.passwordhash, self.user.passwordhash)
@@ -96,8 +96,8 @@ class ChangingPasswords(BasicUsersTestCase):
                                           "currpass": "bananas"},
                                     follow_redirects=True)
 
-        self.assertNotIn("Password changed", resp.data)
-        self.assertIn("Your current password was wrong", resp.data)
+        self.assertNotIn(b"Password changed", resp.data)
+        self.assertIn(b"Your current password was wrong", resp.data)
 
         usernow = User.get(id=self.user.id)
         self.assertEqual(usernow.passwordhash, self.user.passwordhash)
@@ -113,8 +113,8 @@ class ChangingPasswords(BasicUsersTestCase):
                                           "currpass": USERPASS},
                                     follow_redirects=True)
 
-        self.assertNotIn("Password changed", resp.data)
-        self.assertIn("Passwords don&#39;t match", resp.data)
+        self.assertNotIn(b"Password changed", resp.data)
+        self.assertIn(b"Passwords don&#39;t match", resp.data)
 
         usernow = User.get(id=self.user.id)
         self.assertEqual(usernow.passwordhash, self.user.passwordhash)
@@ -131,7 +131,7 @@ class ChangingPasswords(BasicUsersTestCase):
                                           "conf_newpass": "200"},
                                     follow_redirects=True)
 
-        self.assertIn("Password changed", resp.data)
+        self.assertIn(b"Password changed", resp.data)
 
         usernow = User.get(id=self.user.id)
         self.assertNotEqual(usernow.passwordhash, self.user.passwordhash)
@@ -154,8 +154,8 @@ class ChangingPasswords(BasicUsersTestCase):
                                           "currpass": USERPASS},
                                     follow_redirects=True)
 
-        self.assertIn("Permission Denied", resp.data)
-        self.assertEquals(resp.status_code, 403)
+        self.assertIn(b"Permission Denied", resp.data)
+        self.assertEqual(resp.status_code, 403)
 
         usernow = User.get(id=user2.id)
         self.assertEqual(usernow.passwordhash, user2.passwordhash)
@@ -178,8 +178,8 @@ class ChangingPasswords(BasicUsersTestCase):
                                           "currpass": "userpass2"},
                                     follow_redirects=True)
 
-        self.assertIn("Permission Denied", resp.data)
-        self.assertEquals(resp.status_code, 403)
+        self.assertIn(b"Permission Denied", resp.data)
+        self.assertEqual(resp.status_code, 403)
 
         usernow = User.get(id=user2.id)
         self.assertEqual(usernow.passwordhash, user2.passwordhash)
@@ -195,7 +195,7 @@ class ChangingPasswords(BasicUsersTestCase):
                                           "conf_newpass": "200"},
                                     follow_redirects=True)
 
-        self.assertIn("Password changed", resp.data)
+        self.assertIn(b"Password changed", resp.data)
 
         usernow = User.get(id=self.user.id)
         self.assertNotEqual(usernow.passwordhash, self.user.passwordhash)
@@ -211,7 +211,7 @@ class ChangingPasswords(BasicUsersTestCase):
                                           "conf_newpass": "200"},
                                     follow_redirects=True)
 
-        self.assertIn("Password changed", resp.data)
+        self.assertIn(b"Password changed", resp.data)
 
         usernow = User.get(id=self.admin.id)
         self.assertNotEqual(usernow.passwordhash, self.admin.passwordhash)
@@ -258,7 +258,7 @@ class CreatingUsersTestCase(BasicUsersTestCase):
 
         self.login(ADMINNAME, ADMINPASS)
         resp = self.post_create_request()
-        self.assertIn("You need to enter your current password", resp.data)
+        self.assertIn(b"You need to enter your current password", resp.data)
 
         with self.assertRaises(User.DoesNotExist):
             User.get(loginname="user2")
@@ -271,8 +271,8 @@ class CreatingUsersTestCase(BasicUsersTestCase):
         resp = self.post_create_request(currpass=ADMINPASS,
                                         newpass='',
                                         conf_newpass='')
-        self.assertIn("Cannot Save", resp.data)
-        self.assertIn("passwordhash", resp.data)
+        self.assertIn(b"Cannot Save", resp.data)
+        self.assertIn(b"passwordhash", resp.data)
 
         with self.assertRaises(User.DoesNotExist):
             User.get(loginname="user2")
@@ -285,7 +285,7 @@ class CreatingUsersTestCase(BasicUsersTestCase):
         resp = self.post_create_request(currpass=ADMINPASS,
                                         newpass='stuff',
                                         conf_newpass='42')
-        self.assertIn("Passwords don&#39;t match", resp.data)
+        self.assertIn(b"Passwords don&#39;t match", resp.data)
 
         with self.assertRaises(User.DoesNotExist):
             User.get(loginname="user2")
@@ -306,7 +306,7 @@ class CreatingUsersTestCase(BasicUsersTestCase):
         self.login(ADMINNAME, ADMINPASS)
         resp = self.post_create_request(currpass=ADMINPASS,
                                         newpass='not42', conf_newpass='not42')
-        self.assertIn("Username already exists", resp.data)
+        self.assertIn(b"Username already exists", resp.data)
 
         # and just make sure we didn't delete them, or set their password...
 
@@ -374,7 +374,7 @@ class DeletingUsers(BasicUsersTestCase):
     def test_admin_cannot_delete_self(self):
         self.login(ADMINNAME, ADMINPASS)
         resp = self.post_delete_request(userid=self.admin.id)
-        self.assertIn("You cannot delete yourself", resp.data)
+        self.assertIn(b"You cannot delete yourself", resp.data)
 
         User.get(id=self.admin.id)
 
@@ -446,7 +446,7 @@ class UserUpdatesTestCase(BasicUsersTestCase):
         self.login(USERNAME, USERPASS)
         resp = self.post_update_request(emailaddress='BANANA!!!!')
 
-        self.assertIn('not a valid emailaddress', resp.data)
+        self.assertIn(b'not a valid emailaddress', resp.data)
 
         usernow = User.get(id=self.user.id)
         self.assertEqual(usernow.emailaddress, 'test@streetsign.org.uk')

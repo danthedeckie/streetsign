@@ -1,0 +1,32 @@
+# the web framework:
+Flask
+
+# database stuff:
+peewee
+flask-peewee
+
+# for importing 'external data' sources:
+feedparser
+#feedformatter
+tweepy
+bleach
+
+# a lot of our modules are separately pulled in later:
+#importlib
+
+# for passwords:
+py-bcrypt
+passlib
+
+# for parsing date-related formulae:
+simpleeval
+
+# simple python-based WSGI webserver:
+waitress
+
+# for tests:
+nose
+coverage
+pylint
+requests
+html5lib

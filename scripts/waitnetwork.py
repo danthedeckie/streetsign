@@ -4,10 +4,11 @@
 Simple Python Wait for the Network to be online enough to start a server...
 '''
 
-from __future__ import print_function
+
 
 import sys
-reload(sys)
+import importlib
+importlib.reload(sys)
 sys.setdefaultencoding('utf-8')
 
 # Wait for Network...

@@ -22,7 +22,7 @@ class TestFeedModel(StreetSignTestCase):
 
     def test_repr(self):
         f = Feed(name='123')
-        self.assertEqual(str(f), '<Feed:123>')
+        self.assertEqual(repr(f), '<Feed:123>')
 
     def test_post_count_empty(self):
         f = Feed(name='123')

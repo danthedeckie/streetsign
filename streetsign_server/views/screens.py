@@ -34,7 +34,7 @@ from werkzeug import ImmutableDict
 import sqlite3
 from glob import glob
 from os.path import basename
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import streetsign_server.post_types as post_types
 from streetsign_server import app
 from streetsign_server.models import Feed, Post, Screen, ConfigVar, \
@@ -100,7 +100,7 @@ def screenedit(screenid):
         # first check that name is OK:
         try:
             oldname = screen.urlname
-            screen.urlname = urllib.quote(request.form.get('urlname'), '')
+            screen.urlname = urllib.parse.quote(request.form.get('urlname'), '')
             screen.save()
         except sqlite3.IntegrityError:
             screen.urlname = oldname
@@ -252,7 +252,7 @@ def client_alias(alias_name):
         if alias.get('scrollspeed', None):
             details.append(('scrollspeed', alias['scrollspeed']))
 
-        request.args = ImmutableDict(**dict(details + request.args.items()))
+        request.args = ImmutableDict(**dict(details + list(request.args.items())))
 
         return screendisplay(alias['screen_type'], alias['screen_name'])
 

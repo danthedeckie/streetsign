@@ -45,7 +45,7 @@ from datetime import datetime, timedelta
 from time import time, mktime
 import bleach # html stripping.
 from hashlib import md5
-from types import NoneType, BooleanType, UnicodeType
+
 try:
     import re2 as re # pylint: disable=import-error
 except ImportError:
@@ -57,7 +57,7 @@ from streetsign_server import app
 
 SECRET_KEY = app.config.get('SECRET_KEY')
 
-DB = SqliteDatabase(None, threadlocals=True)
+DB = SqliteDatabase(None)
 
 __all__ = ['DB', 'user_login', 'user_logout', 'get_logged_in_user',
            'User', 'Group', 'Post', 'Feed', 'FeedPermission', 'UserGroup',
@@ -168,7 +168,7 @@ class DBModel(Model):
             if value == re.match(self.validation_regexp.get(field, '.*'),
                                  value).group():
                 fieldtype = type(getattr(self, field))
-                if fieldtype == BooleanType and type(value) == UnicodeType:
+                if fieldtype is bool and type(value) is str:
                     setattr(self, field, value.lower() in ('true', 'yes', 'on'))
                 else:
                     setattr(self, field, value)
@@ -814,7 +814,7 @@ class Screen(DBModel):
             "zones": safe_json_load(self.zones, []),
             }
     def md5(self):
-        return md5(json.dumps(self.to_dict())).hexdigest()
+        return md5(json.dumps(self.to_dict()).encode()).hexdigest()
 
 
 '''

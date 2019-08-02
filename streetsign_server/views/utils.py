@@ -81,7 +81,7 @@ def getstr(name, default, validate='(.*)', flags=0, form=None):
         default. """
     form = form or request.form
     try:
-        return re.search(validate, unicode(form[name]), flags).groups()[0]
+        return re.search(validate, str(form[name]), flags).groups()[0]
     except AttributeError: # no matches
         return default
     except KeyError: # no key in form

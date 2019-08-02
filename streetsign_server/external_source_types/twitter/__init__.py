@@ -28,7 +28,7 @@ __MODULE__ = 'twitter'
 from flask import render_template_string, json
 from jinja2 import Template
 import tweepy
-from urllib import quote
+from urllib.parse import quote
 import re
 
 from streetsign_server.external_source_types import my
@@ -65,7 +65,7 @@ def receive(request):
     try:
         current_posts = json.loads(request.form.get('current_posts', '[]'))
     except TypeError:
-        print 'current_posts', request.form.get('current_posts', '[]')
+        print('current_posts', request.form.get('current_posts', '[]'))
 
     return {"query": request.form.get('query', ''),
 

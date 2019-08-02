@@ -1,4 +1,4 @@
-#!.virtualenv/bin/python
+#!.virtualenv/bin/python3
 # -*- coding: utf-8 -*-
 '''
     Simple run script for streetsign_server.
@@ -12,19 +12,18 @@
         (starts the server running with the waitress production server)
 '''
 
-from __future__ import print_function
+
 
 # Configuration Options:
 
-__HOST__ = u'0.0.0.0'
+__HOST__ = '0.0.0.0'
 __PORT__ = 5000
 __THREADS__ = 8 # (for waitress, only)
 
 # Initialise unicode:
 
 import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
+import importlib
 
 # Load the app:
 
