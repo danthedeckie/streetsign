@@ -38,7 +38,6 @@ lazy-object-proxy==1.4.1
 MarkupSafe==1.1.1
 mccabe==0.6.1
 oauthlib==3.0.2
-pkg-resources==0.0.0
 PySocks==1.7.0
 requests-oauthlib==1.2.0
 six==1.12.0
