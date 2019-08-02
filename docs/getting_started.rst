@@ -10,10 +10,10 @@ easy on any linux/OSX or other unixy type computer.
 System Requirements
 -------------------
 
-- Python 2.7 is recommended, but 2.6 should work too.
+- Python 3.7 (or later) is recommended, but from 3.6 should work too.
 - Python development headerfiles & capable compiler:
-  `yum install python-devel` on CentOS/RPM based distros,
-  `apt-get install python-dev` on Debian/Ubuntu
+  `yum install python3-devel` on CentOS/RPM based distros,
+  `apt-get install python3-dev` on Debian/Ubuntu
 
 It's also recommended to install ImageMagick for creating image thumbnails:
 

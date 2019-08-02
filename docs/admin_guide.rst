@@ -7,9 +7,9 @@ deployment (for real live production usage) check the :doc:`deployment` page.
 Instalation
 -----------
 
-StreetSign requires python 2.7, imagemagick (to generate thumbnails).  If you
-are installing on a fresh server, you may need to install ``python-headers``
-or ``python27-dev`` or whatever your distribution calls it.
+StreetSign requires python 3.6+, imagemagick (to generate thumbnails).  If you
+are installing on a fresh server, you may need to install ``python3-headers``
+or ``python3-dev`` or whatever your distribution calls it.
 
 (On a stock OSX computer, it doesn't need anything.)
 

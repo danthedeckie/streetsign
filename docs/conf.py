@@ -7,7 +7,7 @@
 import sys
 import os
 
-sys.path.append("../.virtualenv/lib/python2.7/site-packages/")
+sys.path.append("../.virtualenv/lib/python3.7/site-packages/")
 sys.path.append("../")
 sys.path.append(os.path.dirname(__file__))
 
@@ -21,7 +21,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'StreetSign'
-copyright = '2013, Daniel Fairhead'
+copyright = '2013-2019, Daniel Fairhead'
 
 version = '0.5'
 # The full version, including alpha/beta/rc tags.
