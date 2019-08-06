@@ -6,8 +6,10 @@ A digital signage system, inspired by Concerto, however written in Flask/Peewee/
 with a simpler basis.  This project was originally written for Teenstreet 2013 in Germany
 (http://www.teenstreet.de).
 
-Although this has been used at a large conference, it's still very much work in progress,
-so if you do use it, expect changes in the future, and some features missing.
+Although this has been used at large conferences, it's been developed in a
+"quick hack" way, and then with incremental fixes and features added.  It could
+really do with a full re-write, but actually does surprisingly well for what
+it is.
 
 There is a full documentation in progress at [streetsign.readthedocs.org](http://streetsign.readthedocs.org/en/latest/)
 
