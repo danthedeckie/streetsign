@@ -108,7 +108,7 @@ def receive(data):
             full_path = pathjoin(image_path(), filename)
 
             try:
-                print data['url']
+                print(data['url'])
                 run_local_script('getexternalimage.sh',
                                  data['url'],
                                  full_path)

@@ -23,7 +23,7 @@
     brings in all the main views from the other files.
 
 '''
-from __future__ import print_function
+
 from flask import render_template, g, Response, url_for
 
 ##########################

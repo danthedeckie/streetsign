@@ -7,7 +7,7 @@
 import sys
 import os
 
-sys.path.append("../.virtualenv/lib/python2.7/site-packages/")
+sys.path.append("../.virtualenv/lib/python3.7/site-packages/")
 sys.path.append("../")
 sys.path.append(os.path.dirname(__file__))
 
@@ -20,8 +20,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'StreetSign'
-copyright = u'2013, Daniel Fairhead'
+project = 'StreetSign'
+copyright = '2013-2019, Daniel Fairhead'
 
 version = '0.5'
 # The full version, including alpha/beta/rc tags.
@@ -138,8 +138,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'StreetSign.tex', u'StreetSign Documentation',
-   u'Daniel Fairhead', 'manual'),
+  ('index', 'StreetSign.tex', 'StreetSign Documentation',
+   'Daniel Fairhead', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -168,8 +168,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'streetsign', u'StreetSign Documentation',
-     [u'Daniel Fairhead'], 1)
+    ('index', 'streetsign', 'StreetSign Documentation',
+     ['Daniel Fairhead'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -182,8 +182,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'StreetSign', u'StreetSign Documentation',
-   u'Daniel Fairhead', 'StreetSign', 'One line description of project.',
+  ('index', 'StreetSign', 'StreetSign Documentation',
+   'Daniel Fairhead', 'StreetSign', 'One line description of project.',
    'Miscellaneous'),
 ]
 

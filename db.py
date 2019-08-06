@@ -1,4 +1,4 @@
-#!.virtualenv/bin/python -i
+#!.virtualenv/bin/python3
 
 '''
 A set of useful database bits and pieces for StreetSign.
@@ -63,7 +63,7 @@ def make():
     Screen(urlname='Default').save()
 
 if __name__ == '__main__':
-    print 'welcome to the database shell.'
-    print 'type:  make() to make default data'
-    print 'or init() to connect to the database for interative work.'
-    print 'dir() will show you the available functions and models'
+    print('welcome to the database shell.')
+    print('type:  make() to make default data')
+    print('or init() to connect to the database for interative work.')
+    print('dir() will show you the available functions and models')

@@ -73,7 +73,7 @@ between Ubuntu 14 and Ubuntu 15, for instance.
 There are startup files in the streetsign source, in the ``deployment`` folder.
 
 systemd systems (Ubuntu 15.x, CentOS 7, Debian Jessie, etc)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you're on a systemd based linux (Such as Ubuntu 15.x),
 then copy the ``deployment/systemd/streetsign.service`` file to ``/var/systemd/system``,
@@ -98,7 +98,7 @@ Logs for streetsign can then be found using the normal systemd logging utils::
     journalctl -u streetsign.service
 
 (Recent) upstartd systems (Ubuntu 14.x, etc)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Copy the streetsign upstart configuration file to ``/etc/init``::
 
@@ -120,7 +120,7 @@ The streetsign log file can be found with the rest of the upstart log files at::
 
 
 SysV (initscript) systems (CentOS 6.x, etc.)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There's a basic (hopefully OK) init script in ``deployment/init``, which should work on many
 other systems.  So just copy it in::

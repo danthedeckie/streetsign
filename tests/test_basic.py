@@ -24,8 +24,8 @@ class TestSetup(StreetSignTestCase):
         ''' test that with the new database, there are no posts. '''
 
         request = self.client.get('/')
-        assert 'Dashboard' in request.data # it is the front page
-        assert 'Login' in request.data # not logged in
+        assert b'Dashboard' in request.data # it is the front page
+        assert b'Login' in request.data # not logged in
 
         u = models.User.create(name='test user',
                                loginname='test',
@@ -39,7 +39,7 @@ class TestSetup(StreetSignTestCase):
         with self.ctx():
             request = self.client.get('/posts/')
 
-        assert '<span class="post_count">No Posts at all!' in request.data
+        assert b'<span class="post_count">No Posts at all!' in request.data
 
 class TestDB(StreetSignTestCase):
     ''' test basic database interactions '''

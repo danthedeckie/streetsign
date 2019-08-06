@@ -178,7 +178,7 @@ class TestLifetimesPostedWithOffsets(TestLifetimes):
             resp = self.client.get(url_for('feedpage', feedid=self.feed.id))
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn(self.feed.name, resp.data)
+            self.assertIn(self.feed.name.encode(), resp.data)
 
             resp = self.client.post(url_for('post_new', feed_id=self.feed.id),
                                     data={"post_type":"html",

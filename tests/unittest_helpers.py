@@ -8,7 +8,7 @@ import sys
 import os
 import unittest
 import html5lib
-from peewee import SqliteDatabase, create_model_tables
+from peewee import SqliteDatabase
 from flask import json
 
 sys.path.append(os.path.dirname(__file__) + '/..')
@@ -50,7 +50,7 @@ class StreetSignTestCase(unittest.TestCase):
 
         streetsign_server.app.config['TESTING'] = True
 
-        models.DB = SqliteDatabase(None, threadlocals=True, autocommit=False)
+        models.DB = SqliteDatabase(None)
         models.DB.init(streetsign_server.app.config['DATABASE_FILE'])
 
         model_list = []
@@ -63,8 +63,7 @@ class StreetSignTestCase(unittest.TestCase):
             except AttributeError:
                 pass
 
-        create_model_tables(model_list)
-        models.DB.set_autocommit(False)
+        models.DB.create_tables(model_list)
 
         self.client = streetsign_server.app.test_client()
 
@@ -91,13 +90,13 @@ class StreetSignTestCase(unittest.TestCase):
             except Exception as e:
                 lineno = parser.errors[0][0][0] - 1
 
-                print 'HTML Parse Error, %s, %s:' % parser.errors[0][0]
-                print '----------------:', parser.errors[0][1]
-                print '----------------:', parser.errors[0][2]
+                print('HTML Parse Error, %s, %s:' % parser.errors[0][0])
+                print('----------------:', parser.errors[0][1])
+                print('----------------:', parser.errors[0][2])
 
-                print '\n    '.join(request.data.split('\n')[lineno-3: lineno])
-                print '-->', request.data.split('\n')[lineno]
-                print '\n    ' + ('\n    '.join(request.data.split('\n')[lineno+1: lineno+3]))
+                print('\n    '.join(request.data.split('\n')[lineno-3: lineno]))
+                print('-->', request.data.split('\n')[lineno])
+                print('\n    ' + ('\n    '.join(request.data.split('\n')[lineno+1: lineno+3])))
 
                 raise e
 
@@ -106,7 +105,7 @@ class StreetSignTestCase(unittest.TestCase):
 
 
         if code != request.status_code:
-            print request.data
+            print(request.data)
             raise WrongHTTPCode(url, code, request.status_code)
 
     def login(self, username, password):

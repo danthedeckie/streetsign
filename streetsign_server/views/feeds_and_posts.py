@@ -32,7 +32,7 @@ from datetime import timedelta
 from flask import render_template, url_for, request, redirect, \
                   flash, json, jsonify, make_response
 import peewee
-from feedformatter import Feed as RSSFeed
+#from feedformatter import Feed as RSSFeed
 import bleach
 
 import streetsign_server.user_session as user_session
@@ -275,7 +275,7 @@ def post_new(feed_id):
                 if post_type in all_posttypes:
                     allowed_post_types.append(all_posttypes[post_type])
         else:
-            allowed_post_types = all_posttypes.values()
+            allowed_post_types = list(all_posttypes.values())
 
         # return the page:
 
