@@ -1,0 +1,36 @@
+/* Layout Editor */
+#layout_box {
+    border: 2px solid black;
+    width: 100%;
+    height: 100%;
+    background: #222;
+    position:relative;
+}
+
+#layout_box .zone {
+    border: 2px solid red;
+    background: #888;
+    position: absolute;
+    text-align: center;
+}
+
+#zone_mover {
+    position: absolute;
+    border: 5px dashed pink;
+    padding: 10px;
+}
+#zone_resizer_bg {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(255,255,0,0.1);
+}
+
+.zone_resizer {
+    background: #0ff;
+    position: absolute;
+    height: 15px;
+    width: 15px;
+}
