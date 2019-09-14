@@ -1,0 +1,15 @@
+{% load i18n %}
+<h1>Feeds</h1>
+
+{% for feed in feeds %}
+    <h2><a href="{{ feed.get_absolute_url }}">{{ feed.name }}</a></h2>
+{% empty %}
+    <h2>{% trans "No Feeds" %}</h2>
+{% endfor %}
+
+<h1>{% trans "Create a New Feed" %}</h1>
+<form method=POST>
+    {% csrf_token %}
+    {{ newfeedform }}
+    <button type="Submit">Create</button>
+</form>

@@ -7,3 +7,4 @@ config.py
 database.db
 streetsign_server/static/user_files
 *.bak
+streetsign/db.sqlite3
