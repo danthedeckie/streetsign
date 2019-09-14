@@ -1,4 +1,6 @@
+{% extends "_base.html" %}
 {% load i18n %}
+{% block content %}
 <h1>Feeds</h1>
 
 {% for feed in feeds %}
@@ -10,6 +12,9 @@
 <h1>{% trans "Create a New Feed" %}</h1>
 <form method=POST>
     {% csrf_token %}
+    <div class="form-group">
     {{ newfeedform }}
+    </div>
     <button type="Submit">Create</button>
 </form>
+{% endblock %}

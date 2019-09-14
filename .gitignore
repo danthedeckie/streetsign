@@ -1,5 +1,6 @@
 .setup/virtualenv-1.9.1
 .virtualenv
+.DS_Store
 *.pyc
 *.pyo
 *.swp
