@@ -18,7 +18,7 @@ passlib==1.7.1
 # for parsing date-related formulae:
 simpleeval==0.9.8
 # simple python-based WSGI webserver:
-waitress==1.4.2
+waitress==1.4.3
 # for tests:
 nose==1.3.7
 coverage==4.5.4
