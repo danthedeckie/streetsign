@@ -9,7 +9,7 @@ flask-peewee==3.0.3
 feedparser==5.2.1
 #feedformatter
 tweepy==3.8.0
-bleach==3.1.0
+bleach==3.1.1
 # a lot of our modules are separately pulled in later:
 #importlib
 # for passwords:
