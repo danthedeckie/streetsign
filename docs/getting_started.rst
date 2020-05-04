@@ -44,6 +44,21 @@ and re-run `./setup.sh`.
 This rest of this document hopes to make the different concepts and terminology clear, so
 that you can be up to speed as quickly as possible.
 
+Using Docker
+------------
+
+This project is also available as a docker image on the Docker Hub. You can pull it with::
+
+    docker pull streetsign/streetsign-server:alpine
+
+for an image based on Alpine OS or
+
+    docker pull streetsign/streetsign-server:basic
+
+for an image based on CentOS. You can create a new container from the pulled image with::
+
+    docker run streetsign/streetsign-server:<tag>
+
 Basic Overview
 --------------
 
