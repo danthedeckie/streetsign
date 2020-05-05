@@ -34,6 +34,25 @@ for production deployment, you can run:
 
 to run the server using the waitress WSGI server, or you can use any other WSGI server of your choice.  It is recommended for 'big' deployments that you use nginx or a similar reverse proxy in front of the WSGI server, and also that you serve the static folder (javascript, css, pictures, etc) statically.
 
+## Docker:
+
+This project is also available as a docker image, see [streetsign/streetsign-server](https://hub.docker.com/r/streetsign/streetsign-server) on Docker Hub.
+Type
+
+    docker pull streetsign/streetsign-server:alpine
+
+to download an image based on [Alpine Linux](https://alpinelinux.org/). Or type
+
+    docker pull streetsign/streetsign-server:basic
+
+to download an image based on CentOS.
+
+    docker run streetsign/streetsign-server:<tag>
+
+will start the container. Alternatively you can checkout this project and build the image yourself
+
+    docker build .
+
 ## Requirements:
 
 Most packages will be installed by the ./setup.sh script into a folder called .virtualenv.
