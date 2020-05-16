@@ -63,6 +63,10 @@ div.zone {
     bottom: 0px;
 }
 
+.zone_ .post_html .post_inner.post_reset_fontsize, .zone_fade .post_html .post_inner.post_reset_fontsize {
+    font-size: 0px;
+}
+
 .text_dropshadow {
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
 }
