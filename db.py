@@ -62,8 +62,13 @@ def make():
 
     Screen(urlname='Default').save()
 
+def run_migrations():
+    ''' run migrations, configured in modles.py '''
+    migrations()
+
 if __name__ == '__main__':
     print('welcome to the database shell.')
     print('type:  make() to make default data')
     print('or init() to connect to the database for interative work.')
     print('dir() will show you the available functions and models')
+    print('run_migrate() will run migrations on the database.')

@@ -12,6 +12,7 @@
 <table class="table table-striped">
 	<thead>
 		<tr>
+			<th>Title</th>
 			<th>Content</th>
 			<th>Author</th>
 			<th>Feed</th>
@@ -40,7 +41,8 @@
 		{% for post in posts|sort(attribute="active_end") %}
 			<tr class="time_{{- post.active_status() }} item 
 			    {{ 'un' if not post.published}}published"
-			    data-uri="{{ url_for('postpage', postid=post.id) }}" >
+				data-uri="{{ url_for('postpage', postid=post.id) }}" >
+				<td>{{ linkmacros.post_title(post) }}</td>
 				<td>{{ linkmacros.post(post) }}</td>
 				<td>
 					{% if post.author %}

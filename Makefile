@@ -1,3 +1,5 @@
+.PHONY: migrate
+
 _INSTRUCTIONS:
 	echo 'make all, or make clean.'
 
@@ -21,3 +23,5 @@ requirements.txt: requirements_raw.txt
 	echo '# This file is generated from requirements_raw.txt.' > requirements.txt
 	./.virtualenv/bin/pip freeze -r requirements_raw.txt >> requirements.txt
 
+migrate:
+	echo 'run_migrations()' | ./.virtualenv/bin/python3 -i db.py
