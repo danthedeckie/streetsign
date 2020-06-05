@@ -16,7 +16,7 @@ bleach==3.1.4
 py-bcrypt==0.4
 passlib==1.7.1
 # for parsing date-related formulae:
-simpleeval==0.9.8
+simpleeval==0.9.10
 # simple python-based WSGI webserver:
 waitress==1.4.3
 # for tests:
