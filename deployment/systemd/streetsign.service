@@ -1,8 +1,8 @@
 [Unit]
-description=Streetsign Digital Signage Server
+Description=Streetsign Digital Signage Server
 
 [Service]
-Type=Simple
+Type=simple
 WorkingDirectory=/srv/streetsign
 ExecStart=/srv/streetsign/run.py waitress
 User=streetsign

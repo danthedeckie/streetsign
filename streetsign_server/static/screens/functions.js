@@ -129,7 +129,7 @@ function magic_time() {
         this.innerHTML = d.format(format);
     });
     $('.magic_date').each(function(i){
-        var format = $(this).data('format') || '%F';
+        var format = $(this).data('format') || '%d/%m/%Y';
         this.innerHTML = d.format(format); // Date().replace(/:[^:]*$/,'');
     });
     setTimeout(magic_time, 60000);
