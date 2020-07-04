@@ -62,6 +62,7 @@ def make():
 
     Screen(urlname='Default').save()
 
+
 def run_migrations():
     ''' run migrations, configured in modles.py '''
     migrations()
