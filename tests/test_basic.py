@@ -58,6 +58,7 @@ class TestDB(StreetSignTestCase):
         u.set_password('test pass')
 
         p = models.Post.create(feed=f,
+                               title='test',
                                type='html',
                                content='{"content":"text"}',
                                author=u)

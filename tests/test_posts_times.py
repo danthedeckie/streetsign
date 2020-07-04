@@ -46,7 +46,7 @@ class TestLifetimes(StreetSignTestCase):
 
     def create_post(self, **kwargs):
         ''' create a post, return it '''
-        p = models.Post.create(feed=self.feed, type='html',
+        p = models.Post.create(feed=self.feed, title='test', type='html',
                                content='{"content":"text"}', author=self.user,
                                **kwargs)
 
@@ -182,6 +182,7 @@ class TestLifetimesPostedWithOffsets(TestLifetimes):
 
             resp = self.client.post(url_for('post_new', feed_id=self.feed.id),
                                     data={"post_type":"html",
+                                          "post_title": "test",
                                           "content": "{'content':'test'}",
                                           "active_start": models.now(),
                                           "active_end": models.now() + \
