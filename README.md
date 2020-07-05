@@ -34,6 +34,14 @@ for production deployment, you can run:
 
 to run the server using the waitress WSGI server, or you can use any other WSGI server of your choice.  It is recommended for 'big' deployments that you use nginx or a similar reverse proxy in front of the WSGI server, and also that you serve the static folder (javascript, css, pictures, etc) statically.
 
+## Updating:
+
+These are the steps if you have used StreetSign in the past and want to update to a newer version:
+- Backup `database.db` and `config.py`.
+- Pull the new version or download it.
+- Run `make migrate` to update the database to the latest version.
+- Run `./run.py` or `./run.py waitress` depending on your needs.
+
 ## Requirements:
 
 Most packages will be installed by the ./setup.sh script into a folder called .virtualenv.

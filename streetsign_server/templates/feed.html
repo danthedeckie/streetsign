@@ -6,6 +6,7 @@
 <table class="table table-striped">
 <thead>
   <tr>
+    <th>Title</th>
     <th>Post</th>
     <th>Author</th>
     <th>Date</th>
@@ -17,6 +18,7 @@
 {% for post in feed.posts|sort(attribute="active_end") %}
     <tr class="item time_{{- post.active_status() }} {{ 'un' if not post.published}}published"
      data-uri="{{ url_for('postpage', postid=post.id) }}">
+        <td>{{ linkmacros.post_title(post) }}</td>
         <td>{{ linkmacros.post(post) }}</td>
         <td>{{ linkmacros.user(post.author) }}</td>
         <td><b>Written:</b> {{ post.write_date.date() }}<br/>

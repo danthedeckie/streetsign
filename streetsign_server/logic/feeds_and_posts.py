@@ -128,6 +128,7 @@ def post_form_intake(post, form, editor):
         NOTE: this actually modifies the post it is sent!
     '''
 
+    post.title = form['post_title']
     post.content = json.dumps(editor.receive(form))
 
     post.status = 0 # any time a post is edited, remove it from archive.

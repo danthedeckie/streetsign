@@ -286,6 +286,11 @@ def post_new(feed_id):
                                post_types=allowed_post_types)
 
     else: # POST. new post!
+        if not request.form.get('post_title', '').strip():
+            flash("I'm not making you an un-named post!")
+            return redirect(url_for('posts'))
+
+        post_title = request.form.get('post_title').strip()
         post_type = request.form.get('post_type')
         try:
             post_type_module = post_types.load(post_type)
@@ -297,7 +302,7 @@ def post_new(feed_id):
             flash('sorry! this post type is not allowed in this feed!')
             return redirect(request.referrer if request.referrer else '/')
 
-        post = Post(type=post_type, author=user)
+        post = Post(title=post_title, type=post_type, author=user)
 
         try:
             post.feed = feed

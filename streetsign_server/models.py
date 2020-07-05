@@ -45,6 +45,7 @@ from datetime import datetime, timedelta
 from time import time, mktime
 import bleach # html stripping.
 from hashlib import md5
+from playhouse.migrate import *
 
 try:
     import re2 as re # pylint: disable=import-error
@@ -58,11 +59,12 @@ from streetsign_server import app
 SECRET_KEY = app.config.get('SECRET_KEY')
 
 DB = SqliteDatabase(None)
+MIGRATOR = SqliteMigrator(DB)
 
 __all__ = ['DB', 'user_login', 'user_logout', 'get_logged_in_user',
            'User', 'Group', 'Post', 'Feed', 'FeedPermission', 'UserGroup',
            'ConfigVar', 'Screen', 'config_var', 'UserSession', 'ExternalSource',
-           'init', 'create_all', 'by_id']
+           'init', 'create_all', 'by_id', 'migrations']
 
 
 '''
@@ -121,6 +123,29 @@ def create_all(dbfile=False):
 def by_id(model, ids):
     ''' returns a list of objects, selected by id (list) '''
     return [x for x in model.select().where(model.id << [int(i) for i in ids])]
+
+
+'''
+--------------------------------------------------------------------------------
+Migrations
+--------------------------------------------------------------------------------
+'''
+
+
+def migrations(dbfile=False):
+    # http://docs.peewee-orm.com/en/latest/peewee/playhouse.html#migrate
+    init(dbfile)
+
+    # Migration 1: add post title
+    post_fields = DB.get_columns('Post')
+    post_field_names = [x[0] for x in post_fields]  # 0: name of column
+
+    if 'title' not in post_field_names:
+        post_title = TextField(default='')
+        migrate(
+            MIGRATOR.add_column('Post', 'title', post_title)
+        )
+
 
 '''
 --------------------------------------------------------------------------------
@@ -604,6 +629,7 @@ class Post(DBModel):
         of post can be added quite easily later, without changing the
         schema. '''
 
+    title = TextField()  #: used to easily identify the post
     type = TextField() #: used to load the content-type module for this post
     content = TextField() #: JSON data sent to the content-type module
     feed = ForeignKeyField(Feed, related_name='posts') #: which feed
@@ -670,6 +696,7 @@ class Post(DBModel):
         ''' must give all info, for use on screens, etc. '''
         return (
             {'id': self.id,
+             'title': self.title,
              'type': self.type,
              'content': safe_json_load(self.content, {}),
              'time_restrictions': safe_json_load(self.time_restrictions, []),
