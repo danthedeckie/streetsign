@@ -27,7 +27,7 @@ requests==2.22.0
 html5lib==1.0.1
 ## The following requirements were added by pip freeze:
 astroid==2.2.5
-certifi==2019.6.16
+certifi==2022.12.7
 chardet==3.0.4
 Click==7.0
 idna==2.8
